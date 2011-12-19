@@ -1,6 +1,4 @@
 #labels start,canvas,c
-#What is Canvas++?
-
 = Introduction =
 
 What is Canvas++?
@@ -25,4 +23,3 @@ Why Canvas++?
 
 Although many devices have a screen in common (most of them have a web browser as well) there is no standard native way to draw on the screen.  
 The canvas++ will allow C++ programmers to collaborate and have the same standard interface used on the web to drawing on the screen.
-
