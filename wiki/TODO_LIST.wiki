@@ -5,10 +5,9 @@ The basic implementation needs a way to set the color used on
 lines and shapes.
 
 
-* FillStyle  class , fillStyle property
-
-* Parser "rgb(255,255,255)" (fillStyle implementation)
-* Parser "rgba(255,255,255, 0.1)" (fillStyle implementation)
+  * FillStyle  class , fillStyle property
+  * Parser "rgb(255,255,255)" (fillStyle implementation)
+  * Parser "rgba(255,255,255, 0.1)" (fillStyle implementation)
 
 
 bool ParserColor(const char* psz, Color& color)
@@ -16,6 +15,7 @@ bool ParserColor(const char* psz, Color& color)
   return true; //ok
 }
 
+{{{
 //Sample
 
 auto ctx = canvas.getContext("2d");  
@@ -25,3 +25,4 @@ ctx.fillRect (10, 10, 55, 50);
   
 ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
 ctx.fillRect (30, 30, 55, 50);  
+}}}
