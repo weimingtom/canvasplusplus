@@ -20,11 +20,37 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-
+#include <string>
 
 
 namespace CanvasPlus //Better name?
 {
+    //The possible values are start, end, left, right, and center.
+    enum TextAlign
+    {
+        TextAlignStart,
+        TextAlignEnd,
+        TextAlignLeft,
+        TextAlignRight,
+        TextAlignCenter,
+    };
+    //struct TextAlign 
+    //{
+    //TextAlign operator = (TextAlign& textAlign, const char*);
+    //};
+    
+
+    enum TextBaseline
+    {
+        TextBaselineTop , //The top of the em square
+        TextBaselineHanging, //The hanging baseline
+        TextBaselineMiddle , //The middle of the em square
+        TextBaselineAlphabetic ,//The alphabetic baseline
+        TextBaselineIdeographic , //The ideographic baseline
+        TextBaselineBottom  //The bottom of the em square
+    };
+
+
     //TODO
     struct CanvasGradient
     {
@@ -38,6 +64,20 @@ namespace CanvasPlus //Better name?
         // opaque object
     };
 
+    struct Font
+    {
+      friend class CanvasRenderingContext2D;
+      void* m_pNativeObject;
+
+    public:
+        Font();
+        ~Font();
+
+        bool italic;
+        bool bold;
+        std::wstring name;
+    };
+
     //Local representation of color
     struct Color
     {
@@ -47,11 +87,20 @@ namespace CanvasPlus //Better name?
         int a;
     };
 
-    void ParserColor(const char* psz, Color& );
+    void ParserColor(const char* psz, Color&);
+
+    struct TextMetrics
+    {
+        const double width;
+        TextMetrics(double w) : width(w)
+        {
+        }
+    };
+
 
     class FillStyle
     {
-      
+
     public:
         //TODO variant type?
         Color m_Color;
@@ -82,17 +131,25 @@ namespace CanvasPlus //Better name?
         void* m_pNativeHandle;
         CanvasRenderingContext2D(void*);
 
+        int ToPixelX(double);
+        int ToPixelY(double);
+
     public:
         ~CanvasRenderingContext2D();
 
         // rects
         void fillRect(double x, double y, double w, double h);
-        
+
         //fillStyle
         FillStyle fillStyle;
         FillStyle strokeStyle;
 
-        //TODO
+        void fillText(const wchar_t*, double x, double y);
+
+        TextAlign textAlign;
+        TextBaseline textBaseline;
+        Font font;
+        TextMetrics measureText(const wchar_t*);
     };
 
     class Canvas

@@ -11,11 +11,15 @@ void Sample1(Canvas& canvas)
   auto ctx = canvas.getContext("2d");
   ctx.fillStyle = "rgb(255, 200, 200)";
   ctx.fillRect(10, 10, 50, 50);
+  
+  ctx.textBaseline = CanvasPlus::TextBaselineBottom;
+  ctx.fillStyle = "rgb(0, 0, 0)";
+  ctx.fillText(L"teste", 10,10);
 }
 
 void Sample2(Canvas& canvas)
 {
   auto ctx = canvas.getContext("2d");
-  ctx.fillStyle = "rgb(255, 200, 200)";
+  //ctx.setFillStyle("rgb(255, 200, 200)");
   ctx.fillRect(10, 10, 50, 50);
 }
