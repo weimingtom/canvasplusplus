@@ -1,6 +1,11 @@
 ==TODO LIST==
 
 
+Better directory organization.
+
+
+----
+
 The basic implementation needs a way to set the color used on 
 lines and shapes.
 
