@@ -60,14 +60,11 @@ CanvasPlus::CanvasRenderingContext2D& CanvasPlus::Canvas::getContext(const char*
 }
 
 CanvasPlus::CanvasRenderingContext2D::CanvasRenderingContext2D(void* p)
-    : m_pNativeHandle(p)
+    : m_pNativeHandle(p)      
 {
-    //"When the context is created, the textAlign attribute must
-    //initially have the value start."
-    textAlign = CanvasPlus::TextAlignStart;
+   
     //
-    //"the textBaseline attribute must initially have the value alphabetic."
-    textBaseline = CanvasPlus::TextBaselineAlphabetic;
+
 }
 
 CanvasPlus::CanvasRenderingContext2D::~CanvasRenderingContext2D()
@@ -91,12 +88,14 @@ void CanvasPlus::CanvasRenderingContext2D::fillRect(double x, double y, double w
 
 int CanvasPlus::CanvasRenderingContext2D::ToPixelX(double x)
 {
-    return x;
+    //TODO
+    return (int) x;
 }
 
 int CanvasPlus::CanvasRenderingContext2D::ToPixelY(double y)
 {
-    return y;
+    //TODO
+    return (int) y;
 }
 
 UINT TextAlignToWindowsFlags(CanvasPlus::TextAlign textAlign,
