@@ -18,8 +18,9 @@
         Sample1(context);
     }
 
-    function Sample1(ctx) {
-        ctx.fillStyle = "rgb(255, 200, 200)";
+    function Sample1(ctx)
+ {
+         ctx.fillStyle = "rgb(255, 200, 200)";
   ctx.fillRect(10, 10, 50, 50);
   
   ctx.textBaseline = "bottom";
@@ -32,6 +33,10 @@
 
   ctx.textAlign = "left";  
   ctx.fillText("teste", 10+50, 10);
+
+  ctx.strokeRect(30,30,40,40);
+  ctx.moveTo(30,30);
+  ctx.lineTo(30+40,30+40);
     }
 
 </script>

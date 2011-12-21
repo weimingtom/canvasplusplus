@@ -22,6 +22,11 @@ void Sample1(Canvas& canvas)
 
   ctx.textAlign = "left";  
   ctx.fillText(L"teste", 10+50, 10);
+
+  ctx.strokeRect(30,30,40,40);
+
+  ctx.moveTo(30,30);
+  ctx.lineTo(30+40,30+40);
 }
 
 void Sample2(Canvas& canvas)

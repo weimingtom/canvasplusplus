@@ -211,17 +211,24 @@ namespace CanvasPlus //Better name?
 
         // rects
         void fillRect(double x, double y, double w, double h);
+        void strokeRect(double x, double y, double w, double h);
 
         //fillStyle
         FillStyle fillStyle;
         FillStyle strokeStyle;
 
         void fillText(const wchar_t*, double x, double y);
+        
 
         TextAlign textAlign;
         TextBaseline textBaseline;
         Font font;
         TextMetrics measureText(const wchar_t*);
+        double lineWidth;
+
+        void moveTo(double x, double y);
+        void lineTo(double x, double y);
+
     };
 
     class Canvas

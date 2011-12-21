@@ -62,9 +62,8 @@ CanvasPlus::CanvasRenderingContext2D& CanvasPlus::Canvas::getContext(const char*
 CanvasPlus::CanvasRenderingContext2D::CanvasRenderingContext2D(void* p)
     : m_pNativeHandle(p)      
 {
-   
-    //
-
+    //"When the context is created, the lineWidth attribute must initially have the value 1.0."
+    lineWidth = 1.0;
 }
 
 CanvasPlus::CanvasRenderingContext2D::~CanvasRenderingContext2D()
@@ -85,6 +84,28 @@ void CanvasPlus::CanvasRenderingContext2D::fillRect(double x, double y, double w
     COLORREF color = RGB(fillStyle.m_Color.r, fillStyle.m_Color.g, fillStyle.m_Color.b);
     FillSolidRect(hdc, &rect, color);
 }
+
+void CanvasPlus::CanvasRenderingContext2D::strokeRect(double x, double y, double w, double h)
+{
+    //------------------------------
+    HDC hdc = (HDC) m_pNativeHandle;
+    //-------------------------------
+    //TODO waiting for transformations..
+    RECT rect = {(LONG)x, (LONG)y, (LONG)(x + w), (LONG)(y + h)};
+    COLORREF color = RGB(fillStyle.m_Color.r, fillStyle.m_Color.g, fillStyle.m_Color.b);
+    //DrawRect(hdc, &rect, color);
+
+  HPEN hpen = CreatePen(PS_SOLID, lineWidth, color); //TODO
+  HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
+  HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, GetStockObject(HOLLOW_BRUSH));
+  //
+  ::Rectangle(hdc, (LONG)x, (LONG)y, (LONG)(x + w), (LONG)(y + h));
+  //
+  SelectObject(hdc, oldPen);
+  SelectObject(hdc, oldBrush );
+}
+
+
 
 int CanvasPlus::CanvasRenderingContext2D::ToPixelX(double x)
 {
@@ -168,6 +189,33 @@ CanvasPlus::TextMetrics CanvasPlus::CanvasRenderingContext2D::measureText(const 
   SIZE sz;
   ::GetTextExtentPoint(hdc, psz, wcslen(psz), &sz);
   return TextMetrics(sz.cx);
+}
+
+void CanvasPlus::CanvasRenderingContext2D::moveTo(double x, double y)
+{
+  //------------------------------
+  HDC hdc = (HDC) m_pNativeHandle;
+  //-------------------------------
+  const int ix = ToPixelX(x);
+  const int iy = ToPixelY(y);
+  ::MoveToEx(hdc, ix, iy, NULL);
+}
+
+void CanvasPlus::CanvasRenderingContext2D::lineTo(double x, double y)
+{
+  //------------------------------
+  HDC hdc = (HDC) m_pNativeHandle;
+  //-------------------------------
+  const int ix = ToPixelX(x);
+  const int iy = ToPixelY(y);
+
+  COLORREF color = RGB(fillStyle.m_Color.r, fillStyle.m_Color.g, fillStyle.m_Color.b);
+  HPEN hpen = CreatePen(PS_SOLID, lineWidth, color); //TODO
+  HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
+  //
+  ::LineTo(hdc, ix, iy);
+  //
+  SelectObject(hdc, oldPen);
 }
 
 void CanvasPlus::CanvasRenderingContext2D::fillText(const wchar_t* psz, double x, double y)
