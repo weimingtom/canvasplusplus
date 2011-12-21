@@ -26,7 +26,7 @@
 namespace CanvasPlus //Better name?
 {
     //The possible values are start, end, left, right, and center.
-    enum TextAlign
+    enum TextAlignEnum
     {
         TextAlignStart,
         TextAlignEnd,
@@ -34,13 +34,40 @@ namespace CanvasPlus //Better name?
         TextAlignRight,
         TextAlignCenter,
     };
-    //struct TextAlign 
-    //{
-    //TextAlign operator = (TextAlign& textAlign, const char*);
-    //};
-    
 
-    enum TextBaseline
+    TextAlignEnum ParseTextAlign(const char* psz);
+
+    
+    struct TextAlign
+    {
+      TextAlignEnum m_Value;
+
+      TextAlign()
+      {
+         //"When the context is created, the textAlign attribute must
+        //initially have the value start."
+         m_Value = CanvasPlus::TextAlignStart;
+      }
+
+      TextAlign & operator = (const char* psz)
+      {
+        m_Value = ParseTextAlign(psz);
+        return *this;
+      }
+
+      /*TextAlign & operator = (TextAlignEnum e)
+      {
+        m_Value = e;
+        return *this;
+      }*/
+
+      operator TextAlignEnum() const
+      {
+        return m_Value;
+      }
+    };
+
+    enum TextBaselineEnum
     {
         TextBaselineTop , //The top of the em square
         TextBaselineHanging, //The hanging baseline
@@ -50,6 +77,38 @@ namespace CanvasPlus //Better name?
         TextBaselineBottom  //The bottom of the em square
     };
 
+    TextBaselineEnum ParseTextBaseline(const char* psz);
+  
+
+    struct TextBaseline
+    {
+      TextBaselineEnum m_Value;
+
+      TextBaseline()
+      {
+        //"the textBaseline attribute must initially have the value alphabetic."
+        m_Value = CanvasPlus::TextBaselineAlphabetic;
+      }
+
+      TextBaseline & operator = (const char* psz)
+      {
+        m_Value = ParseTextBaseline(psz);
+        
+        
+        return *this;
+      }
+
+      /*TextBaseline & operator = (TextBaselineEnum e)
+      {
+        m_Value = e;
+        return *this;
+      }*/
+
+      operator TextBaselineEnum() const
+      {
+        return m_Value;
+      }
+    };
 
     //TODO
     struct CanvasGradient
@@ -85,6 +144,13 @@ namespace CanvasPlus //Better name?
         int g;
         int b;
         int a;
+        Color()
+        {
+          r = 0;
+          g = 0;
+          b = 0;
+          a = 0;
+        }
         Color(const char*);
     };
 
@@ -105,6 +171,11 @@ namespace CanvasPlus //Better name?
     public:
         //TODO variant type?
         Color m_Color;
+
+        FillStyle()
+        {
+          
+        }
 
         FillStyle& operator = (const char* color)
         {

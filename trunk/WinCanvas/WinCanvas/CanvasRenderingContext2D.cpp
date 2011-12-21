@@ -161,3 +161,62 @@ void CanvasPlus::ParserColor(const char* psz, CanvasPlus::Color& color)
     tk.NextToken(ws, token); //)
 }
 
+
+CanvasPlus::TextBaselineEnum CanvasPlus::ParseTextBaseline(const char* psz)
+{  
+  if (strcmp(psz, "top") == 0)
+  {
+    return CanvasPlus::TextBaselineTop;
+  }
+  else if (strcmp(psz, "hanging") == 0)
+  {
+    return CanvasPlus::TextBaselineHanging;
+  }
+  else if (strcmp(psz, "middle") == 0)
+  {
+    return CanvasPlus::TextBaselineMiddle;
+  }
+  else if (strcmp(psz, "alphabetic") == 0)
+  {
+    return CanvasPlus::TextBaselineAlphabetic;
+  }
+  else if (strcmp(psz, "ideographic") == 0)
+  {
+    return CanvasPlus::TextBaselineIdeographic;
+  }
+  else if (psz == "bottom" || strcmp(psz, "bottom") == 0)
+  {
+    return CanvasPlus::TextBaselineBottom;
+  }
+
+  //assert
+  return CanvasPlus::TextBaselineTop;
+}
+
+
+ CanvasPlus::TextAlignEnum CanvasPlus::ParseTextAlign(const char* psz)
+ {
+    if (strcmp(psz, "start") == 0)
+  {
+    return CanvasPlus::TextAlignStart;
+  }
+  else if (strcmp(psz, "end") == 0)
+  {
+    return CanvasPlus::TextAlignEnd;
+  }
+     else if (strcmp(psz, "left") == 0)
+  {
+    return CanvasPlus::TextAlignLeft;
+  }
+   else if (strcmp(psz, "right") == 0)
+  {
+    return CanvasPlus::TextAlignRight;
+  }
+   else if (strcmp(psz, "center") == 0)
+  {
+    return CanvasPlus::TextAlignCenter;
+  }
+
+    //assert
+    return CanvasPlus::TextAlignLeft;
+ }
