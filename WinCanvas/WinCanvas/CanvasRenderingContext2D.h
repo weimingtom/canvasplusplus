@@ -85,6 +85,7 @@ namespace CanvasPlus //Better name?
         int g;
         int b;
         int a;
+        Color(const char*);
     };
 
     void ParserColor(const char* psz, Color&);

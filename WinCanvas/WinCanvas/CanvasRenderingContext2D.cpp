@@ -101,13 +101,27 @@ public:
 
 typedef Tokenizer<CanvasParser::DFA> CanvasTokenizer;
 
-//TODO find fast and portable way to do this
-int StringToInt(const std::wstring& ws)
+CanvasPlus::Color::Color(const char*)
 {
-    std::wistringstream ss(ws);
-    int i;
-    ss >> i;
-    return i;
+}
+
+static CanvasPlus::Color backcolor = "rgb(255,0,0)";
+
+
+int ParsePositiveInt(const wchar_t* psz)
+{
+  int result = 0; 
+  while ((*psz >= '0') && (*psz <= '9'))
+  { 
+    result = result * 10 + (*psz - '0'); 
+    psz++; 
+  } 
+  return result;
+}
+
+int ParsePositiveInt(const std::wstring& ws)
+{
+  return ParsePositiveInt(ws.c_str());
 }
 
 void CanvasPlus::ParserColor(const char* psz, CanvasPlus::Color& color)
@@ -129,19 +143,19 @@ void CanvasPlus::ParserColor(const char* psz, CanvasPlus::Color& color)
     bool hasa = (token == (CanvasParser::TokenTKRGBA));
     tk.NextToken(ws, token); //(
     tk.NextToken(ws, token); //r
-    color.r = StringToInt(ws);
+    color.r = ParsePositiveInt(ws);
     tk.NextToken(ws, token); //,
     tk.NextToken(ws, token); //g
-    color.g = StringToInt(ws);
+    color.g = ParsePositiveInt(ws);
     tk.NextToken(ws, token); //,
     tk.NextToken(ws, token); //b
-    color.b = StringToInt(ws);
+    color.b = ParsePositiveInt(ws);
 
     if (hasa)
     {
         tk.NextToken(ws, token); //,
         tk.NextToken(ws, token); //a
-        color.a = StringToInt(ws);
+        color.a = ParsePositiveInt(ws);
     }
 
     tk.NextToken(ws, token); //)
