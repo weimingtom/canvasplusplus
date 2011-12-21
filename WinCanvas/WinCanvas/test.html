@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Canvas test</title>
+    <style type="text/css">
+        .auto-style1
+        {
+            width: 100%;
+        }
+    </style>
+</head>
+<script language="JavaScript">
+
+
+    function drawAll() {
+        var canvas = document.getElementById("canvas1");
+        var context = canvas.getContext("2d");
+        Sample1(context);
+    }
+
+    function Sample1(ctx) {
+        ctx.fillStyle = "rgb(255, 200, 200)";
+  ctx.fillRect(10, 10, 50, 50);
+  
+  ctx.textBaseline = "bottom";
+  ctx.fillStyle = "rgb(0, 0, 0)";
+  ctx.fillText("teste", 10,10);
+
+
+  ctx.textAlign = "center";  
+  ctx.fillText("teste", 10+50, 10+50);
+
+  ctx.textAlign = "left";  
+  ctx.fillText("teste", 10+50, 10);
+    }
+
+</script>
+<body onload="drawAll()">
+    <table class="auto-style1">
+        <tr>
+            <td>
+                <canvas id="canvas1" width="250" height="200" style="border-style: solid">
+            <td>
+                <pre>
+        function Sample1(ctx) 
+        {
+          ctx.fillStyle = "rgb(255, 200, 200)";
+          ctx.fillRect(10, 10, 50, 50);
+  
+          ctx.textBaseline = "bottom";
+          ctx.fillStyle = "rgb(0, 0, 0)";
+          ctx.fillText("teste", 10,10);
+        }
+        </pre>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <canvas id="canvas2" width="250" height="200" style="border-style: solid">
+
+            <td>
+                <pre>
+                Sample2
+                context.fillRect(20, 20, 50, 50);
+                </pre>
+            </td>
+        </tr>
+    </table>
+    </canvas>
+</body>
+</html>
