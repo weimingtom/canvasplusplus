@@ -186,17 +186,16 @@ LRESULT CALLBACK DemoApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
         switch (pDemoApp->m_CurrentSampleIndex)
         {
-        case 0:
-            Sample1(canvas);
-            break;
-
-        case 1:
-            Sample2(canvas);
-            break;
-
-        case 2:
-            Sample3(canvas);
-            break;
+        case 0: Sample1(canvas); break;
+        case 1: Sample2(canvas); break;
+        case 2: Sample3(canvas); break;
+        case 3: Sample4(canvas); break;
+        case 4: Sample5(canvas); break;
+        case 5: Sample6(canvas); break;
+        case 6: Sample7(canvas); break;
+        case 7: Sample8(canvas); break;
+        case 8: Sample9(canvas); break;
+        case 9: Sample10(canvas); break;                
         }
 
         // TODO: Add any drawing code here...

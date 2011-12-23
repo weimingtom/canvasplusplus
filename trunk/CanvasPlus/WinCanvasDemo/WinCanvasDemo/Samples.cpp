@@ -59,3 +59,26 @@ void Sample3(Canvas& canvas)
     ctx.fillStyle = "rgb(255, 200, 200)";
     ctx.fillRect(10, 10, 50, 50);
 }
+
+void Sample4(CanvasPlus::Canvas&)
+{
+}
+void Sample5(CanvasPlus::Canvas&)
+{
+}
+void Sample6(CanvasPlus::Canvas&)
+{
+}
+void Sample7(CanvasPlus::Canvas&)
+{
+}
+void Sample8(CanvasPlus::Canvas&)
+{
+}
+void Sample9(CanvasPlus::Canvas&)
+{
+}
+void Sample10(CanvasPlus::Canvas&)
+{
+}
+
