@@ -45,8 +45,8 @@ GDI is very old, the drawing may not be pixel to pixel compatible   with the dra
 Direct 2d (not started), but probably it will be the api used in windows 8 apps. 
 
 
-- Mac (not started)
+2) Mac (not started)
   Can run in MacOS (CGContext)
 
-- IOs (not started)
+3) IOs (not started)
   Can run un iPads and IOs (CGContext)
