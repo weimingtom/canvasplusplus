@@ -30,3 +30,23 @@ The canvas++ will allow C++ programmers to collaborate and have the same standar
 This specification defines the 2D Context for the HTML canvas element. 
 
 http://dev.w3.org/html5/2dcontext/#dom-context-2d
+
+
+===Plataforms===
+
+The first plataforms suported will be:
+
+1) Windows
+
+1.1 GDI (started)
+GDI is very old, the drawing may not be pixel to pixel compatible   with the drawing on the web page, however is is very usefull to run in old windows plataforms.
+
+1.2 Direct2d
+Direct 2d (not started), but probably it will be the api used in windows 8 apps. 
+
+
+- Mac (not started)
+  Can run in MacOS (CGContext)
+
+- IOs (not started)
+  Can run un iPads and IOs (CGContext)
