@@ -14,20 +14,69 @@
 
     function drawAll() {
 
-        var canvas = document.getElementById("canvas1");
-        var context = canvas.getContext("2d");
 
-        context.save()
-        Sample1(context);
-        context.restore();
 
-       // context.save()
-       // Sample2(context);
-        //context.restore();
+
+        Sample1(document.getElementById("canvas1").getContext("2d"));
+
+        Sample2(document.getElementById("canvas2").getContext("2d"));
+
+        Sample3(document.getElementById("canvas3").getContext("2d"));
+
+        Sample4(document.getElementById("canvas4").getContext("2d"));
         
     }
 
-    function Sample2(ctx) {
+  function Sample3(ctx) 
+   {
+
+
+    var lingrad = ctx.createLinearGradient(0,10,0,10 + 130);
+    lingrad.addColorStop(0, 'rgb(255,0,0)');
+    lingrad.addColorStop(1, 'rgb(255,255,255)');
+
+    ctx.fillStyle = lingrad;
+    ctx.fillRect(10,10,130,130);
+
+  }
+
+  function Sample4(ctx) 
+   {
+
+
+    var lingrad = ctx.createLinearGradient(0,10+130,0,10 );
+    lingrad.addColorStop(0, 'rgb(255,0,0)');
+    lingrad.addColorStop(1, 'rgb(255,255,255)');
+
+    ctx.fillStyle = lingrad;
+    ctx.fillRect(10,10,130,130);
+
+  }
+
+
+    function Sample2(ctx) 
+   {
+
+    ctx.fillStyle = "rgb(220,220,220)";
+    var w = 200;
+    var h = 200;
+    var t = 100;
+    var l = 100;
+    ctx.fillRect(l, t, w, h);
+    ctx.strokeStyle = "rgb(0,0,0)";
+    ctx.strokeRect(l + 2, t + 2, w - 4, h - 4);
+    ctx.strokeRect(l + 6, t + 6, w - 12, h - 12);
+    var text = "Title";
+    var textw = ctx.measureText(text).width;
+    ctx.fillRect(l + w / 2 - textw / 2,
+                 t + 2,
+                 textw,
+                 t + 10);
+    ctx.fillStyle = "rgb(0,0,0)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText(text, l + w / 2, t);
+
     }
 
     function Sample1(ctx) {
@@ -74,7 +123,13 @@
     <canvas id="canvas1" width="900" height="550" style="border-style: solid"></canvas>
         
     <p>Sample2</p>
-    <canvas id="canvas2" width="200" height="200" style="border-style: solid"></canvas>
+    <canvas id="canvas2" width="500" height="500" style="border-style: solid"></canvas>
+
+    <p>Sample3</p>
+    <canvas id="canvas3" width="500" height="500" style="border-style: solid"></canvas>
+
+    <p>Sample4</p>
+    <canvas id="canvas4" width="500" height="500" style="border-style: solid"></canvas>
 
 </body>
 </html>
