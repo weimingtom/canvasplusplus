@@ -21,10 +21,30 @@
 //SOFTWARE.
 
 #include <string>
-
+#include <vector>
 
 namespace CanvasPlus //Better name?
 {
+    //Local representation of color
+    struct Color
+    {
+        int r;
+        int g;
+        int b;
+        int a;
+        Color()
+        {
+            r = 0;
+            g = 0;
+            b = 0;
+            a = 0;
+        }
+        Color(const char*);
+    };
+
+    void ParserColor(const char* psz, Color&);
+
+
     //The possible values are start, end, left, right, and center.
     enum TextAlignEnum
     {
@@ -37,34 +57,34 @@ namespace CanvasPlus //Better name?
 
     TextAlignEnum ParseTextAlign(const char* psz);
 
-    
+
     struct TextAlign
     {
-      TextAlignEnum m_Value;
+        TextAlignEnum m_Value;
 
-      TextAlign()
-      {
-         //"When the context is created, the textAlign attribute must
-        //initially have the value start."
-         m_Value = CanvasPlus::TextAlignStart;
-      }
+        TextAlign()
+        {
+            //"When the context is created, the textAlign attribute must
+            //initially have the value start."
+            m_Value = CanvasPlus::TextAlignStart;
+        }
 
-      TextAlign & operator = (const char* psz)
-      {
-        m_Value = ParseTextAlign(psz);
-        return *this;
-      }
+        TextAlign& operator = (const char* psz)
+        {
+            m_Value = ParseTextAlign(psz);
+            return *this;
+        }
 
-      /*TextAlign & operator = (TextAlignEnum e)
-      {
-        m_Value = e;
-        return *this;
-      }*/
+        /*TextAlign & operator = (TextAlignEnum e)
+        {
+          m_Value = e;
+          return *this;
+        }*/
 
-      operator TextAlignEnum() const
-      {
-        return m_Value;
-      }
+        operator TextAlignEnum() const
+        {
+            return m_Value;
+        }
     };
 
     enum TextBaselineEnum
@@ -78,43 +98,58 @@ namespace CanvasPlus //Better name?
     };
 
     TextBaselineEnum ParseTextBaseline(const char* psz);
-  
+
 
     struct TextBaseline
     {
-      TextBaselineEnum m_Value;
+        TextBaselineEnum m_Value;
 
-      TextBaseline()
-      {
-        //"the textBaseline attribute must initially have the value alphabetic."
-        m_Value = CanvasPlus::TextBaselineAlphabetic;
-      }
+        TextBaseline()
+        {
+            //"the textBaseline attribute must initially have the value alphabetic."
+            m_Value = CanvasPlus::TextBaselineAlphabetic;
+        }
 
-      TextBaseline & operator = (const char* psz)
-      {
-        m_Value = ParseTextBaseline(psz);
-        
-        
-        return *this;
-      }
+        TextBaseline& operator = (const char* psz)
+        {
+            m_Value = ParseTextBaseline(psz);
+            return *this;
+        }
 
-      /*TextBaseline & operator = (TextBaselineEnum e)
-      {
-        m_Value = e;
-        return *this;
-      }*/
+        /*TextBaseline & operator = (TextBaselineEnum e)
+        {
+          m_Value = e;
+          return *this;
+        }*/
 
-      operator TextBaselineEnum() const
-      {
-        return m_Value;
-      }
+        operator TextBaselineEnum() const
+        {
+            return m_Value;
+        }
     };
 
     //TODO
+    enum CanvasGradientType
+    {
+        CanvasGradientTypeLinear,
+    };
+
+    struct CanvasGradientImp;
     struct CanvasGradient
     {
-        // opaque object
-        //  void addColorStop(double offset, DOMString color);
+        CanvasGradientImp* pCanvasGradientImp;
+        
+        CanvasGradient()
+        {
+            pCanvasGradientImp = nullptr; //error
+        }
+
+        CanvasGradient(const CanvasGradient&);
+       
+        CanvasGradient(CanvasGradientImp*);
+        ~CanvasGradient();
+        
+        void addColorStop(double offset, const char* color);
     };
 
     //TODO
@@ -125,8 +160,8 @@ namespace CanvasPlus //Better name?
 
     struct Font
     {
-      friend class CanvasRenderingContext2D;
-      void* m_pNativeObject;
+        friend class Context2D;
+        void* m_pNativeObject;
 
     public:
         Font();
@@ -137,24 +172,6 @@ namespace CanvasPlus //Better name?
         std::wstring name;
     };
 
-    //Local representation of color
-    struct Color
-    {
-        int r;
-        int g;
-        int b;
-        int a;
-        Color()
-        {
-          r = 0;
-          g = 0;
-          b = 0;
-          a = 0;
-        }
-        Color(const char*);
-    };
-
-    void ParserColor(const char* psz, Color&);
 
     struct TextMetrics
     {
@@ -164,28 +181,38 @@ namespace CanvasPlus //Better name?
         }
     };
 
+    enum FillStyleEnum
+    {
+        FillStyleEnumSolid,
+        FillStyleEnumGradient,
+    };
 
     class FillStyle
     {
 
     public:
+        FillStyleEnum fillStyleEnum;
+
         //TODO variant type?
         Color m_Color;
+        CanvasGradient canvasGradient;
 
         FillStyle()
         {
-          
+            fillStyleEnum =  FillStyleEnumSolid;
         }
 
         FillStyle& operator = (const char* color)
         {
+            fillStyleEnum =     FillStyleEnumSolid;
             ParserColor(color, m_Color);
             return *this;
         }
 
-        FillStyle& operator = (const CanvasGradient&)
+        FillStyle& operator = (const CanvasGradient& cg)
         {
-            //TODO
+            fillStyleEnum =     FillStyleEnumGradient;
+            canvasGradient = cg;
             return *this;
         }
 
@@ -197,17 +224,18 @@ namespace CanvasPlus //Better name?
     };
 
     //http://dev.w3.org/html5/2dcontext/
-    class CanvasRenderingContext2D
+    class Context2D
     {
         friend class Canvas;
         void* m_pNativeHandle;
-        CanvasRenderingContext2D(void*);
+        Context2D(void*);
+        Context2D(const Context2D&);//
 
         int ToPixelX(double);
         int ToPixelY(double);
 
     public:
-        ~CanvasRenderingContext2D();
+        ~Context2D();
 
         // rects
         void fillRect(double x, double y, double w, double h);
@@ -218,7 +246,8 @@ namespace CanvasPlus //Better name?
         FillStyle strokeStyle;
 
         void fillText(const wchar_t*, double x, double y);
-        
+
+        CanvasGradient createLinearGradient(double x0, double y0, double x1, double y1);
 
         TextAlign textAlign;
         TextBaseline textBaseline;
@@ -233,10 +262,10 @@ namespace CanvasPlus //Better name?
 
     class Canvas
     {
-        CanvasRenderingContext2D m_CanvasRenderingContext2D;
+        Context2D m_CanvasRenderingContext2D;
     public:
         Canvas(void*);
         ~Canvas();
-        CanvasRenderingContext2D& getContext(const char*);
+        Context2D& getContext(const char*);
     };
 }

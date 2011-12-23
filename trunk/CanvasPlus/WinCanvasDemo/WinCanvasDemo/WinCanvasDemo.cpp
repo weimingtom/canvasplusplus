@@ -1,6 +1,6 @@
 
 #include "WinCanvasDemo.h"
-#include <Canvas.h> 
+#include <Canvas.h>
 #include "Samples.h"
 
 // Provides the application entry point.
@@ -17,15 +17,12 @@ int WINAPI WinMain(
     // The return value is ignored, because we want to continue running in the
     // unlikely event that HeapSetInformation fails.
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
+    DemoApp app;
 
-
-            DemoApp app;
-
-            if (SUCCEEDED(app.Initialize()))
-            {
-                app.RunMessageLoop();
-            }
-    
+    if (SUCCEEDED(app.Initialize()))
+    {
+        app.RunMessageLoop();
+    }
 
     return 0;
 }
@@ -34,7 +31,7 @@ int WINAPI WinMain(
 DemoApp::DemoApp() :
     m_hwnd(NULL)
 {
-     m_CurrentSampleIndex = 0;
+    m_CurrentSampleIndex = 0;
 }
 
 // DemoApp destructor
@@ -154,52 +151,83 @@ LRESULT CALLBACK DemoApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
             wasHandled = true;
             break;
 
-               case WM_LBUTTONDOWN:
-            if (pDemoApp->m_CurrentSampleIndex < TOTALSAMPLES)
-            {
-                pDemoApp->m_CurrentSampleIndex++;
-            }
-            else
-            {
-                pDemoApp->m_CurrentSampleIndex = 0;
-            }
-            InvalidateRect(pDemoApp->m_hwnd, NULL, TRUE);
-            break;
+            case WM_LBUTTONDOWN:
+                if (pDemoApp->m_CurrentSampleIndex < TOTALSAMPLES)
+                {
+                    pDemoApp->m_CurrentSampleIndex++;
+                }
+                else
+                {
+                    pDemoApp->m_CurrentSampleIndex = 0;
+                }
 
-        case WM_RBUTTONDOWN:
-            if (pDemoApp->m_CurrentSampleIndex > 0)
-            {
-                pDemoApp->m_CurrentSampleIndex--;
-            }
-            else
-            {
-                pDemoApp->m_CurrentSampleIndex = (TOTALSAMPLES - 1);
-            }
-            InvalidateRect(pDemoApp->m_hwnd, NULL, TRUE);
-            break;
+                InvalidateRect(pDemoApp->m_hwnd, NULL, TRUE);
+                break;
+
+            case WM_RBUTTONDOWN:
+                if (pDemoApp->m_CurrentSampleIndex > 0)
+                {
+                    pDemoApp->m_CurrentSampleIndex--;
+                }
+                else
+                {
+                    pDemoApp->m_CurrentSampleIndex = (TOTALSAMPLES - 1);
+                }
+
+                InvalidateRect(pDemoApp->m_hwnd, NULL, TRUE);
+                break;
 
             case WM_PAINT:
             {
                 PAINTSTRUCT ps;
                 HDC hdc = BeginPaint(pDemoApp->m_hwnd, &ps);
-        CanvasPlus::Canvas canvas(hdc);
+                CanvasPlus::Canvas canvas(hdc);
 
-        switch (pDemoApp->m_CurrentSampleIndex)
-        {
-        case 0: Sample1(canvas); break;
-        case 1: Sample2(canvas); break;
-        case 2: Sample3(canvas); break;
-        case 3: Sample4(canvas); break;
-        case 4: Sample5(canvas); break;
-        case 5: Sample6(canvas); break;
-        case 6: Sample7(canvas); break;
-        case 7: Sample8(canvas); break;
-        case 8: Sample9(canvas); break;
-        case 9: Sample10(canvas); break;                
-        }
+                switch (pDemoApp->m_CurrentSampleIndex)
+                {
+                case 0:
+                    Sample1(canvas);
+                    break;
 
-        // TODO: Add any drawing code here...
-        EndPaint(pDemoApp->m_hwnd, &ps);
+                case 1:
+                    Sample2(canvas);
+                    break;
+
+                case 2:
+                    Sample3(canvas);
+                    break;
+
+                case 3:
+                    Sample4(canvas);
+                    break;
+
+                case 4:
+                    Sample5(canvas);
+                    break;
+
+                case 5:
+                    Sample6(canvas);
+                    break;
+
+                case 6:
+                    Sample7(canvas);
+                    break;
+
+                case 7:
+                    Sample8(canvas);
+                    break;
+
+                case 8:
+                    Sample9(canvas);
+                    break;
+
+                case 9:
+                    Sample10(canvas);
+                    break;
+                }
+
+                // TODO: Add any drawing code here...
+                EndPaint(pDemoApp->m_hwnd, &ps);
             }
 
             result = 0;

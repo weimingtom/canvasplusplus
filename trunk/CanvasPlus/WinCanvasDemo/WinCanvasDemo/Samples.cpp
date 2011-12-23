@@ -8,7 +8,7 @@ using namespace CanvasPlus;
 
 
 
-void DrawPos(CanvasPlus::CanvasRenderingContext2D& ctx, double x, double y)
+void DrawPos(CanvasPlus::Context2D& ctx, double x, double y)
 {
     ctx.moveTo(x - 20, y);
     ctx.lineTo(x + 20, y);
@@ -18,7 +18,7 @@ void DrawPos(CanvasPlus::CanvasRenderingContext2D& ctx, double x, double y)
 
 void Sample1(Canvas& canvas)
 {
-    auto ctx = canvas.getContext("2d");
+    Context2D& ctx = canvas.getContext("2d");
     const char* baselines[] = {"top", "hanging",  "middle", "alphabetic", "ideographic", "bottom" };
     const char* align[] = { "start" , "end" , "left" , "right", "center" };
     const wchar_t* text[] =
@@ -49,34 +49,87 @@ void Sample1(Canvas& canvas)
 
 void Sample2(Canvas& canvas)
 {
-    auto ctx = canvas.getContext("2d");
+    auto& ctx = canvas.getContext("2d");
     ctx.fillRect(10, 10, 50, 50);
 }
 
 void Sample3(Canvas& canvas)
 {
-    auto ctx = canvas.getContext("2d");
+    auto& ctx = canvas.getContext("2d");
     ctx.fillStyle = "rgb(255, 200, 200)";
     ctx.fillRect(10, 10, 50, 50);
 }
 
-void Sample4(CanvasPlus::Canvas&)
+void Sample4(CanvasPlus::Canvas& canvas)
 {
+    auto& ctx = canvas.getContext("2d");
+    ctx.fillStyle = "rgb(170,170,170)";
+    ctx.fillRect(10, 10, 50, 50);
+    ctx.strokeRect(10, 10, 50, 50);
+    ctx.fillStyle = "rgb(255,255,255)";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.fillText(L"Button", (10 + 10 + 50) / 2, (10 + 10 + 50) / 2);
 }
-void Sample5(CanvasPlus::Canvas&)
+void Sample5(CanvasPlus::Canvas& canvas)
 {
+    auto& ctx = canvas.getContext("2d");
+    ctx.fillStyle = "rgb(220,220,220)";
+    auto w = 200;
+    auto h = 200;
+    auto t = 100;
+    auto l = 100;
+    ctx.fillRect(l, t, w, h);
+    ctx.strokeStyle = "rgb(0,0,0)";
+    ctx.strokeRect(l + 2, t + 2, w - 4, h - 4);
+    ctx.strokeRect(l + 4, t + 4, w - 8, h - 8);
+    auto text = L"Title";
+    auto textw = ctx.measureText(text).width;
+    ctx.fillRect(l + w / 2 - textw / 2,
+                 t + 2,
+                 textw,
+                 t + 10);
+    ctx.fillStyle = "rgb(0,0,0)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText(text, l + w / 2, t);
 }
-void Sample6(CanvasPlus::Canvas&)
+void Sample6(CanvasPlus::Canvas& canvas)
 {
+    auto& ctx = canvas.getContext("2d");
+    auto lingrad = ctx.createLinearGradient(0, 10, 0, 10 + 130);
+    lingrad.addColorStop(0, "rgb(255,0,0)");
+    lingrad.addColorStop(1, "rgb(255,255,255)");
+    ctx.fillStyle = lingrad;
+    ctx.fillRect(10, 10, 130, 130);
 }
-void Sample7(CanvasPlus::Canvas&)
+
+void Sample7(CanvasPlus::Canvas& canvas)
 {
+    auto& ctx = canvas.getContext("2d");
+    auto lingrad = ctx.createLinearGradient(10, 0, 130, 0);
+    lingrad.addColorStop(0, "rgb(255,0,0)");
+    lingrad.addColorStop(1, "rgb(255,255,255)");
+    ctx.fillStyle = lingrad;
+    ctx.fillRect(10, 10, 130, 130);
 }
-void Sample8(CanvasPlus::Canvas&)
+void Sample8(CanvasPlus::Canvas& canvas)
 {
+    auto& ctx = canvas.getContext("2d");
+    auto lingrad = ctx.createLinearGradient(130, 0, 10, 0);
+    lingrad.addColorStop(0, "rgb(255,0,0)");
+    lingrad.addColorStop(1, "rgb(255,255,255)");
+    ctx.fillStyle = lingrad;
+    ctx.fillRect(10, 10, 130, 130);
 }
-void Sample9(CanvasPlus::Canvas&)
+void Sample9(CanvasPlus::Canvas& canvas)
 {
+    auto& ctx = canvas.getContext("2d");
+    auto lingrad = ctx.createLinearGradient(0, 10 + 130, 0, 10 );
+    lingrad.addColorStop(0, "rgb(255,0,0)");
+    lingrad.addColorStop(1, "rgb(255,255,255)");
+    ctx.fillStyle = lingrad;
+    ctx.fillRect(10, 10, 130, 130);
 }
 void Sample10(CanvasPlus::Canvas&)
 {
