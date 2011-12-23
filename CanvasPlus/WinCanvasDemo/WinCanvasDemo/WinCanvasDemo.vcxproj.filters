@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Canvas++">
+      <UniqueIdentifier>{fb82dff8-d8ff-49fe-81b8-7b4e2da3809e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Canvas++\Win">
+      <UniqueIdentifier>{65be2e7c-c9af-48a4-a574-73d47ad18d2d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WinCanvasDemo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Samples.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CanvasPlus\Win\Win_Canvas.cpp">
+      <Filter>Source Files\Canvas++\Win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CanvasPlus\Canvas.cpp">
+      <Filter>Source Files\Canvas++</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="WinCanvasDemo.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Samples.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CanvasPlus\Canvas.h">
+      <Filter>Source Files\Canvas++</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
