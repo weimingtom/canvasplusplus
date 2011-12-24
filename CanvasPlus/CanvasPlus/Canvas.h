@@ -75,12 +75,6 @@ namespace CanvasPlus //Better name?
             return *this;
         }
 
-        /*TextAlign & operator = (TextAlignEnum e)
-        {
-          m_Value = e;
-          return *this;
-        }*/
-
         operator TextAlignEnum() const
         {
             return m_Value;
@@ -116,12 +110,6 @@ namespace CanvasPlus //Better name?
             return *this;
         }
 
-        /*TextBaseline & operator = (TextBaselineEnum e)
-        {
-          m_Value = e;
-          return *this;
-        }*/
-
         operator TextBaselineEnum() const
         {
             return m_Value;
@@ -138,17 +126,16 @@ namespace CanvasPlus //Better name?
     struct CanvasGradient
     {
         CanvasGradientImp* pCanvasGradientImp;
-        
+
         CanvasGradient()
         {
             pCanvasGradientImp = nullptr; //error
         }
 
         CanvasGradient(const CanvasGradient&);
-       
         CanvasGradient(CanvasGradientImp*);
         ~CanvasGradient();
-        
+
         void addColorStop(double offset, const char* color);
     };
 
@@ -167,9 +154,7 @@ namespace CanvasPlus //Better name?
         Font();
         ~Font();
 
-        bool italic;
-        bool bold;
-        std::wstring name;
+        Font& operator = (const char*);
     };
 
 
@@ -192,8 +177,6 @@ namespace CanvasPlus //Better name?
 
     public:
         FillStyleEnum fillStyleEnum;
-
-        //TODO variant type?
         Color m_Color;
         CanvasGradient canvasGradient;
 
@@ -204,7 +187,7 @@ namespace CanvasPlus //Better name?
 
         FillStyle& operator = (const char* color)
         {
-            fillStyleEnum =     FillStyleEnumSolid;
+            fillStyleEnum = FillStyleEnumSolid;
             ParserColor(color, m_Color);
             return *this;
         }
@@ -235,29 +218,36 @@ namespace CanvasPlus //Better name?
         int ToPixelY(double);
 
     public:
-        ~Context2D();
-
-        // rects
-        void fillRect(double x, double y, double w, double h);
-        void strokeRect(double x, double y, double w, double h);
 
         //fillStyle
         FillStyle fillStyle;
         FillStyle strokeStyle;
 
-        void fillText(const wchar_t*, double x, double y);
-
-        CanvasGradient createLinearGradient(double x0, double y0, double x1, double y1);
-
         TextAlign textAlign;
         TextBaseline textBaseline;
         Font font;
-        TextMetrics measureText(const wchar_t*);
         double lineWidth;
+        //==Shadows==
+        //
+        Color shadowColor;
+        double shadowOffsetX;
+        double shadowOffsetY;
+        double shadowBlur;
 
+        ~Context2D();
+
+        // state
+        void save(); // push state on state stack
+        void restore(); // pop state stack and restore state
+
+
+        void fillRect(double x, double y, double w, double h);
+        void strokeRect(double x, double y, double w, double h);
+        void fillText(const wchar_t*, double x, double y);
+        CanvasGradient createLinearGradient(double x0, double y0, double x1, double y1);
+        TextMetrics measureText(const wchar_t*);
         void moveTo(double x, double y);
         void lineTo(double x, double y);
-
     };
 
     class Canvas

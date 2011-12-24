@@ -6,6 +6,17 @@
 
 namespace CanvasPlus
 {
+    // state
+    void Context2D::save()
+    {
+        // push state on state stack
+    }
+
+    void Context2D::restore()
+    {
+        // pop state stack and restore state
+    }
+
 
     Color::Color(const char* psz)
     {
