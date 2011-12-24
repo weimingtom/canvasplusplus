@@ -41,6 +41,8 @@ The first plataforms suported will be:
 1.1 GDI (started)
 GDI is very old, the drawing may not be pixel to pixel compatible   with the drawing on the web page, however is is very usefull to run in old windows plataforms.
 
+http://msdn.microsoft.com/en-us/library/dd145203(v=vs.85).aspx
+
 1.2 Direct2d
 Direct 2d (not started), but probably it will be the api used in windows 8 apps. 
 
