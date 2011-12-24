@@ -24,6 +24,8 @@
         Sample3(document.getElementById("canvas3").getContext("2d"));
 
         Sample4(document.getElementById("canvas4").getContext("2d"));
+
+        Sample5(document.getElementById("canvas5").getContext("2d"));
         
     }
 
@@ -39,6 +41,22 @@
     ctx.fillRect(10,10,130,130);
 
   }
+
+
+  function Sample5(ctx) 
+   {
+
+    ctx.shadowOffsetX = 5;   
+    ctx.shadowOffsetY = 5;   
+    ctx.shadowBlur = 5;   
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";  
+
+    ctx.fillStyle = "rgb(255,0,0)";
+
+    ctx.fillRect(20, 20, 150, 100);
+
+  }
+
 
   function Sample4(ctx) 
    {
@@ -130,6 +148,9 @@
 
     <p>Sample4</p>
     <canvas id="canvas4" width="500" height="500" style="border-style: solid"></canvas>
+
+    <p>Sample5</p>
+    <canvas id="canvas5" width="500" height="500" style="border-style: solid"></canvas>
 
 </body>
 </html>

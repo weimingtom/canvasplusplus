@@ -79,20 +79,38 @@ void Sample5(CanvasPlus::Canvas& canvas)
     auto h = 200;
     auto t = 100;
     auto l = 100;
+    
+    ctx.font = "14px arial";
+
+    //shadow
+    ctx.shadowOffsetX = 10;
+    ctx.shadowOffsetY = 10;
+    ctx.shadowBlur = 5;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+    //main
     ctx.fillRect(l, t, w, h);
     ctx.strokeStyle = "rgb(0,0,0)";
     ctx.strokeRect(l + 2, t + 2, w - 4, h - 4);
     ctx.strokeRect(l + 4, t + 4, w - 8, h - 8);
     auto text = L"Title";
     auto textw = ctx.measureText(text).width;
+
+    
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+
     ctx.fillRect(l + w / 2 - textw / 2,
                  t + 2,
                  textw,
-                 t + 10);
+                 14);
+
     ctx.fillStyle = "rgb(0,0,0)";
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     ctx.fillText(text, l + w / 2, t);
+
+    
+
 }
 void Sample6(CanvasPlus::Canvas& canvas)
 {
@@ -131,7 +149,21 @@ void Sample9(CanvasPlus::Canvas& canvas)
     ctx.fillStyle = lingrad;
     ctx.fillRect(10, 10, 130, 130);
 }
-void Sample10(CanvasPlus::Canvas&)
+void Sample10(CanvasPlus::Canvas& canvas)
 {
+    auto& ctx = canvas.getContext("2d");
+    
+    ctx.shadowOffsetX = 5;
+    ctx.shadowOffsetY = 5;
+    ctx.shadowBlur = 5;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";  
+
+    ctx.fillStyle = "rgb(255,0,0)";
+
+    ctx.fillRect(20, 20, 150, 100);
 }
 
+void Sample11(CanvasPlus::Canvas& canvas)
+{
+    auto& ctx = canvas.getContext("2d");        
+}

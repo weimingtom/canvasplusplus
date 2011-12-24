@@ -13,6 +13,231 @@
 #pragma comment( lib, "msimg32.lib" )
 ///
 
+
+inline void DrawBitmap (HDC hdc, HBITMAP hbm, int Left, int Top)
+{
+    BOOL f;
+    HDC hdcBits;
+    BITMAP bm;
+    hdcBits = CreateCompatibleDC(hdc);
+    GetObject (hbm, sizeof(BITMAP), &bm);
+    SelectObject(hdcBits,hbm);
+    f = BitBlt(hdc,Left,Top,bm.bmWidth, bm.bmHeight,hdcBits,0,0,SRCCOPY);
+    DeleteDC(hdcBits);
+}
+
+
+//////////////////////////////////////////////////////////////
+inline HBITMAP CreateBitmap_32(const SIZE& size, void** pBits)
+{
+    assert(0 < size.cx);
+    assert(0 != size.cy);
+
+    if (pBits != NULL)
+    {
+        *pBits = NULL;
+    }
+
+    if (size.cx <= 0 || size.cy == 0)
+    {
+        return NULL;
+    }
+
+    BITMAPINFO bi = {0};
+
+    // Fill in the BITMAPINFOHEADER
+    bi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
+    bi.bmiHeader.biWidth       = size.cx;
+    bi.bmiHeader.biHeight      = size.cy;
+    bi.bmiHeader.biSizeImage   = size.cx * abs(size.cy);
+    bi.bmiHeader.biPlanes      = 1;
+    bi.bmiHeader.biBitCount    = 32;
+    bi.bmiHeader.biCompression = BI_RGB;
+
+    LPVOID pData = NULL;
+    HBITMAP hbmp = ::CreateDIBSection(NULL, &bi, DIB_RGB_COLORS, &pData, NULL, 0);
+
+    if (pData != NULL && hbmp != NULL && pBits != NULL)
+    {
+        *pBits = pData;
+    }
+
+    return hbmp;
+}
+
+inline COLORREF  __stdcall PixelAlpha(COLORREF srcPixel, int percent)
+{
+    // My formula for calculating the transpareny is as
+    // follows(for each single color):
+    //
+    //                             percent
+    // destPixel = sourcePixel *( ------- )
+    //                               100
+    //
+    // This is not real alpha blending, as it only modifies the brightness,
+    // but not the color(a real alpha blending had to mix the source and
+    // destination pixels, e.g. mixing green and red makes yellow).
+    // For our nice "menu" shadows its good enough.
+
+    COLORREF clrFinal = RGB( min(255, (GetRValue(srcPixel) * percent) / 100), min(255, (GetGValue(srcPixel) * percent) / 100), min(255, (GetBValue(srcPixel) * percent) / 100));
+
+    // TRACE("%d %d %d\n", GetRValue(clrFinal), GetGValue(clrFinal), GetBValue(clrFinal));
+    return(clrFinal);
+
+}
+
+inline int GetHeight(const RECT& rect)
+{
+    return rect.bottom - rect.top;
+}
+
+inline int GetWidth(const RECT& rect)
+{
+    return rect.right - rect.left;
+}
+
+
+inline void __stdcall SetAlphaPixel(COLORREF* pBits,
+                                    int rect_Width,
+                                    int rect_Height,
+                                    int x,
+                                    int y,
+                                    int percent,
+                                    int iShadowSize,
+                                    COLORREF clrBase,
+                                    BOOL bIsRight)
+{
+    // Our direct bitmap access swapped the y coordinate...
+    y = (rect_Height+ iShadowSize)- y;
+
+    COLORREF* pColor = (COLORREF*)(bIsRight ? (pBits +(rect_Width + iShadowSize) *(y + 1) - x) : (pBits +(rect_Width + iShadowSize) * y + x));
+
+    *pColor = PixelAlpha(*pColor, percent);
+
+    if (clrBase == (COLORREF)-1)
+    {
+        return;
+    }
+
+    *pColor = RGB( min(255, (3 * GetRValue(*pColor) + GetBValue(clrBase)) / 4), min(255, (3 * GetGValue(*pColor) + GetGValue(clrBase)) / 4), min(255, (3 * GetBValue(*pColor) + GetRValue(clrBase)) / 4));
+}
+
+
+
+
+static BOOL DrawShadow(HDC hdc,
+                       RECT& rect,                 // Shadow will be draw around this rect
+                       int nDepth,                     // Shadow depth (pixels)
+                       int iMinBrightness = 100,       // Min. brighttness
+                       int iMaxBrightness = 50,        // Max. beightness
+                       COLORREF clrBase =(COLORREF)-1, // Base color
+                       BOOL bRightShadow = TRUE)
+{
+    assert(nDepth >= 0);
+
+    if (nDepth == 0 || IsRectEmpty(&rect))
+    {
+        return TRUE;
+    }
+
+    const int cx = GetWidth(rect);
+    const int cy = GetHeight(rect);
+
+    const BOOL bIsLeft = !bRightShadow;
+
+    // Copy screen content into the memory bitmap:
+    HDC hdcMem = ::CreateCompatibleDC(hdc);
+    if (hdcMem == NULL)
+    {
+        assert(FALSE);
+        return FALSE;
+    }
+
+    // Gets the whole menu and changes the shadow.
+    HBITMAP hbmpMem = ::CreateCompatibleBitmap(hdc, cx + nDepth, cy + nDepth);
+    if (hbmpMem  == NULL)
+    {
+        ::DeleteDC(hdcMem);
+        assert(FALSE);
+        return FALSE;
+    }
+
+    HBITMAP hOldBmp = (HBITMAP)SelectObject(hdcMem, hbmpMem);
+
+    COLORREF* pBits;
+    SIZE sz = {cx + nDepth, cy + nDepth};
+    HBITMAP hmbpDib = CreateBitmap_32(sz, (LPVOID*)&pBits);
+
+    if (hmbpDib == NULL || pBits == NULL)
+    {
+        ::DeleteDC(hdcMem);
+        ::DeleteObject(hbmpMem);
+
+        assert(FALSE);
+        return FALSE;
+    }
+
+    ::SelectObject(hdcMem, hmbpDib);
+    ::BitBlt(hdcMem, 0, 0, cx + nDepth, cy + nDepth, hdc, bIsLeft ? rect.left - nDepth : rect.left, rect.top, SRCCOPY);
+
+    // Process shadowing:
+    // For having a very nice shadow effect, its actually hard work. Currently,
+    // I'm using a more or less "hardcoded" way to set the shadows(by using a
+    // hardcoded algorythm):
+    //
+    // This algorithm works as follows:
+    //
+    // It always draws a few lines, from left to bottom, from bottom to right,
+    // from right to up, and from up to left). It does this for the specified
+    // shadow width and the color settings.
+
+    // For speeding up things, iShadowOffset is the
+    // value which is needed to multiply for each shadow step
+    const int iShadowOffset = (iMaxBrightness - iMinBrightness) / nDepth;
+
+    const int rect_Width = GetWidth(rect);
+    const int rect_Height = GetHeight(rect);
+
+    // Loop for drawing the shadow
+    for (int c = 0; c < nDepth; c++)
+    {
+        // Draw the shadow from left to bottom
+        for (int y = cy; y < cy +(nDepth - c); y++)
+        {
+            SetAlphaPixel(pBits, rect_Width, rect_Height, c + nDepth, y, iMaxBrightness -((nDepth  - c) *(iShadowOffset)), nDepth, clrBase, bIsLeft);
+        }
+
+        // Draw the shadow from left to right
+        for (int x = nDepth +(nDepth - c); x < cx + c; x++)
+        {
+            SetAlphaPixel(pBits, rect_Width, rect_Height, x, cy + c, iMaxBrightness -((c) *(iShadowOffset)),nDepth, clrBase, bIsLeft);
+        }
+
+        // Draw the shadow from top to bottom
+        for (int y1 = nDepth +(nDepth - c); y1 < cy + c + 1; y1++)
+        {
+            SetAlphaPixel(pBits,  rect_Width, rect_Height, cx+c, y1, iMaxBrightness -((c) *(iShadowOffset)), nDepth, clrBase, bIsLeft);
+        }
+
+        // Draw the shadow from top to left
+        for (int x1 = cx; x1 < cx +(nDepth - c); x1++)
+        {
+            SetAlphaPixel(pBits,  rect_Width, rect_Height, x1, c + nDepth, iMaxBrightness -((nDepth - c) *(iShadowOffset)), nDepth, clrBase, bIsLeft);
+        }
+    }
+
+    // Copy shadowed bitmap back to the screen:
+    ::BitBlt(hdc, bIsLeft ? rect.left - nDepth : rect.left, rect.top, cx + nDepth, cy + nDepth, hdcMem, 0, 0, SRCCOPY);
+
+    ::SelectObject(hdcMem, hOldBmp);
+    ::DeleteObject(hmbpDib);
+    ::DeleteDC(hdcMem);
+    ::DeleteObject(hbmpMem);
+
+    return TRUE;
+}
+
+
 static void GradientRectH(HDC hDC, RECT& rect, COLORREF fore, COLORREF bk)
 {
     TRIVERTEX v[2];
@@ -217,6 +442,63 @@ namespace CanvasPlus
         ::DeleteObject((HDC)m_pNativeObject);
     }
 
+    Font& Font::operator = (const char* psz)
+    {
+         if (m_pNativeObject)
+         {
+             ::DeleteObject((HDC)m_pNativeObject);
+             m_pNativeObject = nullptr;
+         }
+         
+         // TODO THIS IS NOT A PARSER 
+         // PROVISORY
+        
+         std::string str(psz);
+
+         //"When the context is created, the font of the
+        //context must be set to 10px sans-serif. "
+        LOGFONT logFont;
+        
+        /////////////////////////////////////////////////
+        if (str.find("12pt") != std::string::npos)
+           logFont.lfHeight = 12; //-17;
+        else if (str.find("14px") != std::string::npos)
+           logFont.lfHeight = -14; //-17;
+        else 
+        {
+          logFont.lfHeight = -10; //-17;
+        }
+        ////////////////////////////////////////////////
+
+        logFont.lfWidth = 0;
+        logFont.lfEscapement = 0;
+        logFont.lfOrientation = 0;
+        
+        ////
+        if (str.find("bold") != std::string::npos)
+            logFont.lfWeight = 700;
+        else
+            logFont.lfWeight = 400;
+        ////
+
+        logFont.lfItalic = 0;
+        logFont.lfUnderline = 0;
+        logFont.lfStrikeOut = 0;
+        logFont.lfCharSet = 0;
+        logFont.lfOutPrecision = 3;
+        logFont.lfClipPrecision = 2;
+        logFont.lfQuality = 1;
+        logFont.lfPitchAndFamily = 49;
+        
+        if (str.find("arial") != std::string::npos)
+          wcscpy(logFont.lfFaceName , L"arial");
+        else
+          wcscpy(logFont.lfFaceName , L"sans-serif");
+
+        m_pNativeObject = (void*)CreateFontIndirect(&logFont);
+        return *this;
+    }
+
     Canvas::Canvas(void* p) : m_CanvasRenderingContext2D(p)
     {
     }
@@ -233,8 +515,12 @@ namespace CanvasPlus
     Context2D::Context2D(void* p)
         : m_pNativeHandle(p)
     {
-        //"When the context is created, the lineWidth attribute must initially have the value 1.0."
-        lineWidth = 1.0;
+        this->lineWidth = 1.0;
+        this->shadowColor = "rgb(0,0,0)";
+        this->shadowOffsetX = 0;
+        this->shadowOffsetY = 0;
+        this->shadowBlur = 0;
+
     }
 
     Context2D::~Context2D()
@@ -252,6 +538,12 @@ namespace CanvasPlus
         //-------------------------------
         //TODO waiting for transformations..
         RECT rect = {(LONG)x, (LONG)y, (LONG)(x + w), (LONG)(y + h)};
+
+        if (this->shadowOffsetX != 0 &&
+            this->shadowOffsetY != 0)
+        {
+            DrawShadow(hdc, rect, shadowOffsetX);
+        }
 
         if (fillStyle.fillStyleEnum == FillStyleEnumSolid)
         {
