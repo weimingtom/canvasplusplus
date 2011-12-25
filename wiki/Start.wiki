@@ -49,6 +49,8 @@ Direct 2d (not started), but probably it will be the api used in windows 8 apps.
 
 2) Mac (not started)
   Can run in MacOS (CGContext)
+ http://developer.apple.com/library/ios/#documentation/GraphicsImaging/Reference/CGContext/Reference/reference.html
 
 3) IOs (not started)
   Can run un iPads and IOs (CGContext)
+http://developer.apple.com/library/ios/#documentation/GraphicsImaging/Reference/CGContext/Reference/reference.html
