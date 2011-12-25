@@ -249,6 +249,9 @@ namespace CanvasPlus //Better name?
         TextMetrics measureText(const wchar_t*);
         void moveTo(double x, double y);
         void lineTo(double x, double y);
+        void beginPath();
+        void closePath();
+        void stroke();
     };
 
     class Canvas

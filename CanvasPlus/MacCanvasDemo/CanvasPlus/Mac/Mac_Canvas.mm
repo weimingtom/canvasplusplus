@@ -37,6 +37,11 @@ namespace CanvasPlus
     {
     }
     
+    Font& Font::operator=(const char * psz)
+    {
+        return *this;
+    }
+    
     Font::~Font()
     {
     }
@@ -63,6 +68,10 @@ namespace CanvasPlus
     CanvasGradient::CanvasGradient(CanvasGradientImp* p)
     {
         pCanvasGradientImp = p;
+    }
+    
+    void CanvasGradient::addColorStop(double offset, const char *color)
+    {
     }
     
     CanvasGradient::~CanvasGradient()
@@ -114,62 +123,129 @@ namespace CanvasPlus
         int h= [theFont ascender];
         
         CGContextShowTextAtPoint(context, x, y + h, s.c_str(), s.size());
-
     }
     
     void Context2D::fillRect(double left, double top, double w, double h)
     {
-        //fillColor
+        /////
+        CGContextRef context = (CGContextRef) m_pNativeHandle;
+        /////
+        
         float redValue = fillStyle.m_Color.r / 255.0;
         float greenValue = fillStyle.m_Color.g / 255.0;
         float blueValue = fillStyle.m_Color.b/ 255.0;
         
+        float alphaValue = 1.0;
         
-        NSColor *nscolor = [NSColor colorWithCalibratedRed:redValue green:greenValue blue:blueValue alpha:1.0f];
+        CGContextSetRGBFillColor (context,
+                                  redValue,
+                                  greenValue,
+                                  blueValue,
+                                  alphaValue);
         
-        NSRect nsrect;
-        nsrect.origin.x = left;
-        nsrect.origin.y = top;
-        nsrect.size.width = w;
-        nsrect.size.height = h;
-        
-        
-        [nscolor setFill];
-        NSBezierPath* drawingPath = [NSBezierPath bezierPath];
-        
-        [drawingPath appendBezierPathWithRect: nsrect];
-        
-            
-        // and fill it
-        [drawingPath fill];
+        CGRect rect;
+        rect.origin.x = left;
+        rect.origin.y = top;
+        rect.size.width = w;
+        rect.size.height = h;
 
+        CGContextFillRect(context, rect);
+        
     }
     
     void Context2D::strokeRect(double left, double top, double w, double h)
     {
-        //fillColor
+        /////
+        CGContextRef context = (CGContextRef) m_pNativeHandle;
+        /////
         float redValue = strokeStyle.m_Color.r / 255.0;
         float greenValue = strokeStyle.m_Color.g / 255.0;
         float blueValue = strokeStyle.m_Color.b/ 255.0;
+        float alphaValue = 1.0;
         
-        NSColor *nscolor = [NSColor colorWithCalibratedRed:redValue green:greenValue blue:blueValue alpha:1.0f];
+        CGContextSetRGBStrokeColor(context,
+                                  redValue,
+                                  greenValue,
+                                  blueValue,
+                                  alphaValue);
         
-        NSRect nsrect;
-        nsrect.origin.x = left;
-        nsrect.origin.y = top;
-        nsrect.size.width = w;
-        nsrect.size.height = h;
+        CGRect rect;
+        rect.origin.x = left;
+        rect.origin.y = top;
+        rect.size.width = w;
+        rect.size.height = h;
         
+        CGContextStrokeRect(context, rect);
+     }
+
+    TextMetrics Context2D::measureText(const wchar_t* psz)
+    {
+        /////
+        CGContextRef context = (CGContextRef) m_pNativeHandle;
+        /////
+    
+    //    CGContextSelectFont(context, "Arial", 14.0, kCGEncodingMacRoman);
         
-        [nscolor setStroke];
-        NSBezierPath* drawingPath = [NSBezierPath bezierPath];
+        std::wstring ws(psz);
+        std::string s = narrow(ws);
+        //assert(s.size() >= slen);
         
-        [drawingPath appendBezierPathWithRect: nsrect];
-        
-        // and fill it
-        [drawingPath stroke];
+        CGPoint startpt = CGContextGetTextPosition (context);
+        CGContextSetTextDrawingMode(context, kCGTextInvisible); 
+        CGContextShowText (context, s.c_str(), s.size());
+        CGPoint endpt = CGContextGetTextPosition (context);
+        CGContextSetTextDrawingMode(context, kCGTextFill); 
+        return TextMetrics(endpt.x - startpt.x);
+
+    }
+    
+    CanvasGradient Context2D::createLinearGradient(double x0, double y0, double x1, double y1)
+    {
+        return CanvasGradient();
     }
 
+    void Context2D::beginPath()
+    {
+        /////
+        CGContextRef context = (CGContextRef) m_pNativeHandle;
+        /////
+        CGContextBeginPath(context);
+    }
+    
+    void Context2D::closePath()
+    {
+        /////
+        CGContextRef context = (CGContextRef) m_pNativeHandle;
+        /////
+        CGContextClosePath(context);
+    }
+    
+    void Context2D::stroke()
+    {
+        /////
+        CGContextRef context = (CGContextRef) m_pNativeHandle;
+        /////
+        CGContextStrokePath(context);
+    }
+    
+    void Context2D::moveTo(double x, double y)
+    {
+        /////
+        CGContextRef context = (CGContextRef) m_pNativeHandle;
+        /////
+
+        CGContextMoveToPoint(context, x,y);
+    }
+    
+    void Context2D::lineTo(double x, double y)
+    {
+        /////
+        CGContextRef context = (CGContextRef) m_pNativeHandle;
+        /////
+        
+        CGContextAddLineToPoint(context, x,y);
+    }
+    
     
     Canvas::Canvas(void* p) : m_CanvasRenderingContext2D(p)
     {
