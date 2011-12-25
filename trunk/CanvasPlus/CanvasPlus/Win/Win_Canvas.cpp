@@ -650,6 +650,18 @@ namespace CanvasPlus
         SelectObject(hdc, oldPen);
     }
 
+    void Context2D::beginPath()
+    {
+    }
+
+    void Context2D::closePath()
+    {
+    }
+    
+    void Context2D::stroke()
+    {
+    }
+
     static void GdiTextOut(HDC hdc,
                            TextAlign textAlign,
                            TextBaselineEnum baseLine,

@@ -10,10 +10,13 @@ using namespace CanvasPlus;
 
 void DrawPos(CanvasPlus::Context2D& ctx, double x, double y)
 {
+    ctx.beginPath();   
     ctx.moveTo(x - 20, y);
     ctx.lineTo(x + 20, y);
     ctx.moveTo(x, y - 20);
     ctx.lineTo(x, y + 20);
+    ctx.closePath();
+    ctx.stroke();
 }
 
 void Sample1(Canvas& canvas)
@@ -49,20 +52,20 @@ void Sample1(Canvas& canvas)
 
 void Sample2(Canvas& canvas)
 {
-    auto& ctx = canvas.getContext("2d");
+    Context2D& ctx = canvas.getContext("2d");
     ctx.fillRect(10, 10, 50, 50);
 }
 
 void Sample3(Canvas& canvas)
 {
-    auto& ctx = canvas.getContext("2d");
+    Context2D& ctx = canvas.getContext("2d");
     ctx.fillStyle = "rgb(255, 200, 200)";
     ctx.fillRect(10, 10, 50, 50);
 }
 
 void Sample4(CanvasPlus::Canvas& canvas)
 {
-    auto& ctx = canvas.getContext("2d");
+    Context2D& ctx = canvas.getContext("2d");
     ctx.fillStyle = "rgb(170,170,170)";
     ctx.fillRect(10, 10, 50, 50);
     ctx.strokeRect(10, 10, 50, 50);
@@ -71,9 +74,10 @@ void Sample4(CanvasPlus::Canvas& canvas)
     ctx.textAlign = "center";
     ctx.fillText(L"Button", (10 + 10 + 50) / 2, (10 + 10 + 50) / 2);
 }
+
 void Sample5(CanvasPlus::Canvas& canvas)
 {
-    auto& ctx = canvas.getContext("2d");
+    Context2D& ctx = canvas.getContext("2d");
     ctx.fillStyle = "rgb(220,220,220)";
     auto w = 200;
     auto h = 200;
@@ -114,7 +118,7 @@ void Sample5(CanvasPlus::Canvas& canvas)
 }
 void Sample6(CanvasPlus::Canvas& canvas)
 {
-    auto& ctx = canvas.getContext("2d");
+    Context2D& ctx = canvas.getContext("2d");
     auto lingrad = ctx.createLinearGradient(0, 10, 0, 10 + 130);
     lingrad.addColorStop(0, "rgb(255,0,0)");
     lingrad.addColorStop(1, "rgb(255,255,255)");
@@ -124,7 +128,7 @@ void Sample6(CanvasPlus::Canvas& canvas)
 
 void Sample7(CanvasPlus::Canvas& canvas)
 {
-    auto& ctx = canvas.getContext("2d");
+    Context2D& ctx = canvas.getContext("2d");
     auto lingrad = ctx.createLinearGradient(10, 0, 130, 0);
     lingrad.addColorStop(0, "rgb(255,0,0)");
     lingrad.addColorStop(1, "rgb(255,255,255)");
@@ -133,7 +137,7 @@ void Sample7(CanvasPlus::Canvas& canvas)
 }
 void Sample8(CanvasPlus::Canvas& canvas)
 {
-    auto& ctx = canvas.getContext("2d");
+    Context2D& ctx = canvas.getContext("2d");
     auto lingrad = ctx.createLinearGradient(130, 0, 10, 0);
     lingrad.addColorStop(0, "rgb(255,0,0)");
     lingrad.addColorStop(1, "rgb(255,255,255)");
@@ -142,7 +146,7 @@ void Sample8(CanvasPlus::Canvas& canvas)
 }
 void Sample9(CanvasPlus::Canvas& canvas)
 {
-    auto& ctx = canvas.getContext("2d");
+    Context2D& ctx = canvas.getContext("2d");
     auto lingrad = ctx.createLinearGradient(0, 10 + 130, 0, 10 );
     lingrad.addColorStop(0, "rgb(255,0,0)");
     lingrad.addColorStop(1, "rgb(255,255,255)");
@@ -151,7 +155,7 @@ void Sample9(CanvasPlus::Canvas& canvas)
 }
 void Sample10(CanvasPlus::Canvas& canvas)
 {
-    auto& ctx = canvas.getContext("2d");
+    Context2D& ctx = canvas.getContext("2d");
     
     ctx.shadowOffsetX = 5;
     ctx.shadowOffsetY = 5;
@@ -165,5 +169,5 @@ void Sample10(CanvasPlus::Canvas& canvas)
 
 void Sample11(CanvasPlus::Canvas& canvas)
 {
-    auto& ctx = canvas.getContext("2d");        
+    Context2D& ctx = canvas.getContext("2d");        
 }
