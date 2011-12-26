@@ -3,6 +3,8 @@
 #include <Canvas.h>
 #include "Samples.h"
 
+
+
 // Provides the application entry point.
 int WINAPI WinMain(
     HINSTANCE /* hInstance */,
@@ -181,6 +183,7 @@ LRESULT CALLBACK DemoApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
             {
                 PAINTSTRUCT ps;
                 HDC hdc = BeginPaint(pDemoApp->m_hwnd, &ps);
+                {
                 CanvasPlus::Canvas canvas(hdc);
 
                 switch (pDemoApp->m_CurrentSampleIndex)
@@ -224,8 +227,11 @@ LRESULT CALLBACK DemoApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case 9:
                     Sample10(canvas);
                     break;
+                     case 10:
+                    Sample11(canvas);
+                    break;
                 }
-
+                } //need to call destructor before end
                 // TODO: Add any drawing code here...
                 EndPaint(pDemoApp->m_hwnd, &ps);
             }
