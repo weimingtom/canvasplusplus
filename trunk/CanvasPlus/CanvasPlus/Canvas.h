@@ -212,6 +212,10 @@ namespace CanvasPlus //Better name?
     {
         friend class Canvas;
         void* m_pNativeHandle;
+        int flags;
+
+        void Check();
+
         Context2D(void*);
         Context2D(const Context2D&);//
 
@@ -252,6 +256,9 @@ namespace CanvasPlus //Better name?
         void beginPath();
         void closePath();
         void stroke();
+        void fill();
+        void clip();
+        void rect(double x, double y, double w, double h);
     };
 
     class Canvas

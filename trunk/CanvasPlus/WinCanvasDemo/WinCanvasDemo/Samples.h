@@ -11,3 +11,4 @@ void Sample7(CanvasPlus::Canvas&);
 void Sample8(CanvasPlus::Canvas&);
 void Sample9(CanvasPlus::Canvas&);
 void Sample10(CanvasPlus::Canvas&);
+void Sample11(CanvasPlus::Canvas&);

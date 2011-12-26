@@ -14,15 +14,15 @@
 ///
 
 
-inline void DrawBitmap (HDC hdc, HBITMAP hbm, int Left, int Top)
+inline void DrawBitmap(HDC hdc, HBITMAP hbm, int Left, int Top)
 {
     BOOL f;
     HDC hdcBits;
     BITMAP bm;
     hdcBits = CreateCompatibleDC(hdc);
-    GetObject (hbm, sizeof(BITMAP), &bm);
-    SelectObject(hdcBits,hbm);
-    f = BitBlt(hdc,Left,Top,bm.bmWidth, bm.bmHeight,hdcBits,0,0,SRCCOPY);
+    GetObject(hbm, sizeof(BITMAP), &bm);
+    SelectObject(hdcBits, hbm);
+    f = BitBlt(hdc, Left, Top, bm.bmWidth, bm.bmHeight, hdcBits, 0, 0, SRCCOPY);
     DeleteDC(hdcBits);
 }
 
@@ -44,7 +44,6 @@ inline HBITMAP CreateBitmap_32(const SIZE& size, void** pBits)
     }
 
     BITMAPINFO bi = {0};
-
     // Fill in the BITMAPINFOHEADER
     bi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
     bi.bmiHeader.biWidth       = size.cx;
@@ -53,7 +52,6 @@ inline HBITMAP CreateBitmap_32(const SIZE& size, void** pBits)
     bi.bmiHeader.biPlanes      = 1;
     bi.bmiHeader.biBitCount    = 32;
     bi.bmiHeader.biCompression = BI_RGB;
-
     LPVOID pData = NULL;
     HBITMAP hbmp = ::CreateDIBSection(NULL, &bi, DIB_RGB_COLORS, &pData, NULL, 0);
 
@@ -78,12 +76,9 @@ inline COLORREF  __stdcall PixelAlpha(COLORREF srcPixel, int percent)
     // but not the color(a real alpha blending had to mix the source and
     // destination pixels, e.g. mixing green and red makes yellow).
     // For our nice "menu" shadows its good enough.
-
-    COLORREF clrFinal = RGB( min(255, (GetRValue(srcPixel) * percent) / 100), min(255, (GetGValue(srcPixel) * percent) / 100), min(255, (GetBValue(srcPixel) * percent) / 100));
-
+    COLORREF clrFinal = RGB(min(255, (GetRValue(srcPixel) * percent) / 100), min(255, (GetGValue(srcPixel) * percent) / 100), min(255, (GetBValue(srcPixel) * percent) / 100));
     // TRACE("%d %d %d\n", GetRValue(clrFinal), GetGValue(clrFinal), GetBValue(clrFinal));
     return(clrFinal);
-
 }
 
 inline int GetHeight(const RECT& rect)
@@ -108,18 +103,16 @@ inline void __stdcall SetAlphaPixel(COLORREF* pBits,
                                     BOOL bIsRight)
 {
     // Our direct bitmap access swapped the y coordinate...
-    y = (rect_Height+ iShadowSize)- y;
-
-    COLORREF* pColor = (COLORREF*)(bIsRight ? (pBits +(rect_Width + iShadowSize) *(y + 1) - x) : (pBits +(rect_Width + iShadowSize) * y + x));
-
+    y = (rect_Height + iShadowSize) - y;
+    COLORREF* pColor = (COLORREF*)(bIsRight ? (pBits + (rect_Width + iShadowSize) * (y + 1) - x) : (pBits + (rect_Width + iShadowSize) * y + x));
     *pColor = PixelAlpha(*pColor, percent);
 
-    if (clrBase == (COLORREF)-1)
+    if (clrBase == (COLORREF) - 1)
     {
         return;
     }
 
-    *pColor = RGB( min(255, (3 * GetRValue(*pColor) + GetBValue(clrBase)) / 4), min(255, (3 * GetGValue(*pColor) + GetGValue(clrBase)) / 4), min(255, (3 * GetBValue(*pColor) + GetRValue(clrBase)) / 4));
+    *pColor = RGB(min(255, (3 * GetRValue(*pColor) + GetBValue(clrBase)) / 4), min(255, (3 * GetGValue(*pColor) + GetGValue(clrBase)) / 4), min(255, (3 * GetBValue(*pColor) + GetRValue(clrBase)) / 4));
 }
 
 
@@ -130,7 +123,7 @@ static BOOL DrawShadow(HDC hdc,
                        int nDepth,                     // Shadow depth (pixels)
                        int iMinBrightness = 100,       // Min. brighttness
                        int iMaxBrightness = 50,        // Max. beightness
-                       COLORREF clrBase =(COLORREF)-1, // Base color
+                       COLORREF clrBase = (COLORREF) - 1, // Base color
                        BOOL bRightShadow = TRUE)
 {
     assert(nDepth >= 0);
@@ -142,11 +135,10 @@ static BOOL DrawShadow(HDC hdc,
 
     const int cx = GetWidth(rect);
     const int cy = GetHeight(rect);
-
     const BOOL bIsLeft = !bRightShadow;
-
     // Copy screen content into the memory bitmap:
     HDC hdcMem = ::CreateCompatibleDC(hdc);
+
     if (hdcMem == NULL)
     {
         assert(FALSE);
@@ -155,6 +147,7 @@ static BOOL DrawShadow(HDC hdc,
 
     // Gets the whole menu and changes the shadow.
     HBITMAP hbmpMem = ::CreateCompatibleBitmap(hdc, cx + nDepth, cy + nDepth);
+
     if (hbmpMem  == NULL)
     {
         ::DeleteDC(hdcMem);
@@ -163,7 +156,6 @@ static BOOL DrawShadow(HDC hdc,
     }
 
     HBITMAP hOldBmp = (HBITMAP)SelectObject(hdcMem, hbmpMem);
-
     COLORREF* pBits;
     SIZE sz = {cx + nDepth, cy + nDepth};
     HBITMAP hmbpDib = CreateBitmap_32(sz, (LPVOID*)&pBits);
@@ -172,14 +164,12 @@ static BOOL DrawShadow(HDC hdc,
     {
         ::DeleteDC(hdcMem);
         ::DeleteObject(hbmpMem);
-
         assert(FALSE);
         return FALSE;
     }
 
     ::SelectObject(hdcMem, hmbpDib);
     ::BitBlt(hdcMem, 0, 0, cx + nDepth, cy + nDepth, hdc, bIsLeft ? rect.left - nDepth : rect.left, rect.top, SRCCOPY);
-
     // Process shadowing:
     // For having a very nice shadow effect, its actually hard work. Currently,
     // I'm using a more or less "hardcoded" way to set the shadows(by using a
@@ -190,11 +180,9 @@ static BOOL DrawShadow(HDC hdc,
     // It always draws a few lines, from left to bottom, from bottom to right,
     // from right to up, and from up to left). It does this for the specified
     // shadow width and the color settings.
-
     // For speeding up things, iShadowOffset is the
     // value which is needed to multiply for each shadow step
     const int iShadowOffset = (iMaxBrightness - iMinBrightness) / nDepth;
-
     const int rect_Width = GetWidth(rect);
     const int rect_Height = GetHeight(rect);
 
@@ -202,38 +190,36 @@ static BOOL DrawShadow(HDC hdc,
     for (int c = 0; c < nDepth; c++)
     {
         // Draw the shadow from left to bottom
-        for (int y = cy; y < cy +(nDepth - c); y++)
+        for (int y = cy; y < cy + (nDepth - c); y++)
         {
-            SetAlphaPixel(pBits, rect_Width, rect_Height, c + nDepth, y, iMaxBrightness -((nDepth  - c) *(iShadowOffset)), nDepth, clrBase, bIsLeft);
+            SetAlphaPixel(pBits, rect_Width, rect_Height, c + nDepth, y, iMaxBrightness - ((nDepth  - c) * (iShadowOffset)), nDepth, clrBase, bIsLeft);
         }
 
         // Draw the shadow from left to right
-        for (int x = nDepth +(nDepth - c); x < cx + c; x++)
+        for (int x = nDepth + (nDepth - c); x < cx + c; x++)
         {
-            SetAlphaPixel(pBits, rect_Width, rect_Height, x, cy + c, iMaxBrightness -((c) *(iShadowOffset)),nDepth, clrBase, bIsLeft);
+            SetAlphaPixel(pBits, rect_Width, rect_Height, x, cy + c, iMaxBrightness - ((c) * (iShadowOffset)), nDepth, clrBase, bIsLeft);
         }
 
         // Draw the shadow from top to bottom
-        for (int y1 = nDepth +(nDepth - c); y1 < cy + c + 1; y1++)
+        for (int y1 = nDepth + (nDepth - c); y1 < cy + c + 1; y1++)
         {
-            SetAlphaPixel(pBits,  rect_Width, rect_Height, cx+c, y1, iMaxBrightness -((c) *(iShadowOffset)), nDepth, clrBase, bIsLeft);
+            SetAlphaPixel(pBits,  rect_Width, rect_Height, cx + c, y1, iMaxBrightness - ((c) * (iShadowOffset)), nDepth, clrBase, bIsLeft);
         }
 
         // Draw the shadow from top to left
-        for (int x1 = cx; x1 < cx +(nDepth - c); x1++)
+        for (int x1 = cx; x1 < cx + (nDepth - c); x1++)
         {
-            SetAlphaPixel(pBits,  rect_Width, rect_Height, x1, c + nDepth, iMaxBrightness -((nDepth - c) *(iShadowOffset)), nDepth, clrBase, bIsLeft);
+            SetAlphaPixel(pBits,  rect_Width, rect_Height, x1, c + nDepth, iMaxBrightness - ((nDepth - c) * (iShadowOffset)), nDepth, clrBase, bIsLeft);
         }
     }
 
     // Copy shadowed bitmap back to the screen:
     ::BitBlt(hdc, bIsLeft ? rect.left - nDepth : rect.left, rect.top, cx + nDepth, cy + nDepth, hdcMem, 0, 0, SRCCOPY);
-
     ::SelectObject(hdcMem, hOldBmp);
     ::DeleteObject(hmbpDib);
     ::DeleteDC(hdcMem);
     ::DeleteObject(hbmpMem);
-
     return TRUE;
 }
 
@@ -312,7 +298,7 @@ namespace CanvasPlus
         double x0, y0, x1, y1;
 
         unsigned int refcount;
-        
+
 
         void Release()
         {
@@ -335,7 +321,6 @@ namespace CanvasPlus
             this->y0 = y0;
             this->x1 = x1;
             this->y1 = y1;
-
             refcount == 0;
         }
 
@@ -444,43 +429,49 @@ namespace CanvasPlus
 
     Font& Font::operator = (const char* psz)
     {
-         if (m_pNativeObject)
-         {
-             ::DeleteObject((HDC)m_pNativeObject);
-             m_pNativeObject = nullptr;
-         }
-         
-         // TODO THIS IS NOT A PARSER 
-         // PROVISORY
-        
-         std::string str(psz);
+        if (m_pNativeObject)
+        {
+            ::DeleteObject((HDC)m_pNativeObject);
+            m_pNativeObject = nullptr;
+        }
 
-         //"When the context is created, the font of the
+        // TODO THIS IS NOT A PARSER
+        // PROVISORY
+        std::string str(psz);
+        //"When the context is created, the font of the
         //context must be set to 10px sans-serif. "
         LOGFONT logFont;
-        
+
         /////////////////////////////////////////////////
         if (str.find("12pt") != std::string::npos)
-           logFont.lfHeight = 12; //-17;
-        else if (str.find("14px") != std::string::npos)
-           logFont.lfHeight = -14; //-17;
-        else 
         {
-          logFont.lfHeight = -10; //-17;
+            logFont.lfHeight = 12;    //-17;
         }
-        ////////////////////////////////////////////////
+        else if (str.find("14px") != std::string::npos)
+        {
+            logFont.lfHeight = -14;    //-17;
+        }
+        else
+        {
+            logFont.lfHeight = -10; //-17;
+        }
 
+        ////////////////////////////////////////////////
         logFont.lfWidth = 0;
         logFont.lfEscapement = 0;
         logFont.lfOrientation = 0;
-        
+
         ////
         if (str.find("bold") != std::string::npos)
+        {
             logFont.lfWeight = 700;
+        }
         else
+        {
             logFont.lfWeight = 400;
-        ////
+        }
 
+        ////
         logFont.lfItalic = 0;
         logFont.lfUnderline = 0;
         logFont.lfStrikeOut = 0;
@@ -489,11 +480,15 @@ namespace CanvasPlus
         logFont.lfClipPrecision = 2;
         logFont.lfQuality = 1;
         logFont.lfPitchAndFamily = 49;
-        
+
         if (str.find("arial") != std::string::npos)
-          wcscpy(logFont.lfFaceName , L"arial");
+        {
+            wcscpy(logFont.lfFaceName , L"arial");
+        }
         else
-          wcscpy(logFont.lfFaceName , L"sans-serif");
+        {
+            wcscpy(logFont.lfFaceName , L"sans-serif");
+        }
 
         m_pNativeObject = (void*)CreateFontIndirect(&logFont);
         return *this;
@@ -512,19 +507,81 @@ namespace CanvasPlus
         return m_CanvasRenderingContext2D;
     }
 
+
+    void Context2D::Check()
+    {
+        //because GDI closes the path after Fill or stroke
+        //we need a state to do both at the same time
+        if (this->flags == 0)
+        {
+            //not using path
+            return;
+        }
+
+        //------------------------------
+        HDC hdc = (HDC) m_pNativeHandle;
+        //-------------------------------
+
+        if (this->flags == 1)
+        {
+            COLORREF color = RGB(strokeStyle.m_Color.r, strokeStyle.m_Color.g, strokeStyle.m_Color.b);
+            HPEN hpen = CreatePen(PS_SOLID, lineWidth, color); //TODO
+            HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
+            StrokePath(hdc);
+            SelectObject(hdc, oldPen);
+        }
+        else if (this->flags == 2)
+        {
+            COLORREF color = RGB(fillStyle.m_Color.r, fillStyle.m_Color.g, fillStyle.m_Color.b);
+            LOGBRUSH logbrush;
+            logbrush.lbColor = color;
+            logbrush.lbStyle = BS_SOLID;
+            logbrush.lbHatch = 0;
+            HBRUSH hBrush = CreateBrushIndirect(&logbrush);
+            HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+            //
+            FillPath(hdc);
+            //
+            SelectObject(hdc, oldBrush);
+            DeleteObject(hBrush);
+        }
+        else if (this->flags == 3)
+        {
+            COLORREF color2 = RGB(strokeStyle.m_Color.r, strokeStyle.m_Color.g, strokeStyle.m_Color.b);
+            HPEN hpen = CreatePen(PS_SOLID, lineWidth, color2); //TODO
+            HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
+            COLORREF color = RGB(fillStyle.m_Color.r, fillStyle.m_Color.g, fillStyle.m_Color.b);
+            LOGBRUSH logbrush;
+            logbrush.lbColor = color;
+            logbrush.lbStyle = BS_SOLID;
+            logbrush.lbHatch = 0;
+            HBRUSH hBrush = CreateBrushIndirect(&logbrush);
+            HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+            //
+            StrokeAndFillPath(hdc);
+            //
+            SelectObject(hdc, oldPen);
+            SelectObject(hdc, oldBrush);
+            DeleteObject(hBrush);
+        }
+
+        this->flags = 0;
+    }
+
     Context2D::Context2D(void* p)
         : m_pNativeHandle(p)
     {
+        this->flags = 0;
         this->lineWidth = 1.0;
         this->shadowColor = "rgb(0,0,0)";
         this->shadowOffsetX = 0;
         this->shadowOffsetY = 0;
         this->shadowBlur = 0;
-
     }
 
     Context2D::~Context2D()
     {
+        Check();
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -533,6 +590,7 @@ namespace CanvasPlus
     //  has no effect.
     void Context2D::fillRect(double x, double y, double w, double h)
     {
+        Check();
         //------------------------------
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------
@@ -540,7 +598,7 @@ namespace CanvasPlus
         RECT rect = {(LONG)x, (LONG)y, (LONG)(x + w), (LONG)(y + h)};
 
         if (this->shadowOffsetX != 0 &&
-            this->shadowOffsetY != 0)
+                this->shadowOffsetY != 0)
         {
             DrawShadow(hdc, rect, shadowOffsetX);
         }
@@ -553,33 +611,32 @@ namespace CanvasPlus
         else if (fillStyle.fillStyleEnum == FillStyleEnumGradient)
         {
             UINT mode = fillStyle.canvasGradient.pCanvasGradientImp->isVertical() ?
-                       GRADIENT_FILL_RECT_V: 
-                       GRADIENT_FILL_RECT_H;
-
+                        GRADIENT_FILL_RECT_V :
+                        GRADIENT_FILL_RECT_H;
             COLORREF color1 = fillStyle.canvasGradient.pCanvasGradientImp->color1;
-            COLORREF color2 = fillStyle.canvasGradient.pCanvasGradientImp->color2;             
+            COLORREF color2 = fillStyle.canvasGradient.pCanvasGradientImp->color2;
 
-            if (mode == GRADIENT_FILL_RECT_V && 
-                fillStyle.canvasGradient.pCanvasGradientImp->y0 >
-                fillStyle.canvasGradient.pCanvasGradientImp->y1)
+            if (mode == GRADIENT_FILL_RECT_V &&
+                    fillStyle.canvasGradient.pCanvasGradientImp->y0 >
+                    fillStyle.canvasGradient.pCanvasGradientImp->y1)
             {
                 std::swap(color1, color2);
             }
 
-            if (mode == GRADIENT_FILL_RECT_H && 
-                fillStyle.canvasGradient.pCanvasGradientImp->x0 >
-                fillStyle.canvasGradient.pCanvasGradientImp->x1)
+            if (mode == GRADIENT_FILL_RECT_H &&
+                    fillStyle.canvasGradient.pCanvasGradientImp->x0 >
+                    fillStyle.canvasGradient.pCanvasGradientImp->x1)
             {
                 std::swap(color1, color2);
             }
 
-
-            FillGradientRect(hdc, rect, color1,color2, mode);
+            FillGradientRect(hdc, rect, color1, color2, mode);
         }
     }
 
     void Context2D::strokeRect(double x, double y, double w, double h)
     {
+        Check();
         //------------------------------
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------
@@ -614,6 +671,7 @@ namespace CanvasPlus
 
     TextMetrics Context2D::measureText(const wchar_t* psz)
     {
+        Check();
         //------------------------------
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------
@@ -626,6 +684,7 @@ namespace CanvasPlus
 
     void Context2D::moveTo(double x, double y)
     {
+        Check();
         //------------------------------
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------
@@ -636,30 +695,88 @@ namespace CanvasPlus
 
     void Context2D::lineTo(double x, double y)
     {
+        Check();
         //------------------------------
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------
         const int ix = ToPixelX(x);
         const int iy = ToPixelY(y);
-        COLORREF color = RGB(fillStyle.m_Color.r, fillStyle.m_Color.g, fillStyle.m_Color.b);
-        HPEN hpen = CreatePen(PS_SOLID, lineWidth, color); //TODO
-        HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
         //
         ::LineTo(hdc, ix, iy);
         //
-        SelectObject(hdc, oldPen);
     }
 
     void Context2D::beginPath()
     {
+        Check();
+        //------------------------------
+        HDC hdc = (HDC) m_pNativeHandle;
+        //-------------------------------
+        BeginPath(hdc);
     }
 
     void Context2D::closePath()
     {
+        Check();
+        //------------------------------
+        HDC hdc = (HDC) m_pNativeHandle;
+        //-------------------------------
+        EndPath(hdc);
     }
-    
+
+    void Context2D::rect(double x, double y, double w, double h)
+    {
+        //------------------------------
+        HDC hdc = (HDC) m_pNativeHandle;
+        //-------------------------------
+        ::Rectangle(hdc, x, y, x + w, y + h);
+    }
+    void Context2D::clip()
+    {
+        // The clip() method must create a new clipping region by calculating the intersection
+        //of the current clipping region and the area described by the current path, using the
+        //non-zero winding number rule. Open subpaths must be implicitly closed when computing
+        //the clipping region, without affecting the actual subpaths. The new clipping region
+        //replaces the current clipping region.
+        //When the context is initialized, the clipping region must be set to the rectangle with the top left corner at (0,0) and the width and height of the coordinate space.
+        //------------------------------
+        HDC hdc = (HDC) m_pNativeHandle;
+        //-------------------------------
+        EndPath(hdc);
+        SelectClipPath(hdc, RGN_AND);
+        //TODO
+    }
+
+    void Context2D::fill()
+    {
+        Check();
+
+        if (flags == 0)
+        {
+            flags = 2;
+        }
+        else if (flags == 1)
+        {
+            flags = 3;
+        }
+
+        //------------------------------
+        HDC hdc = (HDC) m_pNativeHandle;
+        //-------------------------------
+    }
+
     void Context2D::stroke()
     {
+        Check();
+
+        if (flags == 0)
+        {
+            flags = 1;
+        }
+        else if (flags == 2)
+        {
+            flags = 3;
+        }
     }
 
     static void GdiTextOut(HDC hdc,
@@ -745,6 +862,7 @@ namespace CanvasPlus
 
     void Context2D::fillText(const wchar_t* psz, double x, double y)
     {
+        Check();
         //------------------------------
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------

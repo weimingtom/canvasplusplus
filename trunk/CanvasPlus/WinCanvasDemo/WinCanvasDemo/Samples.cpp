@@ -10,7 +10,8 @@ using namespace CanvasPlus;
 
 void DrawPos(CanvasPlus::Context2D& ctx, double x, double y)
 {
-    ctx.beginPath();   
+    ctx.beginPath();
+    ctx.strokeStyle = "rgb(0,0,255)";
     ctx.moveTo(x - 20, y);
     ctx.lineTo(x + 20, y);
     ctx.moveTo(x, y - 20);
@@ -53,7 +54,22 @@ void Sample1(Canvas& canvas)
 void Sample2(Canvas& canvas)
 {
     Context2D& ctx = canvas.getContext("2d");
-    ctx.fillRect(10, 10, 50, 50);
+    ctx.beginPath();
+    ctx.rect(50, 50, 30, 30);
+    ctx.clip();
+    ctx.fillStyle = "rgb(0,0,0)";
+    ctx.fillRect(50, 50, 100, 100);
+    //   ctx.strokeStyle = "rgb(0,0,0)";
+    //  ctx.beginPath();
+    ctx.fillStyle = "rgb(0,170,0)";
+    // ctx.strokeStyle = "rgb(0,0,0)";
+    ctx.fillRect(60, 60, 40, 40);
+    ctx.textBaseline = "top";
+    ctx.fillStyle = "rgb(250,250,250)";
+    ctx.fillText(L"test clip", 50, 50);
+    // ctx.closePath();
+    // ctx.fill();
+    // ctx.stroke();
 }
 
 void Sample3(Canvas& canvas)
@@ -83,9 +99,7 @@ void Sample5(CanvasPlus::Canvas& canvas)
     auto h = 200;
     auto t = 100;
     auto l = 100;
-    
     ctx.font = "14px arial";
-
     //shadow
     ctx.shadowOffsetX = 10;
     ctx.shadowOffsetY = 10;
@@ -98,23 +112,16 @@ void Sample5(CanvasPlus::Canvas& canvas)
     ctx.strokeRect(l + 4, t + 4, w - 8, h - 8);
     auto text = L"Title";
     auto textw = ctx.measureText(text).width;
-
-    
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
-
     ctx.fillRect(l + w / 2 - textw / 2,
                  t + 2,
                  textw,
                  14);
-
     ctx.fillStyle = "rgb(0,0,0)";
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     ctx.fillText(text, l + w / 2, t);
-
-    
-
 }
 void Sample6(CanvasPlus::Canvas& canvas)
 {
@@ -147,7 +154,7 @@ void Sample8(CanvasPlus::Canvas& canvas)
 void Sample9(CanvasPlus::Canvas& canvas)
 {
     Context2D& ctx = canvas.getContext("2d");
-    auto lingrad = ctx.createLinearGradient(0, 10 + 130, 0, 10 );
+    auto lingrad = ctx.createLinearGradient(0, 10 + 130, 0, 10);
     lingrad.addColorStop(0, "rgb(255,0,0)");
     lingrad.addColorStop(1, "rgb(255,255,255)");
     ctx.fillStyle = lingrad;
@@ -156,18 +163,48 @@ void Sample9(CanvasPlus::Canvas& canvas)
 void Sample10(CanvasPlus::Canvas& canvas)
 {
     Context2D& ctx = canvas.getContext("2d");
-    
     ctx.shadowOffsetX = 5;
     ctx.shadowOffsetY = 5;
     ctx.shadowBlur = 5;
-    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";  
-
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
     ctx.fillStyle = "rgb(255,0,0)";
-
     ctx.fillRect(20, 20, 150, 100);
 }
 
 void Sample11(CanvasPlus::Canvas& canvas)
 {
-    Context2D& ctx = canvas.getContext("2d");        
+    Context2D& ctx = canvas.getContext("2d");
+    bool ispressed =  false;
+    bool isfocused = true;
+    bool isMouseOver = false;
+    auto lingrad = ctx.createLinearGradient(0, 10 + 130, 0, 10);
+
+    if (ispressed)
+    {
+        lingrad.addColorStop(0, "rgb(245,245,245)");
+        lingrad.addColorStop(1, "rgb(220,220,220)");
+    }
+    else
+    {
+        lingrad.addColorStop(1, "rgb(220,220,220)");
+        lingrad.addColorStop(0, "rgb(245,245,245)");
+    }
+
+    ctx.fillStyle = lingrad;
+    ctx.fillRect(10, 10, 130, 130);
+
+    if (isfocused)
+    {
+        ctx.strokeStyle = "rgb(74,144,254)";
+    }
+    else
+    {
+        ctx.strokeStyle = "rgb(198,198,198)";
+    }
+
+    ctx.strokeRect(10, 10, 130, 130);
+    ctx.fillStyle = "rgb(0,0,0)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(L"Button", (10 + 10 + 130) / 2, (10 + 10 + 130) / 2);
 }
