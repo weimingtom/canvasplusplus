@@ -54,3 +54,7 @@ Direct 2d (not started), but probably it will be the api used in windows 8 apps.
 3) IOs
   Can run un iPads and IOs (CGContext)
 http://developer.apple.com/library/ios/#documentation/GraphicsImaging/Reference/CGContext/Reference/reference.html
+
+
+==Learning HTML5 Canvas==
+http://www.html5canvastutorials.com/
