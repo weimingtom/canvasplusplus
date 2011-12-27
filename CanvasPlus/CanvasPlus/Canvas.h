@@ -135,7 +135,7 @@ namespace CanvasPlus //Better name?
         CanvasGradient(CanvasGradientImp*);
         ~CanvasGradient();
 
-        void addColorStop(double offset, const char* color);
+        void addColorStop(double offset, const Color& color);
     };
 
     //TODO

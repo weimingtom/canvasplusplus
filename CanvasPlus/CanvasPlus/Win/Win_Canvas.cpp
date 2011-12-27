@@ -330,10 +330,8 @@ namespace CanvasPlus
         }
 
         // opaque object
-        void addColorStop(double offset, const char* colortxt)
+        void addColorStop(double offset, const Color& color)
         {
-            CanvasPlus::Color color(colortxt);
-
             if (offset == 0)
             {
                 color1 = RGB(color.r, color.g, color.b);
@@ -351,7 +349,7 @@ namespace CanvasPlus
 
 
 
-    void CanvasGradient::addColorStop(double offset, const char* color)
+    void CanvasGradient::addColorStop(double offset, const Color& color)
     {
         if (pCanvasGradientImp)
         {
