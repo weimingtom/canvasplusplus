@@ -43,8 +43,6 @@ namespace CanvasPlus //Better name?
         Color(const char*);
     };
 
-    void ParserColor(const char* psz, Color&);
-
 
     //The possible values are start, end, left, right, and center.
     enum TextAlignEnum
@@ -189,7 +187,7 @@ namespace CanvasPlus //Better name?
         FillStyle& operator = (const char* color)
         {
             fillStyleEnum = FillStyleEnumSolid;
-            ParserColor(color, m_Color);
+            m_Color = color;
             return *this;
         }
 

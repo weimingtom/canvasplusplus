@@ -137,7 +137,7 @@ void Sample7(CanvasPlus::Canvas& canvas)
 {
     Context2D& ctx = canvas.getContext("2d");
     auto lingrad = ctx.createLinearGradient(10, 0, 130, 0);
-    lingrad.addColorStop(0, "rgb(255,0,0)");
+    lingrad.addColorStop(0, "#FF01F2");
     lingrad.addColorStop(1, "rgb(255,255,255)");
     ctx.fillStyle = lingrad;
     ctx.fillRect(10, 10, 130, 130);
