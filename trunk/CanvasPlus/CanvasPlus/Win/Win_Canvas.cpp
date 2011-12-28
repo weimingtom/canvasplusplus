@@ -768,10 +768,6 @@ namespace CanvasPlus
         {
             flags = 3;
         }
-
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
     }
 
     void Context2D::stroke()
