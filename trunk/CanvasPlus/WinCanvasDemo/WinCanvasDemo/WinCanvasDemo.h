@@ -55,7 +55,7 @@ private:
         );
 private:
     HWND m_hwnd;  
-    static const int TOTALSAMPLES = 11;
+    
     int m_CurrentSampleIndex;;
 };
 

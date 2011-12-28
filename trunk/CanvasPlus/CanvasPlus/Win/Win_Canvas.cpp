@@ -525,11 +525,15 @@ namespace CanvasPlus
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------
 
+        
+            
+
         if (this->flags == 1)
         {
             COLORREF color = RGB(strokeStyle.m_Color.r, strokeStyle.m_Color.g, strokeStyle.m_Color.b);
             HPEN hpen = CreatePen(PS_SOLID, lineWidth, color); //TODO
             HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
+            
             StrokePath(hdc);
             SelectObject(hdc, oldPen);
         }
@@ -561,6 +565,7 @@ namespace CanvasPlus
             HBRUSH hBrush = CreateBrushIndirect(&logbrush);
             HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
             //
+            
             StrokeAndFillPath(hdc);
             //
             SelectObject(hdc, oldPen);
@@ -724,6 +729,7 @@ namespace CanvasPlus
         //------------------------------
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------
+        CloseFigure(hdc);
         EndPath(hdc);
     }
 
