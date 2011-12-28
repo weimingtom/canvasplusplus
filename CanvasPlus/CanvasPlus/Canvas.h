@@ -151,6 +151,7 @@ namespace CanvasPlus //Better name?
 
     public:
         Font();
+        Font(const Font&);
         ~Font();
 
         Font& operator = (const char*);
@@ -184,8 +185,10 @@ namespace CanvasPlus //Better name?
             fillStyleEnum =  FillStyleEnumSolid;
         }
 
-        FillStyle& operator = (const char* color)
+        FillStyle& operator = (const Color& color)
         {
+            //canvasGradient reset?
+
             fillStyleEnum = FillStyleEnumSolid;
             m_Color = color;
             return *this;
