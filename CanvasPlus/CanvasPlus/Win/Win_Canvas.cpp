@@ -675,8 +675,11 @@ namespace CanvasPlus
         //-------------------------------
         //  TEXTMETRIC tm;
         //  GetTextMetrics(hdc, &tm);
+        //
+        HFONT oldfont = (HFONT) SelectObject(hdc, (HFONT)font.m_pNativeObject);
         SIZE sz;
         ::GetTextExtentPoint(hdc, psz, wcslen(psz), &sz);
+        ::SelectObject(hdc, oldfont);
         return TextMetrics(sz.cx);
     }
 
