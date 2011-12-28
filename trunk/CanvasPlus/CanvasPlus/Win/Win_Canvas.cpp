@@ -420,6 +420,11 @@ namespace CanvasPlus
         m_pNativeObject = (void*)CreateFontIndirect(&logFont);
     }
 
+    Font::Font(const Font&)
+    {
+        assert(false);
+    }
+
     Font::~Font()
     {
         ::DeleteObject((HDC)m_pNativeObject);
