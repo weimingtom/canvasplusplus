@@ -66,7 +66,7 @@ namespace CanvasPlus
         {
             return TextBaselineIdeographic;
         }
-        else if (psz == "bottom" || strcmp(psz, "bottom") == 0)
+        else if (strcmp(psz, "bottom") == 0)
         {
             return TextBaselineBottom;
         }

@@ -164,6 +164,7 @@ namespace CanvasPlus //Better name?
         TextMetrics(double w) : width(w)
         {
         }
+        TextMetrics& operator=(const TextMetrics& other); //not imp       
     };
 
     enum FillStyleEnum
@@ -222,6 +223,8 @@ namespace CanvasPlus //Better name?
 
         int ToPixelX(double);
         int ToPixelY(double);
+        int ToPixelSizeX(double);
+        int ToPixelSizeY(double);
 
     public:
 

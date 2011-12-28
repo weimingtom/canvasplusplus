@@ -176,7 +176,7 @@ void Sample11(CanvasPlus::Canvas& canvas)
     Context2D& ctx = canvas.getContext("2d");
     bool ispressed =  false;
     bool isfocused = true;
-    bool isMouseOver = false;
+
     auto lingrad = ctx.createLinearGradient(0, 10 + 130, 0, 10);
 
     if (ispressed)
@@ -236,9 +236,9 @@ void Sample13(CanvasPlus::Canvas& canvas)
     ctx.stroke();
     }
 }
-void Sample14(CanvasPlus::Canvas& canvas)
+void Sample14(CanvasPlus::Canvas& /*canvas*/)
 {
 }
-void Sample15(CanvasPlus::Canvas& canvas)
+void Sample15(CanvasPlus::Canvas& /*canvas*/)
 {
 }

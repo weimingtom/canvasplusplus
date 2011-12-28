@@ -100,7 +100,7 @@ void DemoApp::RunMessageLoop()
 
 //  If the application receives a WM_SIZE message, this method
 //  resizes the render target appropriately.
-void DemoApp::OnResize(UINT width, UINT height)
+void DemoApp::OnResize(UINT /*width*/, UINT /*height*/)
 {
 }
 
