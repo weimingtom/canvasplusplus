@@ -4,6 +4,8 @@
 #include <cassert>
 #include "..\Canvas.h"
 
+
+
 //THIS FILE IS WINDOWS ONLY AND GDI ONLY
 //GDI+ at the same file?
 
@@ -224,26 +226,6 @@ static BOOL DrawShadow(HDC hdc,
 }
 
 
-static void GradientRectH(HDC hDC, RECT& rect, COLORREF fore, COLORREF bk)
-{
-    TRIVERTEX v[2];
-    GRADIENT_RECT r[1];
-    v[0].x     = (rect.left);
-    v[0].y     = (rect.top);
-    v[0].Red   = GetRValue(bk) << 8;
-    v[0].Green = GetGValue(bk) << 8;
-    v[0].Blue  = GetBValue(bk) << 8;
-    v[0].Alpha = 0x0000;
-    v[1].x     = (rect.right);
-    v[1].y     = (rect.bottom);
-    v[1].Red   = GetRValue(fore) << 8;
-    v[1].Green = GetGValue(fore) << 8;
-    v[1].Blue  = GetBValue(fore) << 8;
-    v[1].Alpha = 0x0000;
-    r[0].UpperLeft = 0;
-    r[0].LowerRight = 1;
-    GradientFill(hDC, v, (ULONG)2, r, (ULONG)1, GRADIENT_FILL_RECT_H);
-}
 
 static void FillGradientRect(HDC hDC, RECT& rect, COLORREF bk, COLORREF fore,  ULONG dwMode)
 {
@@ -266,16 +248,7 @@ static void FillGradientRect(HDC hDC, RECT& rect, COLORREF bk, COLORREF fore,  U
     GradientFill(hDC, v, (ULONG)2, r, (ULONG)1, dwMode);
 }
 
-//, GRADIENT_FILL_RECT_H
-static void GradientRectV(HDC hdc, RECT& rect, COLORREF fore, COLORREF bk, ULONG dwMode = GRADIENT_FILL_RECT_V)
-{
-    FillGradientRect(hdc, rect, bk, fore, GRADIENT_FILL_RECT_V);
-}
 
-static void GradientRectH(HDC hdc, RECT& rect, COLORREF fore, COLORREF bk, ULONG dwMode = GRADIENT_FILL_RECT_V)
-{
-    FillGradientRect(hdc, rect, fore, bk, GRADIENT_FILL_RECT_H);
-}
 
 static void FillSolidRect(HDC hDC, LPCRECT lpRect, COLORREF clr)
 {
@@ -290,6 +263,11 @@ static void FillSolidRect(HDC hDC, LPCRECT lpRect, COLORREF clr)
 
 namespace CanvasPlus
 {
+
+  inline COLORREF ColorToColorRef(const Color& color)
+  {
+    return RGB(color.r, color.g, color.b);
+   }
 
     struct CanvasGradientImp
     {
@@ -321,7 +299,7 @@ namespace CanvasPlus
             this->y0 = y0;
             this->x1 = x1;
             this->y1 = y1;
-            refcount == 0;
+            refcount = 1;
         }
 
         void AddRef()
@@ -530,8 +508,8 @@ namespace CanvasPlus
 
         if (this->flags == 1)
         {
-            COLORREF color = RGB(strokeStyle.m_Color.r, strokeStyle.m_Color.g, strokeStyle.m_Color.b);
-            HPEN hpen = CreatePen(PS_SOLID, lineWidth, color); //TODO
+            COLORREF color = ColorToColorRef(strokeStyle.m_Color);
+            HPEN hpen = CreatePen(PS_SOLID, (int)(lineWidth), color); //TODO
             HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
             
             StrokePath(hdc);
@@ -539,7 +517,7 @@ namespace CanvasPlus
         }
         else if (this->flags == 2)
         {
-            COLORREF color = RGB(fillStyle.m_Color.r, fillStyle.m_Color.g, fillStyle.m_Color.b);
+            COLORREF color = ColorToColorRef(fillStyle.m_Color);
             LOGBRUSH logbrush;
             logbrush.lbColor = color;
             logbrush.lbStyle = BS_SOLID;
@@ -554,10 +532,10 @@ namespace CanvasPlus
         }
         else if (this->flags == 3)
         {
-            COLORREF color2 = RGB(strokeStyle.m_Color.r, strokeStyle.m_Color.g, strokeStyle.m_Color.b);
-            HPEN hpen = CreatePen(PS_SOLID, lineWidth, color2); //TODO
+            COLORREF color2 = ColorToColorRef(strokeStyle.m_Color);
+            HPEN hpen = CreatePen(PS_SOLID, (int) lineWidth, color2); //TODO
             HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
-            COLORREF color = RGB(fillStyle.m_Color.r, fillStyle.m_Color.g, fillStyle.m_Color.b);
+            COLORREF color = ColorToColorRef(fillStyle.m_Color);
             LOGBRUSH logbrush;
             logbrush.lbColor = color;
             logbrush.lbStyle = BS_SOLID;
@@ -608,12 +586,12 @@ namespace CanvasPlus
         if (this->shadowOffsetX != 0 &&
                 this->shadowOffsetY != 0)
         {
-            DrawShadow(hdc, rect, shadowOffsetX);
+            DrawShadow(hdc, rect, (int)shadowOffsetX);
         }
 
         if (fillStyle.fillStyleEnum == FillStyleEnumSolid)
         {
-            COLORREF color = RGB(fillStyle.m_Color.r, fillStyle.m_Color.g, fillStyle.m_Color.b);
+            COLORREF color = ColorToColorRef(fillStyle.m_Color);
             FillSolidRect(hdc, &rect, color);
         }
         else if (fillStyle.fillStyleEnum == FillStyleEnumGradient)
@@ -648,11 +626,10 @@ namespace CanvasPlus
         //------------------------------
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------
-        //TODO waiting for transformations..
-        RECT rect = {(LONG)x, (LONG)y, (LONG)(x + w), (LONG)(y + h)};
-        COLORREF color = RGB(strokeStyle.m_Color.r, strokeStyle.m_Color.g, strokeStyle.m_Color.b);
-        //DrawRect(hdc, &rect, color);
-        HPEN hpen = CreatePen(PS_SOLID, lineWidth, color); //TODO
+        
+        COLORREF color = ColorToColorRef(strokeStyle.m_Color);
+        //
+        HPEN hpen = CreatePen(PS_SOLID, (int)lineWidth, color); //TODO
         HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
         HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, GetStockObject(HOLLOW_BRUSH));
         //
@@ -675,6 +652,19 @@ namespace CanvasPlus
         //TODO
         return (int) y;
     }
+
+    int Context2D::ToPixelSizeX(double x)
+    {
+        //TODO
+        return (int) x;
+    }
+
+    int Context2D::ToPixelSizeY(double y)
+    {
+        //TODO
+        return (int) y;
+    }
+
 
 
     TextMetrics Context2D::measureText(const wchar_t* psz)
@@ -738,7 +728,7 @@ namespace CanvasPlus
         //------------------------------
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------
-        ::Rectangle(hdc, x, y, x + w, y + h);
+        ::Rectangle(hdc, ToPixelX(x), ToPixelY(y), ToPixelX(x + w), ToPixelY(y + h));
     }
     void Context2D::clip()
     {
@@ -874,7 +864,7 @@ namespace CanvasPlus
         const int ix = ToPixelX(x);
         const int iy = ToPixelY(y);
         //
-        COLORREF color = RGB(fillStyle.m_Color.r, fillStyle.m_Color.g, fillStyle.m_Color.b);
+        COLORREF color = ColorToColorRef(fillStyle.m_Color);
         COLORREF oldcolor = SetTextColor(hdc, color);
         int oldbkmode = SetBkMode(hdc, TRANSPARENT);
         HFONT oldfont = (HFONT) SelectObject(hdc, (HFONT)font.m_pNativeObject);
