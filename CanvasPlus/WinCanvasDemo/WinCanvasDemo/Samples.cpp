@@ -208,3 +208,37 @@ void Sample11(CanvasPlus::Canvas& canvas)
     ctx.textBaseline = "middle";
     ctx.fillText(L"Button", (10 + 10 + 130) / 2, (10 + 10 + 130) / 2);
 }
+
+void Sample12(CanvasPlus::Canvas& canvas)
+{
+    Context2D& ctx = canvas.getContext("2d");
+    ctx.beginPath();
+    ctx.moveTo(100, 100);
+    ctx.lineTo(150, 200);
+    ctx.lineTo(250, 20);
+    ctx.closePath();
+    ctx.stroke();
+}
+
+void Sample13(CanvasPlus::Canvas& canvas)
+{
+    Context2D& ctx = canvas.getContext("2d");
+    for (int i = 0; i < 10; i++)
+    {
+    ctx.beginPath();
+    ctx.strokeStyle = "#00F2A0";
+    ctx.lineWidth = i;
+    ctx.moveTo(i * 10 + 100,i*10+ 100);
+    ctx.lineTo(i*10+150, i*10+200);
+    ctx.lineTo(i*10+250, i*10+20);
+    ctx.lineTo(i*10+50,i*10+ 20);
+    ctx.closePath();
+    ctx.stroke();
+    }
+}
+void Sample14(CanvasPlus::Canvas& canvas)
+{
+}
+void Sample15(CanvasPlus::Canvas& canvas)
+{
+}

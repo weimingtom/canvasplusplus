@@ -12,3 +12,9 @@ void Sample8(CanvasPlus::Canvas&);
 void Sample9(CanvasPlus::Canvas&);
 void Sample10(CanvasPlus::Canvas&);
 void Sample11(CanvasPlus::Canvas&);
+void Sample12(CanvasPlus::Canvas&);
+void Sample13(CanvasPlus::Canvas&);
+void Sample14(CanvasPlus::Canvas&);
+void Sample15(CanvasPlus::Canvas&);
+
+#define TOTALSAMPLES 15
