@@ -5,16 +5,126 @@
 #include "..\Canvas.h"
 
 
-
 //THIS FILE IS WINDOWS ONLY AND GDI ONLY
 //GDI+ at the same file?
 
 //TODO Direct2d
 
+
 //Gradient
 #pragma comment( lib, "msimg32.lib" )
 ///
 
+class SaveClipRgn
+{
+    HDC  m_hDC;
+    HRGN m_hOldRgn;
+
+public:
+    SaveClipRgn()
+    {
+        m_hDC = NULL;
+        m_hOldRgn = NULL;
+    }
+
+    ~SaveClipRgn()
+    {
+        Restore();
+        assert(m_hDC == NULL);
+        assert(m_hOldRgn == NULL);
+    }
+
+    SaveClipRgn(HDC hdc)
+    {
+        assert(hdc != NULL);
+        m_hDC = NULL;
+        m_hOldRgn = NULL;
+        Save(hdc);
+    }
+
+    HRGN GetOldRgn()
+    {
+        if (m_hDC == NULL)
+        {
+            assert(FALSE); //lint !e527
+            return NULL;
+        }
+
+        assert(m_hOldRgn != NULL);
+        return m_hOldRgn;
+    }
+
+    BOOL Save(HDC hdc)
+    {
+        assert(hdc != NULL);
+        assert(m_hOldRgn == NULL);
+        assert(m_hDC == NULL);
+        m_hOldRgn = ::CreateRectRgn(0, 0, 0, 0);
+
+        if (m_hOldRgn != NULL)
+        {
+            switch (GetClipRgn(hdc, m_hOldRgn))
+            {
+            case 1:
+            {
+                // success, m_hOldRgn contains the current clipping region for the DC
+                m_hDC = hdc;
+            }
+            break;
+
+            case 0:
+            {
+                // success, but the DC has no clipping region
+                m_hDC = hdc;
+                DeleteObject(m_hOldRgn);
+                m_hOldRgn = NULL;
+            }
+            break;
+
+            default:
+            case -1:
+            {
+                // erro
+                DeleteObject(m_hOldRgn);
+                m_hOldRgn = NULL;
+            }
+            break;
+            }
+        }
+
+        return (m_hDC != NULL);
+    }
+
+    BOOL Restore()
+    {
+        if (m_hDC == NULL)
+        {
+            return FALSE;
+        }
+
+        // m_hDC only gets stored if the clipping region was saved successfully,
+        // but m_hOldRgn may be NULL to indicate that no clipping region was defined
+        ::SelectClipRgn(m_hDC, m_hOldRgn);
+
+        if (m_hOldRgn != NULL)
+        {
+            // free the HRGN object (if any)
+            DeleteObject(m_hOldRgn);
+            m_hOldRgn = NULL;
+        }
+
+        m_hDC = NULL;
+        return TRUE;
+    }
+
+    HRGN Detach()
+    {
+        HRGN hRgn = m_hOldRgn;
+        m_hOldRgn = NULL;
+        m_hDC = NULL;
+        return hRgn;
+    }
+};
 
 inline void DrawBitmap(HDC hdc, HBITMAP hbm, int Left, int Top)
 {
@@ -263,11 +373,39 @@ static void FillSolidRect(HDC hDC, LPCRECT lpRect, COLORREF clr)
 
 namespace CanvasPlus
 {
+    struct CanvasStateInfo
+    {
+         // push state on state stack
+        //The current transformation matrix.
+        //The current clipping region.
+        SaveClipRgn m_SaveClipRgn;
+        //The current values of the following attributes: 
+        FillStyle strokeStyle;
+        FillStyle fillStyle;
+        //globalAlpha, 
+        double lineWidth;
+        //lineCap, 
+        //lineJoin, 
+        //miterLimit, 
+        double shadowOffsetX;
+        double shadowOffsetY;
+        double shadowBlur;
+        Color shadowColor;
+        //globalCompositeOperation, 
+        Font font;
+        TextAlign textAlign;
+        TextBaseline textBaseline;
+};
 
-  inline COLORREF ColorToColorRef(const Color& color)
-  {
-    return RGB(color.r, color.g, color.b);
-   }
+    
+    
+    
+
+
+    inline COLORREF ColorToColorRef(const Color& color)
+    {
+        return RGB(color.r, color.g, color.b);
+    }
 
     struct CanvasGradientImp
     {
@@ -503,15 +641,11 @@ namespace CanvasPlus
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------
 
-        
-            
-
         if (this->flags == 1)
         {
             COLORREF color = ColorToColorRef(strokeStyle.m_Color);
             HPEN hpen = CreatePen(PS_SOLID, (int)(lineWidth), color); //TODO
             HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
-            
             StrokePath(hdc);
             SelectObject(hdc, oldPen);
         }
@@ -543,7 +677,6 @@ namespace CanvasPlus
             HBRUSH hBrush = CreateBrushIndirect(&logbrush);
             HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
             //
-            
             StrokeAndFillPath(hdc);
             //
             SelectObject(hdc, oldPen);
@@ -568,6 +701,71 @@ namespace CanvasPlus
     Context2D::~Context2D()
     {
         Check();
+    }
+
+     // state
+    void Context2D::save()
+    {
+       CanvasStateInfo * p = new CanvasStateInfo();
+        
+        HDC hdc = (HDC) m_pNativeHandle;
+        
+        p->m_SaveClipRgn.Save(hdc);
+
+        // push state on state stack
+        //The current transformation matrix.
+        //The current clipping region.
+        //The current values of the following attributes: 
+        p->strokeStyle = strokeStyle;
+        p->fillStyle = fillStyle; 
+        //globalAlpha, 
+        p->lineWidth = lineWidth; 
+        //lineCap, 
+        //lineJoin, 
+        //miterLimit, 
+        p->shadowOffsetX = shadowOffsetX; 
+        p->shadowOffsetY = shadowOffsetY;
+        p->shadowBlur = shadowBlur;
+        p->shadowColor = shadowColor;
+        //globalCompositeOperation, 
+        p->font = font; 
+        p->textAlign = textAlign; 
+        p->textBaseline = textBaseline;
+
+    
+        m_stack.push_back(p);
+    }
+
+    void Context2D::restore()
+    {
+        // pop state stack and restore state
+         CanvasStateInfo * p = m_stack.back();
+         m_stack.pop_back();
+        
+        
+        p->m_SaveClipRgn.Restore();
+
+        // push state on state stack
+        //The current transformation matrix.
+        //The current clipping region.
+        //The current values of the following attributes: 
+        strokeStyle = p->strokeStyle;
+        fillStyle = p->fillStyle; 
+        //globalAlpha, 
+        lineWidth = p->lineWidth; 
+        //lineCap, 
+        //lineJoin, 
+        //miterLimit, 
+        shadowOffsetX = p->shadowOffsetX; 
+        shadowOffsetY = p->shadowOffsetY;
+        shadowBlur = p->shadowBlur;
+        shadowColor = p->shadowColor;
+        //globalCompositeOperation, 
+        font = p->font; 
+        textAlign = p->textAlign; 
+        textBaseline = p->textBaseline;
+    
+        delete p;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -626,7 +824,6 @@ namespace CanvasPlus
         //------------------------------
         HDC hdc = (HDC) m_pNativeHandle;
         //-------------------------------
-        
         COLORREF color = ColorToColorRef(strokeStyle.m_Color);
         //
         HPEN hpen = CreatePen(PS_SOLID, (int)lineWidth, color); //TODO

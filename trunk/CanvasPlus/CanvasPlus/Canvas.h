@@ -164,7 +164,7 @@ namespace CanvasPlus //Better name?
         TextMetrics(double w) : width(w)
         {
         }
-        TextMetrics& operator=(const TextMetrics& other); //not imp       
+        TextMetrics& operator=(const TextMetrics& other); //not imp
     };
 
     enum FillStyleEnum
@@ -189,7 +189,6 @@ namespace CanvasPlus //Better name?
         FillStyle& operator = (const Color& color)
         {
             //canvasGradient reset?
-
             fillStyleEnum = FillStyleEnumSolid;
             m_Color = color;
             return *this;
@@ -209,12 +208,21 @@ namespace CanvasPlus //Better name?
         }
     };
 
+
+    // Stores state on the stack
+    struct CanvasStateInfo;
+
+    //
+    //
     //http://dev.w3.org/html5/2dcontext/
     class Context2D
     {
         friend class Canvas;
         void* m_pNativeHandle;
         int flags;
+
+        //used by save and restore
+        std::vector<CanvasStateInfo*> m_stack;
 
         void Check();
 
