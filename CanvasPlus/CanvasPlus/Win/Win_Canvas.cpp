@@ -126,6 +126,33 @@ public:
     }
 };
 
+class ClipRect
+{
+    SaveClipRgn m_old;
+    HRGN m_hNewRegionClip;
+public:
+
+    ClipRect(HDC hdc, RECT& newClipRect) : m_old(hdc)
+    {
+        RECT rcClip = newClipRect;
+        ::LPtoDP(hdc, (LPPOINT)&rcClip, 2);
+        m_hNewRegionClip = CreateRectRgnIndirect(&rcClip);
+        ///SelectClipRgn(hdc, m_hNewRegionClip);
+        ExtSelectClipRgn(hdc, m_hNewRegionClip, RGN_AND);
+    }
+
+    ~ClipRect()
+    {
+        DeleteObject(m_hNewRegionClip);
+        EndClip();
+    }
+
+    void EndClip()
+    {
+        m_old.Restore();
+    }
+};
+
 inline void DrawBitmap(HDC hdc, HBITMAP hbm, int Left, int Top)
 {
     BOOL f;
@@ -516,24 +543,8 @@ namespace CanvasPlus
 
     Font::Font()
     {
-        //"When the context is created, the font of the
-        //context must be set to 10px sans-serif. "
-        LOGFONT logFont;
-        logFont.lfHeight = -10; //-17;
-        logFont.lfWidth = 0;
-        logFont.lfEscapement = 0;
-        logFont.lfOrientation = 0;
-        logFont.lfWeight = 400;
-        logFont.lfItalic = 0;
-        logFont.lfUnderline = 0;
-        logFont.lfStrikeOut = 0;
-        logFont.lfCharSet = 0;
-        logFont.lfOutPrecision = 3;
-        logFont.lfClipPrecision = 2;
-        logFont.lfQuality = 1;
-        logFont.lfPitchAndFamily = 49;
-        wcscpy(logFont.lfFaceName , L"sans-serif");
-        m_pNativeObject = (void*)CreateFontIndirect(&logFont);
+        m_pNativeObject = nullptr;
+        operator = ("10px sans-serif");
     }
 
     Font::Font(const Font&)
@@ -543,10 +554,26 @@ namespace CanvasPlus
 
     Font::~Font()
     {
-        ::DeleteObject((HDC)m_pNativeObject);
+        if (m_pNativeObject != nullptr)
+        {
+          ::DeleteObject((HDC)m_pNativeObject);
+        }
     }
 
+    Font& Font::operator = (const Font& font)
+    {
+        setFont(font.fontdesc.c_str());        
+        return *this;
+    }
+
+    
     Font& Font::operator = (const char* psz)
+    {
+        setFont(psz);        
+        return *this;
+    }
+
+    void Font::setFont(const char* psz)
     {
         if (m_pNativeObject)
         {
@@ -609,8 +636,9 @@ namespace CanvasPlus
             wcscpy(logFont.lfFaceName , L"sans-serif");
         }
 
+        assert(m_pNativeObject == nullptr);
+        fontdesc = psz;
         m_pNativeObject = (void*)CreateFontIndirect(&logFont);
-        return *this;
     }
 
     Canvas::Canvas(void* p) : m_CanvasRenderingContext2D(p)
@@ -648,6 +676,8 @@ namespace CanvasPlus
             HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
             StrokePath(hdc);
             SelectObject(hdc, oldPen);
+            //
+            DeleteObject(hpen);
         }
         else if (this->flags == 2)
         {
@@ -681,7 +711,9 @@ namespace CanvasPlus
             //
             SelectObject(hdc, oldPen);
             SelectObject(hdc, oldBrush);
+            //
             DeleteObject(hBrush);
+            DeleteObject(hpen);
         }
 
         this->flags = 0;
@@ -834,6 +866,8 @@ namespace CanvasPlus
         //
         SelectObject(hdc, oldPen);
         SelectObject(hdc, oldBrush);
+        //
+        DeleteObject(hpen);
     }
 
 
