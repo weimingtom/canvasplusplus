@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 
+//The compiler doesn't implement it yet
 #define constexpr
 
 namespace CanvasPlus

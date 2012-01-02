@@ -583,6 +583,10 @@ namespace CanvasPlus
 
         // TODO THIS IS NOT A PARSER
         // PROVISORY
+
+        //See 15.8 Shorthand font property
+        //http://www.w3.org/TR/CSS2/fonts.html#font-shorthand
+
         std::string str(psz);
         //"When the context is created, the font of the
         //context must be set to 10px sans-serif. "
