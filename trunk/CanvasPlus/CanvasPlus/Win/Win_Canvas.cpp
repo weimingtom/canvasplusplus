@@ -645,7 +645,7 @@ namespace CanvasPlus
         m_pNativeObject = (void*)CreateFontIndirect(&logFont);
     }
 
-    Canvas::Canvas(void* p) : m_CanvasRenderingContext2D(p)
+    Canvas::Canvas(void* p, double w, double h) : m_CanvasRenderingContext2D(p), width(w), height(h)
     {
     }
 
