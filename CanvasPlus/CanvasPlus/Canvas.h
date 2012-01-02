@@ -282,7 +282,10 @@ namespace CanvasPlus //Better name?
     {
         Context2D m_CanvasRenderingContext2D;
     public:
-        Canvas(void*);
+        const double width;
+        const double height;
+
+        Canvas(void*, double w, double h);
         ~Canvas();
         Context2D& getContext(const char*);
     };

@@ -181,10 +181,15 @@ LRESULT CALLBACK DemoApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
             case WM_PAINT:
             {
+                RECT clientRect;
+                GetClientRect(hwnd, &clientRect);
                 PAINTSTRUCT ps;
                 HDC hdc = BeginPaint(pDemoApp->m_hwnd, &ps);
                 {
-                    CanvasPlus::Canvas canvas(hdc);
+                    CanvasPlus::Canvas canvas(hdc, 
+                                              clientRect.right - clientRect.left,
+                                              clientRect.bottom - clientRect.top);
+
                     DrawSample(pDemoApp->m_CurrentSampleIndex, canvas);
 
                 } //need to call destructor before end
