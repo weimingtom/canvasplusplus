@@ -6,8 +6,6 @@
 
 using namespace CanvasPlus;
 
-
-
 void DrawPos(CanvasPlus::Context2D& ctx, double x, double y)
 {
     ctx.beginPath();
@@ -176,7 +174,6 @@ void Sample11(CanvasPlus::Canvas& canvas)
     Context2D& ctx = canvas.getContext("2d");
     bool ispressed =  false;
     bool isfocused = true;
-
     auto lingrad = ctx.createLinearGradient(0, 10 + 130, 0, 10);
 
     if (ispressed)
@@ -223,22 +220,93 @@ void Sample12(CanvasPlus::Canvas& canvas)
 void Sample13(CanvasPlus::Canvas& canvas)
 {
     Context2D& ctx = canvas.getContext("2d");
+
     for (int i = 0; i < 10; i++)
     {
-    ctx.beginPath();
-    ctx.strokeStyle = "#00F2A0";
-    ctx.lineWidth = i;
-    ctx.moveTo(i * 10 + 100,i*10+ 100);
-    ctx.lineTo(i*10+150, i*10+200);
-    ctx.lineTo(i*10+250, i*10+20);
-    ctx.lineTo(i*10+50,i*10+ 20);
-    ctx.closePath();
-    ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = "#00F2A0";
+        ctx.lineWidth = i;
+        ctx.moveTo(i * 10 + 100, i * 10 + 100);
+        ctx.lineTo(i * 10 + 150, i * 10 + 200);
+        ctx.lineTo(i * 10 + 250, i * 10 + 20);
+        ctx.lineTo(i * 10 + 50, i * 10 + 20);
+        ctx.closePath();
+        ctx.stroke();
     }
 }
-void Sample14(CanvasPlus::Canvas& /*canvas*/)
+void Sample14(CanvasPlus::Canvas& canvas)
 {
+      // Get the canvas element and its drawing context
+    
+    Context2D& context = canvas.getContext("2d");
+ 
+    /*
+    |---------------------
+    | Origin: Top Left
+    | End: Bottom Right
+    |---------------------
+    */
+ 
+    context.beginPath();
+    context.moveTo(10, 10);
+    context.lineTo(200, 200);
+    context.stroke();
+ 
+    
+    /*
+    |---------------------
+    | Origin: Top Middle
+    | End: Bottom Middle
+    |---------------------
+    */
+ 
+    context.save();
+    context.beginPath();
+    context.moveTo(100, 0);
+    context.lineTo(100, 200);
+    context.stroke();
+    context.restore();
+ 
+    /*
+    |---------------------
+    | Origin: Top Right
+    | End: Bottom Left
+    |---------------------
+    */
+ 
+    context.save();
+    context.beginPath();
+    context.moveTo(200, 0);
+    context.lineTo(0, 200);
+    context.stroke();
+    context.restore();
 }
-void Sample15(CanvasPlus::Canvas& /*canvas*/)
+void Sample15(CanvasPlus::Canvas& canvas)
 {
+    Context2D& ctx = canvas.getContext("2d");
+
+   // Filled triangle
+    ctx.beginPath();
+    ctx.moveTo(25,25);
+    ctx.lineTo(105,25);
+    ctx.lineTo(25,105);
+    ctx.fill();
+    
+    // Stroked triangle
+    ctx.beginPath();
+    ctx.moveTo(125,125);
+    ctx.lineTo(125,45);
+    ctx.lineTo(45,125);
+    ctx.closePath();
+    ctx.stroke();
+
+    //
+
+     for (int i=0;i<10;i++){
+       ctx.lineWidth = 1+i;
+       ctx.beginPath();
+       ctx.moveTo(5+i*14,150+5);
+       ctx.lineTo(5+i*14,150+140);
+       ctx.stroke();
+    }
 }
