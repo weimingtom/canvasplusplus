@@ -75,7 +75,7 @@ public:
             case 0:
             {
                 // success, but the DC has no clipping region
-                m_hDC = hdc;
+                m_hDC = NULL;
                 DeleteObject(m_hOldRgn);
                 m_hOldRgn = NULL;
             }
@@ -742,6 +742,8 @@ namespace CanvasPlus
      // state
     void Context2D::save()
     {
+       Check();
+
        CanvasStateInfo * p = new CanvasStateInfo();
         
         HDC hdc = (HDC) m_pNativeHandle;
@@ -774,6 +776,8 @@ namespace CanvasPlus
 
     void Context2D::restore()
     {
+        Check();
+
         // pop state stack and restore state
          CanvasStateInfo * p = m_stack.back();
          m_stack.pop_back();
@@ -986,6 +990,8 @@ namespace CanvasPlus
 
     void Context2D::fill()
     {
+        closePath();
+
         Check();
 
         if (flags == 0)
@@ -1000,6 +1006,8 @@ namespace CanvasPlus
 
     void Context2D::stroke()
     {
+        closePath();
+
         Check();
 
         if (flags == 0)

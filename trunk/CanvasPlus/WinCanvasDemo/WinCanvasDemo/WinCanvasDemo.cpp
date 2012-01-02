@@ -185,69 +185,8 @@ LRESULT CALLBACK DemoApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 HDC hdc = BeginPaint(pDemoApp->m_hwnd, &ps);
                 {
                     CanvasPlus::Canvas canvas(hdc);
+                    DrawSample(pDemoApp->m_CurrentSampleIndex, canvas);
 
-                    switch (pDemoApp->m_CurrentSampleIndex)
-                    {
-                    case 0:
-                        Sample1(canvas);
-                        break;
-
-                    case 1:
-                        Sample2(canvas);
-                        break;
-
-                    case 2:
-                        Sample3(canvas);
-                        break;
-
-                    case 3:
-                        Sample4(canvas);
-                        break;
-
-                    case 4:
-                        Sample5(canvas);
-                        break;
-
-                    case 5:
-                        Sample6(canvas);
-                        break;
-
-                    case 6:
-                        Sample7(canvas);
-                        break;
-
-                    case 7:
-                        Sample8(canvas);
-                        break;
-
-                    case 8:
-                        Sample9(canvas);
-                        break;
-
-                    case 9:
-                        Sample10(canvas);
-                        break;
-
-                    case 10:
-                        Sample11(canvas);
-                        break;
-
-                    case 11:
-                        Sample12(canvas);
-                        break;
-
-                    case 12:
-                        Sample13(canvas);
-                        break;
-
-                    case 13:
-                        Sample14(canvas);
-                        break;
-
-                    case 14:
-                        Sample15(canvas);
-                        break;
-                    }
                 } //need to call destructor before end
                 // TODO: Add any drawing code here...
                 EndPaint(pDemoApp->m_hwnd, &ps);
