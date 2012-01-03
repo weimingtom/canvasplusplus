@@ -242,19 +242,19 @@ namespace CanvasPlus //Better name?
     public:
 
         //fillStyle
-        FillStyle fillStyle;
-        FillStyle strokeStyle;
+        FillStyle fillStyle;        // (default black)
+        FillStyle strokeStyle;      // (default black)
 
-        TextAlign textAlign;
-        TextBaseline textBaseline;
-        Font font;
-        double lineWidth;
+        TextAlign textAlign;        // "start", "end", "left", "right", "center" (default: "start")
+        TextBaseline textBaseline;  // "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
+        Font font;                  // (default 10px sans-serif)
+        double lineWidth;           // (default 1)
         //==Shadows==
         //
-        Color shadowColor;
-        double shadowOffsetX;
-        double shadowOffsetY;
-        double shadowBlur;
+        Color shadowColor;          // (default transparent black)
+        double shadowOffsetX;       // (default 0)
+        double shadowOffsetY;       // (default 0)
+        double shadowBlur;          // (default 0)
 
         ~Context2D();
 
@@ -262,7 +262,7 @@ namespace CanvasPlus //Better name?
         void save(); // push state on state stack
         void restore(); // pop state stack and restore state
 
-
+        void clearRect(double x, double y, double w, double h);
         void fillRect(double x, double y, double w, double h);
         void strokeRect(double x, double y, double w, double h);
         void fillText(const wchar_t*, double x, double y);

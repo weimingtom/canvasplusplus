@@ -807,7 +807,21 @@ namespace CanvasPlus
     
         delete p;
     }
-
+    //
+    ///////////////////////////////////////////////////////////////////////////
+    // The clearRect(x, y, w, h) method must clear the pixels in the specified 
+    // rectangle that also intersect the current clipping region to a fully transparent 
+    // black, erasing any previous image. If either height or width are zero, 
+    // this method has no effect.
+    void Context2D::clearRect(double x, double y, double w, double h)
+    {
+        FillStyle fs = fillStyle;
+        fillStyle = Color("#FFFFFF"); //GDI background color white? black?
+        //
+        fillRect(x, y, w, h);
+        //
+        fillStyle = fs;
+    }
     ///////////////////////////////////////////////////////////////////////////////
     // The fillRect(x, y, w, h) method must paint the specified rectangular area
     //  using the fillStyle. If either height or width are zero, this method
