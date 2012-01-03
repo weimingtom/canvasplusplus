@@ -132,6 +132,8 @@ namespace CanvasPlus //Better name?
         }
 
         CanvasGradient(const CanvasGradient&);
+        CanvasGradient& operator=(const CanvasGradient&);
+
         CanvasGradient(CanvasGradientImp*);
         ~CanvasGradient();
 
@@ -184,6 +186,14 @@ namespace CanvasPlus //Better name?
         Color m_Color;
         CanvasGradient canvasGradient;
 
+        FillStyle(const FillStyle& fs)
+        {
+          fillStyleEnum = fs.fillStyleEnum;
+          m_Color = fs.m_Color;
+          canvasGradient = fs.canvasGradient;
+        }
+
+
         FillStyle()
         {
             fillStyleEnum =  FillStyleEnumSolid;
@@ -197,6 +207,16 @@ namespace CanvasPlus //Better name?
             m_Color = color;
             return *this;
         }
+
+        
+        FillStyle& operator = (const FillStyle& fs)
+        {
+          fillStyleEnum = fs.fillStyleEnum;
+          m_Color = fs.m_Color;
+          canvasGradient = fs.canvasGradient;
+          return *this;
+        }
+
 
         FillStyle& operator = (const CanvasGradient& cg)
         {

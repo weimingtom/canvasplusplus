@@ -492,7 +492,8 @@ namespace CanvasPlus
 
 
 
-    void CanvasGradient::addColorStop(double offset, const Color& color)
+
+void CanvasGradient::addColorStop(double offset, const Color& color)
     {
         if (pCanvasGradientImp)
         {
@@ -503,7 +504,23 @@ namespace CanvasPlus
     CanvasGradient::CanvasGradient(CanvasGradientImp* p)
     {
         this->pCanvasGradientImp = p;
-        this->pCanvasGradientImp->AddRef();
+
+        if (this->pCanvasGradientImp)
+        {
+            this->pCanvasGradientImp->AddRef();
+        }
+    }
+
+    CanvasGradient& CanvasGradient::operator=(const CanvasGradient& other)
+    {
+        this->pCanvasGradientImp = other.pCanvasGradientImp;
+
+        if (this->pCanvasGradientImp)
+        {
+            this->pCanvasGradientImp->AddRef();
+        }
+
+        return *this;
     }
 
     CanvasGradient::CanvasGradient(const CanvasGradient& other)
@@ -539,6 +556,7 @@ namespace CanvasPlus
 
         return CanvasGradient();
     }
+
 
 
     Font::Font()
