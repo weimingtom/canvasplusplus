@@ -75,7 +75,7 @@ public:
             case 0:
             {
                 // success, but the DC has no clipping region
-                m_hDC = NULL;
+                m_hDC = hdc;
                 DeleteObject(m_hOldRgn);
                 m_hOldRgn = NULL;
             }
