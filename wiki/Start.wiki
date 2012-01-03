@@ -11,7 +11,9 @@ The class interface is based on the standard html5 canvas element.
 
 Why to use html canvas interface?
 
-The Html 5 is a VERY STRONG STANDARD. There are many devices like tablets smart phones and different OS implementing Html 5 compatible browsers. It means that every device is going to support the drawing as specified in the canvas element. For this reason, canvas interface it’s a safe choice very documented with a lot of samples available in the web. 
+The Html 5 is a very strong standard. There are many devices like tablets smart phones and different OS implementing Html 5 compatible browsers. It means that every device is going to support the drawing as specified in the canvas element. For this reason, canvas interface it’s a safe choice very documented with a lot of samples available in the web. 
+
+One adicional reason is for windows users. Today we have 3 interfaces to draw. GDI, GDI+  and Direct2D. If you have to suport old versions of windows you have to create duplicate code to draw. Canvas will provide a common subset for it.
 
 Why C++?
 
@@ -45,6 +47,8 @@ http://msdn.microsoft.com/en-us/library/dd145203(v=vs.85).aspx
 
 1.2 Direct2d
 Direct 2d (not started), but probably it will be the api used in windows 8 apps. 
+
+http://msdn.microsoft.com/en-us/library/windows/desktop/dd370990(v=vs.85).aspx
 
 
 2) Mac
