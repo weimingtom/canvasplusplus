@@ -15,7 +15,7 @@ namespace CanvasPlus
     constexpr int GetG(const char* p);
     constexpr int GetB(const char* p);
     //
-   
+
 
 
     Color::Color(const char* psz)
@@ -97,15 +97,81 @@ namespace CanvasPlus
         return TextAlignLeft;
     }
 
+    FillStyle::FillStyle(const FillStyle& fs)
+    {
+        m_pContext2D = fs.m_pContext2D;
+        fillStyleEnum = fs.fillStyleEnum;
+        m_Color = fs.m_Color;
+        canvasGradient = fs.canvasGradient;
+    }
+
+
+    FillStyle::FillStyle(Context2D* p)
+    {
+        m_pContext2D = p;
+        fillStyleEnum =  FillStyleEnumSolid;
+    }
+
+    FillStyle& FillStyle::operator = (const Color& color)
+    {
+        if (m_pContext2D != nullptr)
+        {
+            m_pContext2D->Check();
+        }
+
+        //canvasGradient reset?
+        fillStyleEnum = FillStyleEnumSolid;
+        m_Color = color;
+        return *this;
+    }
+
+
+    FillStyle& FillStyle::operator = (const FillStyle& fs)
+    {
+        if (m_pContext2D != nullptr)
+        {
+            m_pContext2D->Check();
+        }
+
+        m_pContext2D = fs.m_pContext2D;
+        fillStyleEnum = fs.fillStyleEnum;
+        m_Color = fs.m_Color;
+        canvasGradient = fs.canvasGradient;
+        return *this;
+    }
+
+
+    FillStyle& FillStyle::operator = (const CanvasGradient& cg)
+    {
+        if (m_pContext2D != nullptr)
+        {
+            m_pContext2D->Check();
+        }
+
+        fillStyleEnum =     FillStyleEnumGradient;
+        canvasGradient = cg;
+        return *this;
+    }
+
+    FillStyle& FillStyle::operator = (const CanvasPattern&)
+    {
+        if (m_pContext2D != nullptr)
+        {
+            m_pContext2D->Check();
+        }
+        //TODO
+        return *this;
+    }
+
 
     //==================BEGIN COLOR ==================
 
     //#define ParserError() throw "error"
     //#define ParserError() 0
-    
+
     constexpr int ParserError()
     {
-      return 0;
+        return 0;
     }
 
     constexpr int DECVAL(char c)

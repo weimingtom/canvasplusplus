@@ -402,6 +402,13 @@ namespace CanvasPlus
 {
     struct CanvasStateInfo
     {
+        
+        CanvasStateInfo(Context2D* p) :
+         strokeStyle(p), 
+         fillStyle(p)
+        {
+        }
+
          // push state on state stack
         //The current transformation matrix.
         //The current clipping region.
@@ -743,6 +750,8 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
 
     Context2D::Context2D(void* p)
         : m_pNativeHandle(p)
+        , fillStyle(this)
+        , strokeStyle(this)
     {
         this->flags = 0;
         this->lineWidth = 1.0;
@@ -762,7 +771,7 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
     {
        Check();
 
-       CanvasStateInfo * p = new CanvasStateInfo();
+       CanvasStateInfo * p = new CanvasStateInfo(this);
         
         HDC hdc = (HDC) m_pNativeHandle;
         

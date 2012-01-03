@@ -180,56 +180,19 @@ namespace CanvasPlus //Better name?
 
     class FillStyle
     {
-
+        friend class Context2D;
+        Context2D* m_pContext2D;
     public:
         FillStyleEnum fillStyleEnum;
         Color m_Color;
         CanvasGradient canvasGradient;
 
-        FillStyle(const FillStyle& fs)
-        {
-          fillStyleEnum = fs.fillStyleEnum;
-          m_Color = fs.m_Color;
-          canvasGradient = fs.canvasGradient;
-        }
-
-
-        FillStyle()
-        {
-            fillStyleEnum =  FillStyleEnumSolid;
-        }
-
-        FillStyle& operator = (const Color& color)
-        {
-            //canvasGradient reset?
-
-            fillStyleEnum = FillStyleEnumSolid;
-            m_Color = color;
-            return *this;
-        }
-
-        
-        FillStyle& operator = (const FillStyle& fs)
-        {
-          fillStyleEnum = fs.fillStyleEnum;
-          m_Color = fs.m_Color;
-          canvasGradient = fs.canvasGradient;
-          return *this;
-        }
-
-
-        FillStyle& operator = (const CanvasGradient& cg)
-        {
-            fillStyleEnum =     FillStyleEnumGradient;
-            canvasGradient = cg;
-            return *this;
-        }
-
-        FillStyle& operator = (const CanvasPattern&)
-        {
-            //TODO
-            return *this;
-        }
+        FillStyle(Context2D* p);
+        FillStyle(const FillStyle&);        
+        FillStyle& operator = (const Color&);
+        FillStyle& operator = (const FillStyle&);
+        FillStyle& operator = (const CanvasGradient&);
+        FillStyle& operator = (const CanvasPattern&);
     };
 
     // Store information on the stack
@@ -241,6 +204,7 @@ namespace CanvasPlus //Better name?
     //http://dev.w3.org/html5/2dcontext/
     class Context2D
     {
+        friend class FillStyle;
         friend class Canvas;
         friend CanvasStateInfo* SaveState(Context2D&);
 
