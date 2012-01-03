@@ -236,44 +236,36 @@ void Sample13(CanvasPlus::Canvas& canvas)
 }
 void Sample14(CanvasPlus::Canvas& canvas)
 {
-      // Get the canvas element and its drawing context
-    
+    // Get the canvas element and its drawing context
     Context2D& context = canvas.getContext("2d");
- 
     /*
     |---------------------
     | Origin: Top Left
     | End: Bottom Right
     |---------------------
     */
- 
     context.beginPath();
     context.moveTo(10, 10);
     context.lineTo(200, 200);
     context.stroke();
- 
-    
     /*
     |---------------------
     | Origin: Top Middle
     | End: Bottom Middle
     |---------------------
     */
- 
     context.save();
     context.beginPath();
     context.moveTo(100, 0);
     context.lineTo(100, 200);
     context.stroke();
     context.restore();
- 
     /*
     |---------------------
     | Origin: Top Right
     | End: Bottom Left
     |---------------------
     */
- 
     context.save();
     context.beginPath();
     context.moveTo(200, 0);
@@ -281,32 +273,41 @@ void Sample14(CanvasPlus::Canvas& canvas)
     context.stroke();
     context.restore();
 }
+
 void Sample15(CanvasPlus::Canvas& canvas)
 {
     Context2D& ctx = canvas.getContext("2d");
-
-   // Filled triangle
+    //
     ctx.beginPath();
-    ctx.moveTo(25,25);
-    ctx.lineTo(105,25);
-    ctx.lineTo(25,105);
+    ctx.moveTo(100 - 2, 100);
+    ctx.lineTo(100 + 2, 100);
+    ctx.moveTo(100, 100 - 2);
+    ctx.lineTo(100, 100 + 2);
+    ctx.closePath();
+    ctx.stroke();
+
+    // Filled triangle
+    ctx.beginPath();
+    ctx.moveTo(25, 25);
+    ctx.lineTo(105, 25);
+    ctx.lineTo(25, 105);
     ctx.fill();
-    
     // Stroked triangle
     ctx.beginPath();
-    ctx.moveTo(125,125);
-    ctx.lineTo(125,45);
-    ctx.lineTo(45,125);
+    ctx.moveTo(125, 125);
+    ctx.lineTo(125, 45);
+    ctx.lineTo(45, 125);
     ctx.closePath();
     ctx.stroke();
 
     //
 
-     for (int i=0;i<10;i++){
-       ctx.lineWidth = 1+i;
-       ctx.beginPath();
-       ctx.moveTo(5+i*14,150+5);
-       ctx.lineTo(5+i*14,150+140);
-       ctx.stroke();
+    for (int i = 0; i < 10; i++)
+    {
+        ctx.lineWidth = 1 + i;
+        ctx.beginPath();
+        ctx.moveTo(5 + i * 14, 150 + 5);
+        ctx.lineTo(5 + i * 14, 150 + 140);
+        ctx.stroke();
     }
 }
