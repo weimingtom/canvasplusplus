@@ -169,7 +169,7 @@ namespace CanvasPlus //Better name?
         TextMetrics(double w) : width(w)
         {
         }
-        TextMetrics& operator=(const TextMetrics& other); //not imp       
+        TextMetrics& operator=(const TextMetrics& other); //not imp
     };
 
     enum FillStyleEnum
@@ -180,15 +180,14 @@ namespace CanvasPlus //Better name?
 
     class FillStyle
     {
-        friend class Context2D;
-        Context2D* m_pContext2D;
     public:
         FillStyleEnum fillStyleEnum;
         Color m_Color;
         CanvasGradient canvasGradient;
 
-        FillStyle(Context2D* p);
-        FillStyle(const FillStyle&);        
+        FillStyle();
+        FillStyle(const FillStyle&);
+        FillStyle& operator = (const char*);
         FillStyle& operator = (const Color&);
         FillStyle& operator = (const FillStyle&);
         FillStyle& operator = (const CanvasGradient&);
@@ -198,47 +197,89 @@ namespace CanvasPlus //Better name?
     // Store information on the stack
     class Context2D;
     struct CanvasStateInfo;
+
+#define ATTR(ATTR_TYPE, ATTR_NAME) \
+   struct T##ATTR_NAME \
+    { \
+        private:\
+        void operator = (const T##ATTR_NAME& ); \
+        public:\
+        template<class T> void operator=(T v) { \
+        reinterpret_cast<Context2D*>(this - offsetof(Context2D, ATTR_NAME))->set_##ATTR_NAME(v);\
+        }\
+        operator ATTR_TYPE () const {\
+        return reinterpret_cast<const Context2D*>(this - offsetof(Context2D, ATTR_NAME))->get_##ATTR_NAME();\
+        }\
+    } ATTR_NAME
     
     //
     //
     //http://dev.w3.org/html5/2dcontext/
     class Context2D
     {
-        friend class FillStyle;
+        class Imp;
+        Imp* m_pContext2DImp;
+
         friend class Canvas;
-        friend CanvasStateInfo* SaveState(Context2D&);
-
-        void* m_pNativeHandle;
-        int flags;
-
-        std::vector<CanvasStateInfo*> m_stack;
-
-        void Check();
 
         Context2D(void*);
         Context2D(const Context2D&);//
+        Context2D& operator = (const Context2D&);//
 
-        int ToPixelX(double);
-        int ToPixelY(double);
-        int ToPixelSizeX(double);
-        int ToPixelSizeY(double);
+        void set_fillStyle(const CanvasGradient&);
+        void set_fillStyle(const Color&);
+        void set_fillStyle(const char*);
+        void set_fillStyle(const FillStyle&);
+        const FillStyle& get_fillStyle() const;
+
+        void set_strokeStyle(const CanvasGradient&);
+        void set_strokeStyle(const Color&);
+        void set_strokeStyle(const char*);
+        void set_strokeStyle(const FillStyle&);
+        const FillStyle& get_strokeStyle() const;
+
+        void set_textAlign(const char*);
+        void set_textAlign(const TextAlign&);
+        const TextAlign& get_textAlign()const;
+
+        void set_textBaseline(const char*);
+        void set_textBaseline(const TextBaseline&);
+        const TextBaseline& get_textBaseline() const;
+
+        void set_font(const char*);
+        void set_font(const Font&);
+        const Font& get_font() const;
+
+        void set_lineWidth(double);
+        double get_lineWidth() const;
+
+        void set_shadowColor(const Color&);
+        const Color&  get_shadowColor()const;
+
+        void set_shadowOffsetX(double);
+        double get_shadowOffsetX() const;
+
+        void set_shadowOffsetY(double);
+        double get_shadowOffsetY() const;
+
+        void set_shadowBlur(double);
+        double get_shadowBlur() const;
 
     public:
 
-        //fillStyle
-        FillStyle fillStyle;        // (default black)
-        FillStyle strokeStyle;      // (default black)
+        ATTR(FillStyle, fillStyle);        // (default black)
+        ATTR(FillStyle, strokeStyle);      // (default black)
 
-        TextAlign textAlign;        // "start", "end", "left", "right", "center" (default: "start")
-        TextBaseline textBaseline;  // "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
-        Font font;                  // (default 10px sans-serif)
-        double lineWidth;           // (default 1)
-        //==Shadows==
-        //
-        Color shadowColor;          // (default transparent black)
-        double shadowOffsetX;       // (default 0)
-        double shadowOffsetY;       // (default 0)
-        double shadowBlur;          // (default 0)
+        ATTR(TextAlign, textAlign);        // "start", "end", "left", "right", "center" (default: "start")
+        ATTR(TextBaseline, textBaseline);  // "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
+        ATTR(Font, font);                  // (default 10px sans-serif)
+
+        ATTR(double, lineWidth);           // (default 1)
+
+        ATTR(Color, shadowColor);          // (default transparent black)
+        ATTR(double, shadowOffsetX);       // (default 0)
+        ATTR(double, shadowOffsetY);       // (default 0)
+        ATTR(double,  shadowBlur);          // (default 0)
 
         ~Context2D();
 
@@ -265,6 +306,7 @@ namespace CanvasPlus //Better name?
     class Canvas
     {
         Context2D m_CanvasRenderingContext2D;
+        Canvas& operator=(const Canvas&);
     public:
         const double width;
         const double height;

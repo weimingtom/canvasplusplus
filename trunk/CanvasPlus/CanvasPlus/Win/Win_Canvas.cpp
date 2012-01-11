@@ -4,12 +4,7 @@
 #include <cassert>
 #include "..\Canvas.h"
 
-
 //THIS FILE IS WINDOWS ONLY AND GDI ONLY
-//GDI+ at the same file?
-
-//TODO Direct2d
-
 
 //Gradient
 #pragma comment( lib, "msimg32.lib" )
@@ -34,12 +29,12 @@ public:
         assert(m_hOldRgn == NULL);
     }
 
-    SaveClipRgn(HDC hdc)
+    SaveClipRgn(HDC m_hDC)
     {
-        assert(hdc != NULL);
+        assert(m_hDC != NULL);
         m_hDC = NULL;
         m_hOldRgn = NULL;
-        Save(hdc);
+        Save(m_hDC);
     }
 
     HRGN GetOldRgn()
@@ -54,41 +49,41 @@ public:
         return m_hOldRgn;
     }
 
-    BOOL Save(HDC hdc)
+    BOOL Save(HDC hDC)
     {
-        assert(hdc != NULL);
+        assert(hDC != NULL);
         assert(m_hOldRgn == NULL);
         assert(m_hDC == NULL);
         m_hOldRgn = ::CreateRectRgn(0, 0, 0, 0);
 
         if (m_hOldRgn != NULL)
         {
-            switch (GetClipRgn(hdc, m_hOldRgn))
+            switch (GetClipRgn(hDC, m_hOldRgn))
             {
-            case 1:
-            {
-                // success, m_hOldRgn contains the current clipping region for the DC
-                m_hDC = hdc;
-            }
-            break;
+                case 1:
+                {
+                    // success, m_hOldRgn contains the current clipping region for the DC
+                    m_hDC = hDC;
+                }
+                break;
 
-            case 0:
-            {
-                // success, but the DC has no clipping region
-                m_hDC = hdc;
-                DeleteObject(m_hOldRgn);
-                m_hOldRgn = NULL;
-            }
-            break;
+                case 0:
+                {
+                    // success, but the DC has no clipping region
+                    m_hDC = hDC;
+                    DeleteObject(m_hOldRgn);
+                    m_hOldRgn = NULL;
+                }
+                break;
 
-            default:
-            case -1:
-            {
-                // erro
-                DeleteObject(m_hOldRgn);
-                m_hOldRgn = NULL;
-            }
-            break;
+                default:
+                case -1:
+                {
+                    // erro
+                    DeleteObject(m_hOldRgn);
+                    m_hOldRgn = NULL;
+                }
+                break;
             }
         }
 
@@ -132,13 +127,13 @@ class ClipRect
     HRGN m_hNewRegionClip;
 public:
 
-    ClipRect(HDC hdc, RECT& newClipRect) : m_old(hdc)
+    ClipRect(HDC m_hDC, RECT& newClipRect) : m_old(m_hDC)
     {
         RECT rcClip = newClipRect;
-        ::LPtoDP(hdc, (LPPOINT)&rcClip, 2);
+        ::LPtoDP(m_hDC, (LPPOINT)&rcClip, 2);
         m_hNewRegionClip = CreateRectRgnIndirect(&rcClip);
-        ///SelectClipRgn(hdc, m_hNewRegionClip);
-        ExtSelectClipRgn(hdc, m_hNewRegionClip, RGN_AND);
+        ///SelectClipRgn(m_hDC, m_hNewRegionClip);
+        ExtSelectClipRgn(m_hDC, m_hNewRegionClip, RGN_AND);
     }
 
     ~ClipRect()
@@ -153,15 +148,15 @@ public:
     }
 };
 
-inline void DrawBitmap(HDC hdc, HBITMAP hbm, int Left, int Top)
+inline void DrawBitmap(HDC m_hDC, HBITMAP hbm, int Left, int Top)
 {
     BOOL f;
     HDC hdcBits;
     BITMAP bm;
-    hdcBits = CreateCompatibleDC(hdc);
+    hdcBits = CreateCompatibleDC(m_hDC);
     GetObject(hbm, sizeof(BITMAP), &bm);
     SelectObject(hdcBits, hbm);
-    f = BitBlt(hdc, Left, Top, bm.bmWidth, bm.bmHeight, hdcBits, 0, 0, SRCCOPY);
+    f = BitBlt(m_hDC, Left, Top, bm.bmWidth, bm.bmHeight, hdcBits, 0, 0, SRCCOPY);
     DeleteDC(hdcBits);
 }
 
@@ -257,7 +252,7 @@ inline void __stdcall SetAlphaPixel(COLORREF* pBits,
 
 
 
-static BOOL DrawShadow(HDC hdc,
+static BOOL DrawShadow(HDC m_hDC,
                        RECT& rect,                 // Shadow will be draw around this rect
                        int nDepth,                     // Shadow depth (pixels)
                        int iMinBrightness = 100,       // Min. brighttness
@@ -276,7 +271,7 @@ static BOOL DrawShadow(HDC hdc,
     const int cy = GetHeight(rect);
     const BOOL bIsLeft = !bRightShadow;
     // Copy screen content into the memory bitmap:
-    HDC hdcMem = ::CreateCompatibleDC(hdc);
+    HDC hdcMem = ::CreateCompatibleDC(m_hDC);
 
     if (hdcMem == NULL)
     {
@@ -285,7 +280,7 @@ static BOOL DrawShadow(HDC hdc,
     }
 
     // Gets the whole menu and changes the shadow.
-    HBITMAP hbmpMem = ::CreateCompatibleBitmap(hdc, cx + nDepth, cy + nDepth);
+    HBITMAP hbmpMem = ::CreateCompatibleBitmap(m_hDC, cx + nDepth, cy + nDepth);
 
     if (hbmpMem  == NULL)
     {
@@ -308,7 +303,7 @@ static BOOL DrawShadow(HDC hdc,
     }
 
     ::SelectObject(hdcMem, hmbpDib);
-    ::BitBlt(hdcMem, 0, 0, cx + nDepth, cy + nDepth, hdc, bIsLeft ? rect.left - nDepth : rect.left, rect.top, SRCCOPY);
+    ::BitBlt(hdcMem, 0, 0, cx + nDepth, cy + nDepth, m_hDC, bIsLeft ? rect.left - nDepth : rect.left, rect.top, SRCCOPY);
     // Process shadowing:
     // For having a very nice shadow effect, its actually hard work. Currently,
     // I'm using a more or less "hardcoded" way to set the shadows(by using a
@@ -354,7 +349,7 @@ static BOOL DrawShadow(HDC hdc,
     }
 
     // Copy shadowed bitmap back to the screen:
-    ::BitBlt(hdc, bIsLeft ? rect.left - nDepth : rect.left, rect.top, cx + nDepth, cy + nDepth, hdcMem, 0, 0, SRCCOPY);
+    ::BitBlt(m_hDC, bIsLeft ? rect.left - nDepth : rect.left, rect.top, cx + nDepth, cy + nDepth, hdcMem, 0, 0, SRCCOPY);
     ::SelectObject(hdcMem, hOldBmp);
     ::DeleteObject(hmbpDib);
     ::DeleteDC(hdcMem);
@@ -385,8 +380,6 @@ static void FillGradientRect(HDC hDC, RECT& rect, COLORREF bk, COLORREF fore,  U
     GradientFill(hDC, v, (ULONG)2, r, (ULONG)1, dwMode);
 }
 
-
-
 static void FillSolidRect(HDC hDC, LPCRECT lpRect, COLORREF clr)
 {
     COLORREF clrOld = ::SetBkColor(hDC, clr);
@@ -400,40 +393,134 @@ static void FillSolidRect(HDC hDC, LPCRECT lpRect, COLORREF clr)
 
 namespace CanvasPlus
 {
+    class CanvasStateInfo;
+    //
+    //
+    class CanvasPlus::Context2D::Imp
+    {
+        int flags;
+        HDC m_hDC;
+        //Context2D* m_pContext2D;
+        std::vector<CanvasStateInfo*> m_stack;
+
+        //
+        FillStyle fillStyle;        // (default black)
+        FillStyle strokeStyle;      // (default black)
+
+        TextAlign textAlign;        // "start", "end", "left", "right", "center" (default: "start")
+        TextBaseline textBaseline;  // "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
+        Font font;                  // (default 10px sans-serif)
+
+        double lineWidth;           // (default 1)
+
+        Color shadowColor;          // (default transparent black)
+        double shadowOffsetX;       // (default 0)
+        double shadowOffsetY;       // (default 0)
+        double  shadowBlur;          // (default 0)
+
+    public:
+
+        Imp(void* p)
+        {            
+            this->m_hDC = (HDC)p;
+            this->lineWidth = 1.0;
+            this->shadowColor = "rgb(0,0,0)";
+            this->shadowOffsetX = 0;
+            this->shadowOffsetY = 0;
+            this->shadowBlur = 0;
+        }
+
+        void Check();
+
+        // state
+        void save(); // push state on state stack
+        void restore(); // pop state stack and restore state
+
+        void clearRect(double x, double y, double w, double h);
+        void fillRect(double x, double y, double w, double h);
+        void strokeRect(double x, double y, double w, double h);
+        void fillText(const wchar_t*, double x, double y);
+        CanvasGradient createLinearGradient(double x0, double y0, double x1, double y1);
+        TextMetrics measureText(const wchar_t*);
+        void moveTo(double x, double y);
+        void lineTo(double x, double y);
+        void beginPath();
+        void closePath();
+        void stroke();
+        void fill();
+        void clip();
+        void rect(double x, double y, double w, double h);
+
+        //
+
+        void set_fillStyle(const CanvasGradient&);
+        void set_fillStyle(const Color&);
+        void set_fillStyle(const char*);
+        void set_fillStyle(const FillStyle&);
+        const FillStyle& get_fillStyle() const;
+
+        void set_strokeStyle(const CanvasGradient&);
+        void set_strokeStyle(const Color&);
+        void set_strokeStyle(const char*);
+        void set_strokeStyle(const FillStyle&);
+        const FillStyle& get_strokeStyle() const;
+
+        void set_textAlign(const char*);
+        void set_textAlign(const TextAlign&);
+        const TextAlign& get_textAlign()const;
+
+        void set_textBaseline(const char*);
+        void set_textBaseline(const TextBaseline&);
+        const TextBaseline& get_textBaseline() const;
+
+        void set_font(const char*);
+        void set_font(const Font&);
+        const Font& get_font() const;
+
+        void set_lineWidth(double);
+        double get_lineWidth() const;
+
+        void set_shadowColor(const Color&);
+        const Color&  get_shadowColor()const;
+
+        void set_shadowOffsetX(double);
+        double get_shadowOffsetX() const;
+
+        void set_shadowOffsetY(double);
+        double get_shadowOffsetY() const;
+
+        void set_shadowBlur(double);
+        double get_shadowBlur() const;
+        //
+    };
+
     struct CanvasStateInfo
     {
-        
-        CanvasStateInfo(Context2D* p) :
-         strokeStyle(p), 
-         fillStyle(p)
+        CanvasStateInfo()
         {
         }
 
-         // push state on state stack
+        // push state on state stack
         //The current transformation matrix.
         //The current clipping region.
         SaveClipRgn m_SaveClipRgn;
-        //The current values of the following attributes: 
+        //The current values of the following attributes:
         FillStyle strokeStyle;
         FillStyle fillStyle;
-        //globalAlpha, 
+        //globalAlpha,
         double lineWidth;
-        //lineCap, 
-        //lineJoin, 
-        //miterLimit, 
+        //lineCap,
+        //lineJoin,
+        //miterLimit,
         double shadowOffsetX;
         double shadowOffsetY;
         double shadowBlur;
         Color shadowColor;
-        //globalCompositeOperation, 
+        //globalCompositeOperation,
         Font font;
         TextAlign textAlign;
         TextBaseline textBaseline;
-};
-
-    
-    
-    
+    };
 
 
     inline COLORREF ColorToColorRef(const Color& color)
@@ -498,9 +585,7 @@ namespace CanvasPlus
     };
 
 
-
-
-void CanvasGradient::addColorStop(double offset, const Color& color)
+    void CanvasGradient::addColorStop(double offset, const Color& color)
     {
         if (pCanvasGradientImp)
         {
@@ -544,7 +629,7 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
         }
     }
 
-    CanvasGradient Context2D::createLinearGradient(double x0,
+    CanvasGradient Context2D::Imp::createLinearGradient(double x0,
             double y0,
             double x1,
             double y1)
@@ -564,8 +649,6 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
         return CanvasGradient();
     }
 
-
-
     Font::Font()
     {
         m_pNativeObject = nullptr;
@@ -581,20 +664,20 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
     {
         if (m_pNativeObject != nullptr)
         {
-          ::DeleteObject((HDC)m_pNativeObject);
+            ::DeleteObject((HDC)m_pNativeObject);
         }
     }
 
     Font& Font::operator = (const Font& font)
     {
-        setFont(font.fontdesc.c_str());        
+        setFont(font.fontdesc.c_str());
         return *this;
     }
 
-    
+
     Font& Font::operator = (const char* psz)
     {
-        setFont(psz);        
+        setFont(psz);
         return *this;
     }
 
@@ -608,10 +691,8 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
 
         // TODO THIS IS NOT A PARSER
         // PROVISORY
-
         //See 15.8 Shorthand font property
         //http://www.w3.org/TR/CSS2/fonts.html#font-shorthand
-
         std::string str(psz);
         //"When the context is created, the font of the
         //context must be set to 10px sans-serif. "
@@ -684,7 +765,9 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
     }
 
 
-    void Context2D::Check()
+    // == Context2D::Implementation ==
+
+    void Context2D::Imp::Check()
     {
         //because GDI closes the path after Fill or stroke
         //we need a state to do both at the same time
@@ -694,17 +777,13 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
             return;
         }
 
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
-
         if (this->flags == 1)
         {
             COLORREF color = ColorToColorRef(strokeStyle.m_Color);
-            HPEN hpen = CreatePen(PS_SOLID, (int)(lineWidth), color); //TODO
-            HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
-            StrokePath(hdc);
-            SelectObject(hdc, oldPen);
+            HPEN hpen = CreatePen(PS_SOLID, (int)lineWidth, color); //TODO
+            HPEN oldPen = (HPEN) SelectObject(m_hDC, hpen);
+            StrokePath(m_hDC);
+            SelectObject(m_hDC, oldPen);
             //
             DeleteObject(hpen);
         }
@@ -716,30 +795,30 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
             logbrush.lbStyle = BS_SOLID;
             logbrush.lbHatch = 0;
             HBRUSH hBrush = CreateBrushIndirect(&logbrush);
-            HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+            HBRUSH oldBrush = (HBRUSH)SelectObject(m_hDC, hBrush);
             //
-            FillPath(hdc);
+            FillPath(m_hDC);
             //
-            SelectObject(hdc, oldBrush);
+            SelectObject(m_hDC, oldBrush);
             DeleteObject(hBrush);
         }
         else if (this->flags == 3)
         {
             COLORREF color2 = ColorToColorRef(strokeStyle.m_Color);
             HPEN hpen = CreatePen(PS_SOLID, (int) lineWidth, color2); //TODO
-            HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
+            HPEN oldPen = (HPEN) SelectObject(m_hDC, hpen);
             COLORREF color = ColorToColorRef(fillStyle.m_Color);
             LOGBRUSH logbrush;
             logbrush.lbColor = color;
             logbrush.lbStyle = BS_SOLID;
             logbrush.lbHatch = 0;
             HBRUSH hBrush = CreateBrushIndirect(&logbrush);
-            HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+            HBRUSH oldBrush = (HBRUSH)SelectObject(m_hDC, hBrush);
             //
-            StrokeAndFillPath(hdc);
+            StrokeAndFillPath(m_hDC);
             //
-            SelectObject(hdc, oldPen);
-            SelectObject(hdc, oldBrush);
+            SelectObject(m_hDC, oldPen);
+            SelectObject(m_hDC, oldBrush);
             //
             DeleteObject(hBrush);
             DeleteObject(hpen);
@@ -748,130 +827,99 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
         this->flags = 0;
     }
 
-    Context2D::Context2D(void* p)
-        : m_pNativeHandle(p)
-        , fillStyle(this)
-        , strokeStyle(this)
-    {
-        this->flags = 0;
-        this->lineWidth = 1.0;
-        this->shadowColor = "rgb(0,0,0)";
-        this->shadowOffsetX = 0;
-        this->shadowOffsetY = 0;
-        this->shadowBlur = 0;
-    }
 
-    Context2D::~Context2D()
+
+    // state
+    void Context2D::Imp::save()
     {
         Check();
-    }
-
-     // state
-    void Context2D::save()
-    {
-       Check();
-
-       CanvasStateInfo * p = new CanvasStateInfo(this);
-        
-        HDC hdc = (HDC) m_pNativeHandle;
-        
-        p->m_SaveClipRgn.Save(hdc);
-
+        CanvasStateInfo* p = new CanvasStateInfo();
+        p->m_SaveClipRgn.Save(m_hDC);
         // push state on state stack
         //The current transformation matrix.
         //The current clipping region.
-        //The current values of the following attributes: 
+        //The current values of the following attributes:
         p->strokeStyle = strokeStyle;
-        p->fillStyle = fillStyle; 
-        //globalAlpha, 
-        p->lineWidth = lineWidth; 
-        //lineCap, 
-        //lineJoin, 
-        //miterLimit, 
-        p->shadowOffsetX = shadowOffsetX; 
+        p->fillStyle = fillStyle;
+        //globalAlpha,
+        p->lineWidth = lineWidth;
+        //lineCap,
+        //lineJoin,
+        //miterLimit,
+        p->shadowOffsetX = shadowOffsetX;
         p->shadowOffsetY = shadowOffsetY;
         p->shadowBlur = shadowBlur;
         p->shadowColor = shadowColor;
-        //globalCompositeOperation, 
-        p->font = font; 
-        p->textAlign = textAlign; 
+        //globalCompositeOperation,
+        p->font = font;
+        p->textAlign = textAlign;
         p->textBaseline = textBaseline;
-
-    
         m_stack.push_back(p);
     }
 
-    void Context2D::restore()
+    void Context2D::Imp::restore()
     {
         Check();
-
         // pop state stack and restore state
-         CanvasStateInfo * p = m_stack.back();
-         m_stack.pop_back();
-        
-        
+        CanvasStateInfo* p = m_stack.back();
+        m_stack.pop_back();
         p->m_SaveClipRgn.Restore();
-
         // push state on state stack
         //The current transformation matrix.
         //The current clipping region.
-        //The current values of the following attributes: 
-        strokeStyle = p->strokeStyle;
-        fillStyle = p->fillStyle; 
-        //globalAlpha, 
-        lineWidth = p->lineWidth; 
-        //lineCap, 
-        //lineJoin, 
-        //miterLimit, 
-        shadowOffsetX = p->shadowOffsetX; 
-        shadowOffsetY = p->shadowOffsetY;
-        shadowBlur = p->shadowBlur;
-        shadowColor = p->shadowColor;
-        //globalCompositeOperation, 
-        font = p->font; 
-        textAlign = p->textAlign; 
-        textBaseline = p->textBaseline;
-    
+        //The current values of the following attributes:
+        set_strokeStyle(p->strokeStyle);
+        set_fillStyle(p->fillStyle);
+        //globalAlpha,
+        lineWidth = p->lineWidth;
+        //lineCap,
+        //lineJoin,
+        //miterLimit,
+        set_shadowOffsetX(p->shadowOffsetX);
+        set_shadowOffsetY(p->shadowOffsetY);
+        set_shadowBlur(p->shadowBlur);
+        set_shadowColor(p->shadowColor);
+        //globalCompositeOperation,
+        set_font(p->font);
+        set_textAlign( p->textAlign);
+        set_textBaseline(p->textBaseline);
         delete p;
     }
     //
     ///////////////////////////////////////////////////////////////////////////
-    // The clearRect(x, y, w, h) method must clear the pixels in the specified 
-    // rectangle that also intersect the current clipping region to a fully transparent 
-    // black, erasing any previous image. If either height or width are zero, 
+    // The clearRect(x, y, w, h) method must clear the pixels in the specified
+    // rectangle that also intersect the current clipping region to a fully transparent
+    // black, erasing any previous image. If either height or width are zero,
     // this method has no effect.
-    void Context2D::clearRect(double x, double y, double w, double h)
+    void Context2D::Imp::clearRect(double x, double y, double w, double h)
     {
         FillStyle fs = fillStyle;
         fillStyle = Color("#FFFFFF"); //GDI background color white? black?
         //
         fillRect(x, y, w, h);
         //
-        fillStyle = fs;
+        set_fillStyle(fs);
     }
     ///////////////////////////////////////////////////////////////////////////////
     // The fillRect(x, y, w, h) method must paint the specified rectangular area
     //  using the fillStyle. If either height or width are zero, this method
     //  has no effect.
-    void Context2D::fillRect(double x, double y, double w, double h)
+    void Context2D::Imp::fillRect(double x, double y, double w, double h)
     {
         Check();
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
         //TODO waiting for transformations..
         RECT rect = {(LONG)x, (LONG)y, (LONG)(x + w), (LONG)(y + h)};
 
-        if (this->shadowOffsetX != 0 &&
-                this->shadowOffsetY != 0)
+        if (shadowOffsetX != 0 &&
+                shadowOffsetY != 0)
         {
-            DrawShadow(hdc, rect, (int)shadowOffsetX);
+            DrawShadow(m_hDC, rect, (int)shadowOffsetX);
         }
 
         if (fillStyle.fillStyleEnum == FillStyleEnumSolid)
         {
             COLORREF color = ColorToColorRef(fillStyle.m_Color);
-            FillSolidRect(hdc, &rect, color);
+            FillSolidRect(m_hDC, &rect, color);
         }
         else if (fillStyle.fillStyleEnum == FillStyleEnumGradient)
         {
@@ -895,125 +943,77 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
                 std::swap(color1, color2);
             }
 
-            FillGradientRect(hdc, rect, color1, color2, mode);
+            FillGradientRect(m_hDC, rect, color1, color2, mode);
         }
     }
 
-    void Context2D::strokeRect(double x, double y, double w, double h)
+    void Context2D::Imp::strokeRect(double x, double y, double w, double h)
     {
         Check();
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
         COLORREF color = ColorToColorRef(strokeStyle.m_Color);
         //
         HPEN hpen = CreatePen(PS_SOLID, (int)lineWidth, color); //TODO
-        HPEN oldPen = (HPEN) SelectObject(hdc, hpen);
-        HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, GetStockObject(HOLLOW_BRUSH));
+        HPEN oldPen = (HPEN) SelectObject(m_hDC, hpen);
+        HBRUSH oldBrush = (HBRUSH)SelectObject(m_hDC, GetStockObject(HOLLOW_BRUSH));
         //
-        ::Rectangle(hdc, (LONG)x, (LONG)y, (LONG)(x + w), (LONG)(y + h));
+        ::Rectangle(m_hDC, (LONG)x, (LONG)y, (LONG)(x + w), (LONG)(y + h));
         //
-        SelectObject(hdc, oldPen);
-        SelectObject(hdc, oldBrush);
+        SelectObject(m_hDC, oldPen);
+        SelectObject(m_hDC, oldBrush);
         //
         DeleteObject(hpen);
     }
 
 
-
-    int Context2D::ToPixelX(double x)
-    {
-        //TODO
-        return (int) x;
-    }
-
-    int Context2D::ToPixelY(double y)
-    {
-        //TODO
-        return (int) y;
-    }
-
-    int Context2D::ToPixelSizeX(double x)
-    {
-        //TODO
-        return (int) x;
-    }
-
-    int Context2D::ToPixelSizeY(double y)
-    {
-        //TODO
-        return (int) y;
-    }
-
-
-
-    TextMetrics Context2D::measureText(const wchar_t* psz)
+    TextMetrics Context2D::Imp::measureText(const wchar_t* psz)
     {
         Check();
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
         //  TEXTMETRIC tm;
-        //  GetTextMetrics(hdc, &tm);
+        //  GetTextMetrics(m_hDC, &tm);
         //
-        HFONT oldfont = (HFONT) SelectObject(hdc, (HFONT)font.m_pNativeObject);
+        HFONT oldfont = (HFONT) SelectObject(m_hDC, (HFONT) font.m_pNativeObject);
         SIZE sz;
-        ::GetTextExtentPoint(hdc, psz, wcslen(psz), &sz);
-        ::SelectObject(hdc, oldfont);
+        ::GetTextExtentPoint(m_hDC, psz, wcslen(psz), &sz);
+        ::SelectObject(m_hDC, oldfont);
         return TextMetrics(sz.cx);
     }
 
-    void Context2D::moveTo(double x, double y)
+    void Context2D::Imp::moveTo(double x, double y)
     {
         Check();
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
-        const int ix = ToPixelX(x);
-        const int iy = ToPixelY(y);
-        ::MoveToEx(hdc, ix, iy, NULL);
+        const int ix = x;
+        const int iy = y;
+        ::MoveToEx(m_hDC, ix, iy, NULL);
     }
 
-    void Context2D::lineTo(double x, double y)
+    void Context2D::Imp::lineTo(double x, double y)
     {
         Check();
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
-        const int ix = ToPixelX(x);
-        const int iy = ToPixelY(y);
+        const int ix = (x);
+        const int iy = (y);
         //
-        ::LineTo(hdc, ix, iy);
+        ::LineTo(m_hDC, ix, iy);
         //
     }
 
-    void Context2D::beginPath()
+    void Context2D::Imp::beginPath()
     {
         Check();
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
-        BeginPath(hdc);
+        BeginPath(m_hDC);
     }
 
-    void Context2D::closePath()
+    void Context2D::Imp::closePath()
     {
         Check();
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
-        CloseFigure(hdc);
-        EndPath(hdc);
+        CloseFigure(m_hDC);
+        EndPath(m_hDC);
     }
 
-    void Context2D::rect(double x, double y, double w, double h)
+    void Context2D::Imp::rect(double x, double y, double w, double h)
     {
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
-        ::Rectangle(hdc, ToPixelX(x), ToPixelY(y), ToPixelX(x + w), ToPixelY(y + h));
+        ::Rectangle(m_hDC, x, y, (x + w), (y + h));
     }
-    void Context2D::clip()
+    void Context2D::Imp::clip()
     {
         // The clip() method must create a new clipping region by calculating the intersection
         //of the current clipping region and the area described by the current path, using the
@@ -1021,18 +1021,14 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
         //the clipping region, without affecting the actual subpaths. The new clipping region
         //replaces the current clipping region.
         //When the context is initialized, the clipping region must be set to the rectangle with the top left corner at (0,0) and the width and height of the coordinate space.
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
-        EndPath(hdc);
-        SelectClipPath(hdc, RGN_AND);
+        EndPath(m_hDC);
+        SelectClipPath(m_hDC, RGN_AND);
         //TODO
     }
 
-    void Context2D::fill()
+    void Context2D::Imp::fill()
     {
         closePath();
-
         Check();
 
         if (flags == 0)
@@ -1045,10 +1041,9 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
         }
     }
 
-    void Context2D::stroke()
+    void Context2D::Imp::stroke()
     {
         closePath();
-
         Check();
 
         if (flags == 0)
@@ -1061,7 +1056,7 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
         }
     }
 
-    static void GdiTextOut(HDC hdc,
+    static void GdiTextOut(HDC m_hDC,
                            TextAlign textAlign,
                            TextBaselineEnum baseLine,
                            const wchar_t* psz,
@@ -1069,99 +1064,501 @@ void CanvasGradient::addColorStop(double offset, const Color& color)
                            int ix,
                            int iy)
     {
-        assert(GetTextAlign(hdc) == TA_LEFT);
+        assert(GetTextAlign(m_hDC) == TA_LEFT);
         SIZE sz;
-        ::GetTextExtentPointW(hdc, psz, textlen, &sz);
+        ::GetTextExtentPointW(m_hDC, psz, textlen, &sz);
         int newx = ix;
         int newy = iy;
 
         switch (textAlign)
         {
-        case TextAlignStart:
-            newx = ix;
-            break;
+            case TextAlignStart:
+                newx = ix;
+                break;
 
-        case TextAlignEnd:
-            newx = ix - sz.cx;
-            break;
+            case TextAlignEnd:
+                newx = ix - sz.cx;
+                break;
 
-        case TextAlignLeft:
-            newx = ix;
-            break;
+            case TextAlignLeft:
+                newx = ix;
+                break;
 
-        case TextAlignRight:
-            newx = ix - sz.cx;
-            break;
+            case TextAlignRight:
+                newx = ix - sz.cx;
+                break;
 
-        case TextAlignCenter:
-            newx = ix - sz.cx / 2;
-            break;
+            case TextAlignCenter:
+                newx = ix - sz.cx / 2;
+                break;
 
-        default:
-            assert(false);
+            default:
+                assert(false);
         }
 
         switch (baseLine)
         {
-        case TextBaselineTop :
-            newy = iy;
-            break;//The top of the em square
+            case TextBaselineTop :
+                newy = iy;
+                break;//The top of the em square
 
-        case TextBaselineHanging:
-            newy = iy;
-            break; //The hanging baseline
+            case TextBaselineHanging:
+                newy = iy;
+                break; //The hanging baseline
 
-        case TextBaselineMiddle :
-            newy = iy - sz.cy / 2;
-            break; //The middle of the em square
+            case TextBaselineMiddle :
+                newy = iy - sz.cy / 2;
+                break; //The middle of the em square
 
-        case TextBaselineAlphabetic :
-        {
-            TEXTMETRIC tm;
-            GetTextMetrics(hdc, &tm);
-            newy = iy - (tm.tmHeight - tm.tmDescent);
+            case TextBaselineAlphabetic :
+            {
+                TEXTMETRIC tm;
+                GetTextMetrics(m_hDC, &tm);
+                newy = iy - (tm.tmHeight - tm.tmDescent);
+            }
+            break;//The alphabetic baseline
+
+            case TextBaselineIdeographic :
+            {
+                TEXTMETRIC tm;
+                GetTextMetrics(m_hDC, &tm);
+                newy = iy - (tm.tmHeight);
+            }
+            break; //The ideographic baseline
+
+            case TextBaselineBottom :
+                newy = iy - sz.cy;
+                break;//The bottom of the em square
+
+            default:
+                break;
         }
-        break;//The alphabetic baseline
 
-        case TextBaselineIdeographic :
-        {
-            TEXTMETRIC tm;
-            GetTextMetrics(hdc, &tm);
-            newy = iy - (tm.tmHeight);
-        }
-        break; //The ideographic baseline
+        TextOut(m_hDC, newx, newy, psz, wcslen(psz));
+    }
 
-        case TextBaselineBottom :
-            newy = iy - sz.cy;
-            break;//The bottom of the em square
+    void Context2D::Imp::fillText(const wchar_t* psz, double x, double y)
+    {
+        Check();
+        const int ix = x;//ToPixelX(x);
+        const int iy = y;//ToPixelY(y);
+        //
+        COLORREF color = ColorToColorRef(fillStyle.m_Color);
+        COLORREF oldcolor = SetTextColor(m_hDC, color);
+        int oldbkmode = SetBkMode(m_hDC, TRANSPARENT);
+        HFONT oldfont = (HFONT) SelectObject(m_hDC, (HFONT)font.m_pNativeObject);
+        //
+        GdiTextOut(m_hDC, textAlign, textBaseline, psz, wcslen(psz), ix, iy);
+        //
+        SetTextColor(m_hDC, oldcolor);
+        SetBkMode(m_hDC, oldbkmode);
+        SelectObject(m_hDC, oldfont);
+    }
 
-        default:
-            break;
-        }
+    ///
 
-        TextOut(hdc, newx, newy, psz, wcslen(psz));
+    void Context2D::Imp::set_fillStyle(const CanvasGradient& v)
+    {
+        Check();
+        fillStyle = v;
+    }
+
+    void Context2D::Imp::set_fillStyle(const Color& v)
+    {
+        Check();
+        fillStyle = v;
+    }
+
+    void Context2D::Imp::set_fillStyle(const char* v)
+    {
+        Check();
+        fillStyle = v;
+    }
+
+    void Context2D::Imp::set_fillStyle(const FillStyle& v)
+    {
+        fillStyle = v;
+    }
+
+    const FillStyle& Context2D::Imp::get_fillStyle() const
+    {        
+        return fillStyle;
+    }
+
+    void Context2D::Imp::set_strokeStyle(const CanvasGradient& v)
+    {
+        strokeStyle = v;
+    }
+
+    void Context2D::Imp::set_strokeStyle(const Color& v)
+    {
+        Check();
+        strokeStyle = v;
+    }
+
+    void Context2D::Imp::set_strokeStyle(const char* v)
+    {
+        Check();
+        strokeStyle = v;
+    }
+
+    void Context2D::Imp::set_strokeStyle(const FillStyle& v)
+    {
+        Check();
+        strokeStyle = v;
+    }
+
+    const FillStyle& Context2D::Imp::get_strokeStyle() const
+    {
+        return strokeStyle;
+    }
+
+    void Context2D::Imp::set_textAlign(const char* v)
+    {
+        Check();
+        textAlign = v;
+    }
+
+    void Context2D::Imp::set_textAlign(const TextAlign& v)
+    {
+        Check();
+        textAlign = v;
+    }
+
+    const TextAlign& Context2D::Imp::get_textAlign()const
+    {
+        return textAlign;
+    }
+
+    void Context2D::Imp::set_textBaseline(const char* v)
+    {
+        Check();
+        textBaseline = v;
+    }
+
+    void Context2D::Imp::set_textBaseline(const TextBaseline& v)
+    {
+        Check();
+        textBaseline = v;
+    }
+
+    const TextBaseline& Context2D::Imp::get_textBaseline() const
+    {
+        return textBaseline;
+    }
+
+    void Context2D::Imp::set_font(const char* v)
+    {
+        Check();
+        font = v;
+    }
+
+    void Context2D::Imp::set_font(const Font& v)
+    {
+        Check();
+        font = v;
+    }
+
+    const Font& Context2D::Imp::get_font() const
+    {
+        return font;
+    }
+
+    void Context2D::Imp::set_lineWidth(double v)
+    {
+        Check();
+        lineWidth  = v;
+    }
+
+    double Context2D::Imp::get_lineWidth() const
+    {
+        return lineWidth;
+    }
+
+    void Context2D::Imp::set_shadowColor(const Color& v)
+    {
+        Check();
+        shadowColor = v;
+    }
+
+    const Color&  Context2D::Imp::get_shadowColor()const
+    {
+        return shadowColor;
+    }
+
+    void Context2D::Imp::set_shadowOffsetX(double v)
+    {
+        Check();
+        shadowOffsetX = v;
+    }
+
+    double Context2D::Imp::get_shadowOffsetX() const
+    {
+        return shadowOffsetX;
+    }
+
+    void Context2D::Imp::set_shadowOffsetY(double v)
+    {
+        Check();
+        shadowOffsetY = v;
+    }
+
+    double Context2D::Imp::get_shadowOffsetY() const
+    {
+        return shadowOffsetY;
+    }
+
+    void Context2D::Imp::set_shadowBlur(double v)
+    {
+        Check();
+        shadowBlur = v;
+    }
+
+    double Context2D::Imp::get_shadowBlur() const
+    {
+        return shadowBlur;
+    }
+
+    ////////
+    ////////
+    Context2D::Context2D(void* p)
+    {
+        m_pContext2DImp = new Context2D::Imp(p);
+     
+    }
+
+    Context2D::~Context2D()
+    {
+        delete m_pContext2DImp;
+    }
+
+    // state
+    void Context2D::save()
+    {
+        m_pContext2DImp->save();
+    }
+
+    void Context2D::restore()
+    {
+        m_pContext2DImp->restore();
+    }
+
+    void Context2D::clearRect(double x, double y, double w, double h)
+    {
+        m_pContext2DImp->clearRect(x, y, w, h);
+    }
+
+    void Context2D::fillRect(double x, double y, double w, double h)
+    {
+        m_pContext2DImp->fillRect(x, y, w, h);
+    }
+
+    void Context2D::strokeRect(double x, double y, double w, double h)
+    {
+        m_pContext2DImp->strokeRect(x, y, w, h);
     }
 
     void Context2D::fillText(const wchar_t* psz, double x, double y)
     {
-        Check();
-        //------------------------------
-        HDC hdc = (HDC) m_pNativeHandle;
-        //-------------------------------
-        const int ix = ToPixelX(x);
-        const int iy = ToPixelY(y);
-        //
-        COLORREF color = ColorToColorRef(fillStyle.m_Color);
-        COLORREF oldcolor = SetTextColor(hdc, color);
-        int oldbkmode = SetBkMode(hdc, TRANSPARENT);
-        HFONT oldfont = (HFONT) SelectObject(hdc, (HFONT)font.m_pNativeObject);
-        //
-        GdiTextOut(hdc, this->textAlign, this->textBaseline, psz, wcslen(psz), ix, iy);
-        //
-        SetTextColor(hdc, oldcolor);
-        SetBkMode(hdc, oldbkmode);
-        SelectObject(hdc, oldfont);
+        m_pContext2DImp->fillText(psz, x, y);
     }
 
-} //namespace CanvasPlus
+    CanvasGradient Context2D::createLinearGradient(double x0, double y0, double x1, double y1)
+    {
+        return m_pContext2DImp->createLinearGradient(x0, y0, x1, y1);
+    }
 
+    TextMetrics Context2D::measureText(const wchar_t* psz)
+    {
+        return m_pContext2DImp->measureText(psz);
+    }
+
+    void Context2D::moveTo(double x, double y)
+    {
+        m_pContext2DImp->moveTo(x, y);
+    }
+
+    void Context2D::lineTo(double x, double y)
+    {
+        m_pContext2DImp->lineTo(x, y);
+    }
+
+    void Context2D::beginPath()
+    {
+        m_pContext2DImp->beginPath();
+    }
+
+    void Context2D::closePath()
+    {
+        m_pContext2DImp->closePath();
+    }
+
+    void Context2D::stroke()
+    {
+        m_pContext2DImp->stroke();
+    }
+
+    void Context2D::fill()
+    {
+        m_pContext2DImp->fill();
+    }
+
+    void Context2D::clip()
+    {
+        m_pContext2DImp->clip();
+    }
+
+    void Context2D::rect(double x, double y, double w, double h)
+    {
+        m_pContext2DImp->rect(x, y, w, h);
+    }
+
+    ///
+
+    void Context2D::set_fillStyle(const CanvasGradient& v)
+    {
+        m_pContext2DImp->set_fillStyle(v);
+    }
+
+    void Context2D::set_fillStyle(const Color& v)
+    {
+        m_pContext2DImp->set_fillStyle(v);
+    }
+
+    void Context2D::set_fillStyle(const char* v)
+    {
+        m_pContext2DImp->set_fillStyle(v);
+    }
+
+    void Context2D::set_fillStyle(const FillStyle& v)
+    {
+        m_pContext2DImp->set_fillStyle(v);
+    }
+
+    const FillStyle& Context2D::get_fillStyle() const
+    {
+        return m_pContext2DImp->get_fillStyle();
+    }
+
+    void Context2D::set_strokeStyle(const CanvasGradient& v)
+    {
+        m_pContext2DImp->set_strokeStyle(v);
+    }
+
+    void Context2D::set_strokeStyle(const Color& v)
+    {
+        m_pContext2DImp->set_strokeStyle(v);
+    }
+
+    void Context2D::set_strokeStyle(const char* v)
+    {
+        m_pContext2DImp->set_strokeStyle(v);
+    }
+
+    void Context2D::set_strokeStyle(const FillStyle& v)
+    {
+        m_pContext2DImp->set_strokeStyle(v);
+    }
+
+    const FillStyle& Context2D::get_strokeStyle() const
+    {
+        return m_pContext2DImp->get_strokeStyle();
+    }
+
+    void Context2D::set_textAlign(const char* v)
+    {
+        m_pContext2DImp->set_textAlign(v);
+    }
+
+    void Context2D::set_textAlign(const TextAlign& v)
+    {
+        m_pContext2DImp->set_textAlign(v);
+    }
+
+    const TextAlign& Context2D::get_textAlign()const
+    {
+        return m_pContext2DImp->get_textAlign();
+    }
+
+    void Context2D::set_textBaseline(const char* v)
+    {
+        m_pContext2DImp->set_textBaseline(v);
+    }
+
+    void Context2D::set_textBaseline(const TextBaseline& v)
+    {
+        m_pContext2DImp->set_textBaseline(v);
+    }
+
+    const TextBaseline& Context2D::get_textBaseline() const
+    {
+        return m_pContext2DImp->get_textBaseline();
+    }
+
+    void Context2D::set_font(const char* v)
+    {
+        m_pContext2DImp->set_font(v);
+    }
+
+    void Context2D::set_font(const Font& v)
+    {
+        m_pContext2DImp->set_font(v);
+    }
+
+    const Font& Context2D::get_font() const
+    {
+        return m_pContext2DImp->get_font();
+    }
+
+    void Context2D::set_lineWidth(double v)
+    {
+        m_pContext2DImp->set_lineWidth(v);
+    }
+
+    double Context2D::get_lineWidth() const
+    {
+        return m_pContext2DImp->get_lineWidth();
+    }
+
+    void Context2D::set_shadowColor(const Color& v)
+    {
+        m_pContext2DImp->set_shadowColor(v);
+    }
+
+    const Color&  Context2D::get_shadowColor()const
+    {
+        return m_pContext2DImp->get_shadowColor();
+    }
+
+    void Context2D::set_shadowOffsetX(double v)
+    {
+        m_pContext2DImp->set_shadowOffsetX(v);
+    }
+
+    double Context2D::get_shadowOffsetX() const
+    {
+        return m_pContext2DImp->get_shadowOffsetX();
+    }
+
+    void Context2D::set_shadowOffsetY(double v)
+    {
+        m_pContext2DImp->set_shadowOffsetY(v);
+    }
+
+    double Context2D::get_shadowOffsetY() const
+    {
+        return m_pContext2DImp->get_shadowOffsetY();
+    }
+
+    void Context2D::set_shadowBlur(double v)
+    {
+        m_pContext2DImp->set_shadowBlur(v);
+    }
+
+    double Context2D::get_shadowBlur() const
+    {
+        return m_pContext2DImp->get_shadowBlur();
+    }
+
+    ////////
+} //namespace CanvasPlus
