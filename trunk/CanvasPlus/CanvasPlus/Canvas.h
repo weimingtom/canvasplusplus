@@ -24,6 +24,7 @@
 #include <vector>
 #define nullptr 0
 
+
 namespace CanvasPlus //Better name?
 {
     //Local representation of color
