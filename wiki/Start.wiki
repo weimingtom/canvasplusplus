@@ -45,13 +45,13 @@ GDI is very old, the drawing may not be pixel to pixel compatible   with the dra
 
 http://msdn.microsoft.com/en-us/library/dd145203(v=vs.85).aspx
 
-1.2 Direct2d
-Direct 2d (not started), but probably it will be the api used in windows 8 apps. 
+1.2 Direct2d (started)
+Direct 2d
 
 http://msdn.microsoft.com/en-us/library/windows/desktop/dd370990(v=vs.85).aspx
 
 
-2) Mac
+2) Mac (need update!)
   Can run in MacOS (CGContext)
  http://developer.apple.com/library/ios/#documentation/GraphicsImaging/Reference/CGContext/Reference/reference.html
 
