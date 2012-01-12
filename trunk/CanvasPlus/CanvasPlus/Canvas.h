@@ -211,7 +211,12 @@ namespace CanvasPlus //Better name?
         operator ATTR_TYPE () const {\
         return reinterpret_cast<const Context2D*>(this - offsetof(Context2D, ATTR_NAME))->get_##ATTR_NAME();\
         }\
+        template<class T>\
+        bool operator ==(const T& v) const {\
+        return reinterpret_cast<const Context2D*>(this - offsetof(Context2D, ATTR_NAME))->get_##ATTR_NAME() == v;\
+        }\
     } ATTR_NAME
+    
     
     //
     //
