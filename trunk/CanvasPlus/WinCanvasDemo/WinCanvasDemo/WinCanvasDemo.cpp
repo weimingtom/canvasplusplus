@@ -186,9 +186,8 @@ LRESULT CALLBACK DemoApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 PAINTSTRUCT ps;
                 HDC hdc = BeginPaint(pDemoApp->m_hwnd, &ps);
                 {
-                    CanvasPlus::Canvas canvas(hdc, 
-                                              clientRect.right - clientRect.left,
-                                              clientRect.bottom - clientRect.top);
+                    CanvasPlus::Canvas canvas;
+                    canvas.BeginDraw(hdc, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
                     DrawSample(pDemoApp->m_CurrentSampleIndex, canvas);
 
