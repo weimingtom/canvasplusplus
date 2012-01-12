@@ -186,11 +186,17 @@ LRESULT CALLBACK DemoApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 PAINTSTRUCT ps;
                 HDC hdc = BeginPaint(pDemoApp->m_hwnd, &ps);
                 {
-                    CanvasPlus::Canvas canvas;
-                    canvas.BeginDraw(hdc, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+                    //D2D
+#ifdef USING_WIN_D2D
+                    pDemoApp->m_Canvas.BeginDraw(pDemoApp->m_hwnd, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+#endif
 
-                    DrawSample(pDemoApp->m_CurrentSampleIndex, canvas);
-
+#ifdef USING_WIN_GDI
+                    //GDI
+                    pDemoApp->m_Canvas.BeginDraw(hdc, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+#endif
+                    DrawSample(pDemoApp->m_CurrentSampleIndex, pDemoApp->m_Canvas);
+                    pDemoApp->m_Canvas.EndDraw();
                 } //need to call destructor before end
                 // TODO: Add any drawing code here...
                 EndPaint(pDemoApp->m_hwnd, &ps);

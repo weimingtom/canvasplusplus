@@ -19,11 +19,14 @@
     <ClCompile Include="Samples.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CanvasPlus\Win\Win_Canvas.cpp">
-      <Filter>Source Files\Canvas++\Win</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CanvasPlus\Canvas.cpp">
       <Filter>Source Files\Canvas++</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CanvasPlus\Win\WinD2D_Canvas.cpp">
+      <Filter>Source Files\Canvas++\Win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CanvasPlus\Win\Win_Canvas.cpp">
+      <Filter>Source Files\Canvas++\Win</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

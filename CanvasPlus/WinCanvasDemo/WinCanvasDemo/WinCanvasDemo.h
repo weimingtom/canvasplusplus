@@ -10,6 +10,7 @@
 #include <wchar.h>
 #include <math.h>
 
+#include <Canvas.h>
 
 #ifndef Assert
 #if defined( DEBUG ) || defined( _DEBUG )
@@ -29,6 +30,8 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 //
 class DemoApp
 {
+    
+
 public:
     DemoApp();
     ~DemoApp();
@@ -55,7 +58,7 @@ private:
         );
 private:
     HWND m_hwnd;  
-    
+    CanvasPlus::Canvas m_Canvas;    
     int m_CurrentSampleIndex;;
 };
 

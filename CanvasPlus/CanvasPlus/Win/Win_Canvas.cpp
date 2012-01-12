@@ -1,5 +1,8 @@
 
 
+
+#ifdef USING_WIN_GDI
+
 #include <Windows.h>
 #include <cassert>
 #include "..\Canvas.h"
@@ -422,17 +425,22 @@ namespace CanvasPlus
 
         Imp(HDC hdc)
         {            
+            BeginDraw(hdc);            
+        }
+
+        void BeginDraw(HDC hdc)
+        {
             this->m_hDC = hdc;
             this->lineWidth = 1.0;
             this->shadowColor = "rgb(0,0,0)";
             this->shadowOffsetX = 0;
             this->shadowOffsetY = 0;
             this->shadowBlur = 0;
-        }
-
-        void BeginDraw(HDC hdc)
-        {
-            this->m_hDC = hdc;
+            this->strokeStyle = "rgb(0,0,0)";
+            this->fillStyle = "rgb(0,0,0)";
+            this->font = "10px sans-serif";
+                
+            //TODO all init here!
         }
 
         void EndDraw()
@@ -1601,3 +1609,5 @@ namespace CanvasPlus
 
     ////////
 } //namespace CanvasPlus
+
+#endif //USING_WIN_GDI
