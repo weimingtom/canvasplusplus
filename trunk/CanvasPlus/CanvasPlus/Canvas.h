@@ -222,7 +222,7 @@ namespace CanvasPlus //Better name?
 
         friend class Canvas;
 
-        Context2D(void*);
+        Context2D();
         Context2D(const Context2D&);//
         Context2D& operator = (const Context2D&);//
 
@@ -264,6 +264,9 @@ namespace CanvasPlus //Better name?
 
         void set_shadowBlur(double);
         double get_shadowBlur() const;
+
+        void BeginDraw(void*);
+        void EndDraw();
 
     public:
 
@@ -308,10 +311,15 @@ namespace CanvasPlus //Better name?
         Context2D m_CanvasRenderingContext2D;
         Canvas& operator=(const Canvas&);
     public:
-        const double width;
-        const double height;
+        double width;
+        double height;
 
-        Canvas(void*, double w, double h);
+        //Not standard
+        void BeginDraw(void* p, int w, int h);
+        void EndDraw();
+        //
+
+        Canvas();
         ~Canvas();
         Context2D& getContext(const char*);
     };

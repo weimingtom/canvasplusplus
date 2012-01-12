@@ -420,14 +420,24 @@ namespace CanvasPlus
 
     public:
 
-        Imp(void* p)
+        Imp(HDC hdc)
         {            
-            this->m_hDC = (HDC)p;
+            this->m_hDC = hdc;
             this->lineWidth = 1.0;
             this->shadowColor = "rgb(0,0,0)";
             this->shadowOffsetX = 0;
             this->shadowOffsetY = 0;
             this->shadowBlur = 0;
+        }
+
+        void BeginDraw(HDC hdc)
+        {
+            this->m_hDC = hdc;
+        }
+
+        void EndDraw()
+        {
+         
         }
 
         void Check();
@@ -751,7 +761,7 @@ namespace CanvasPlus
         m_pNativeObject = (void*)CreateFontIndirect(&logFont);
     }
 
-    Canvas::Canvas(void* p, double w, double h) : m_CanvasRenderingContext2D(p), width(w), height(h)
+    Canvas::Canvas() : width(0), height(0)
     {
     }
 
@@ -762,6 +772,18 @@ namespace CanvasPlus
     Context2D& Canvas::getContext(const char*)
     {
         return m_CanvasRenderingContext2D;
+    }
+    
+    void Canvas::BeginDraw(void* p, int w, int h)
+    {
+        width = w;
+        height = h;
+        m_CanvasRenderingContext2D.BeginDraw(p);
+    }
+    
+    void Canvas::EndDraw()
+    {
+        m_CanvasRenderingContext2D.EndDraw();
     }
 
 
@@ -1321,10 +1343,27 @@ namespace CanvasPlus
 
     ////////
     ////////
-    Context2D::Context2D(void* p)
+    Context2D::Context2D()
     {
-        m_pContext2DImp = new Context2D::Imp(p);
-     
+        m_pContext2DImp = nullptr;     
+    }
+
+    void Context2D::BeginDraw(void* p)
+    {
+        HDC hdc = (HDC)p;
+        if (m_pContext2DImp  == nullptr)
+        {
+            m_pContext2DImp = new CanvasPlus::Context2D::Imp(hdc);
+        }
+        m_pContext2DImp->BeginDraw(hdc);
+    }
+
+    void Context2D::EndDraw()
+    {
+        if (m_pContext2DImp)
+         {
+             m_pContext2DImp->EndDraw();
+        }
     }
 
     Context2D::~Context2D()
