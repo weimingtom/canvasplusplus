@@ -38,7 +38,7 @@ namespace CanvasPlus
         return result;
     }
 
-    TextBaselineEnum ParseTextBaseline(const char* psz)
+    TextBaseline ParseTextBaseline(const char* psz)
     {
         if (strcmp(psz, "top") == 0)
         {
@@ -70,7 +70,7 @@ namespace CanvasPlus
     }
 
 
-    TextAlignEnum ParseTextAlign(const char* psz)
+    TextAlign ParseTextAlign(const char* psz)
     {
         if (strcmp(psz, "start") == 0)
         {

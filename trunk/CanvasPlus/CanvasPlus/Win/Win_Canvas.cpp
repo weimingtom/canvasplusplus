@@ -399,7 +399,7 @@ namespace CanvasPlus
     class CanvasStateInfo;
     //
     //
-    class CanvasPlus::Context2D::Imp
+    class GdiContext2D : public Context2D
     {
         int flags;
         HDC m_hDC;
@@ -423,14 +423,20 @@ namespace CanvasPlus
 
     public:
 
-        Imp(HDC hdc)
-        {            
-            BeginDraw(hdc);            
+        GdiContext2D(HDC hdc)
+        {
+            BeginDraw(hdc);
         }
 
         void BeginDraw(HDC hdc)
         {
             this->m_hDC = hdc;
+            
+            //defaults==
+
+            this->textAlign = TextAlignStart;
+            this->textBaseline = TextBaselineAlphabetic;
+
             this->lineWidth = 1.0;
             this->shadowColor = "rgb(0,0,0)";
             this->shadowOffsetX = 0;
@@ -439,13 +445,11 @@ namespace CanvasPlus
             this->strokeStyle = "rgb(0,0,0)";
             this->fillStyle = "rgb(0,0,0)";
             this->font = "10px sans-serif";
-                
             //TODO all init here!
         }
 
         void EndDraw()
         {
-         
         }
 
         void Check();
@@ -647,7 +651,7 @@ namespace CanvasPlus
         }
     }
 
-    CanvasGradient Context2D::Imp::createLinearGradient(double x0,
+    CanvasGradient GdiContext2D::createLinearGradient(double x0,
             double y0,
             double x1,
             double y1)
@@ -769,35 +773,13 @@ namespace CanvasPlus
         m_pNativeObject = (void*)CreateFontIndirect(&logFont);
     }
 
-    Canvas::Canvas() : width(0), height(0)
-    {
-    }
 
-    Canvas::~Canvas()
-    {
-    }
 
-    Context2D& Canvas::getContext(const char*)
-    {
-        return m_CanvasRenderingContext2D;
-    }
-    
-    void Canvas::BeginDraw(void* p, int w, int h)
-    {
-        width = w;
-        height = h;
-        m_CanvasRenderingContext2D.BeginDraw(p);
-    }
-    
-    void Canvas::EndDraw()
-    {
-        m_CanvasRenderingContext2D.EndDraw();
-    }
 
 
     // == Context2D::Implementation ==
 
-    void Context2D::Imp::Check()
+    void GdiContext2D::Check()
     {
         //because GDI closes the path after Fill or stroke
         //we need a state to do both at the same time
@@ -860,7 +842,7 @@ namespace CanvasPlus
 
 
     // state
-    void Context2D::Imp::save()
+    void GdiContext2D::save()
     {
         Check();
         CanvasStateInfo* p = new CanvasStateInfo();
@@ -887,7 +869,7 @@ namespace CanvasPlus
         m_stack.push_back(p);
     }
 
-    void Context2D::Imp::restore()
+    void GdiContext2D::restore()
     {
         Check();
         // pop state stack and restore state
@@ -911,7 +893,7 @@ namespace CanvasPlus
         set_shadowColor(p->shadowColor);
         //globalCompositeOperation,
         set_font(p->font);
-        set_textAlign( p->textAlign);
+        set_textAlign(p->textAlign);
         set_textBaseline(p->textBaseline);
         delete p;
     }
@@ -921,7 +903,7 @@ namespace CanvasPlus
     // rectangle that also intersect the current clipping region to a fully transparent
     // black, erasing any previous image. If either height or width are zero,
     // this method has no effect.
-    void Context2D::Imp::clearRect(double x, double y, double w, double h)
+    void GdiContext2D::clearRect(double x, double y, double w, double h)
     {
         FillStyle fs = fillStyle;
         fillStyle = Color("#FFFFFF"); //GDI background color white? black?
@@ -934,7 +916,7 @@ namespace CanvasPlus
     // The fillRect(x, y, w, h) method must paint the specified rectangular area
     //  using the fillStyle. If either height or width are zero, this method
     //  has no effect.
-    void Context2D::Imp::fillRect(double x, double y, double w, double h)
+    void GdiContext2D::fillRect(double x, double y, double w, double h)
     {
         Check();
         //TODO waiting for transformations..
@@ -977,7 +959,7 @@ namespace CanvasPlus
         }
     }
 
-    void Context2D::Imp::strokeRect(double x, double y, double w, double h)
+    void GdiContext2D::strokeRect(double x, double y, double w, double h)
     {
         Check();
         COLORREF color = ColorToColorRef(strokeStyle.m_Color);
@@ -995,7 +977,7 @@ namespace CanvasPlus
     }
 
 
-    TextMetrics Context2D::Imp::measureText(const wchar_t* psz)
+    TextMetrics GdiContext2D::measureText(const wchar_t* psz)
     {
         Check();
         //  TEXTMETRIC tm;
@@ -1008,7 +990,7 @@ namespace CanvasPlus
         return TextMetrics(sz.cx);
     }
 
-    void Context2D::Imp::moveTo(double x, double y)
+    void GdiContext2D::moveTo(double x, double y)
     {
         Check();
         const int ix = x;
@@ -1016,7 +998,7 @@ namespace CanvasPlus
         ::MoveToEx(m_hDC, ix, iy, NULL);
     }
 
-    void Context2D::Imp::lineTo(double x, double y)
+    void GdiContext2D::lineTo(double x, double y)
     {
         Check();
         const int ix = (x);
@@ -1026,24 +1008,24 @@ namespace CanvasPlus
         //
     }
 
-    void Context2D::Imp::beginPath()
+    void GdiContext2D::beginPath()
     {
         Check();
         BeginPath(m_hDC);
     }
 
-    void Context2D::Imp::closePath()
+    void GdiContext2D::closePath()
     {
         Check();
         CloseFigure(m_hDC);
         EndPath(m_hDC);
     }
 
-    void Context2D::Imp::rect(double x, double y, double w, double h)
+    void GdiContext2D::rect(double x, double y, double w, double h)
     {
         ::Rectangle(m_hDC, x, y, (x + w), (y + h));
     }
-    void Context2D::Imp::clip()
+    void GdiContext2D::clip()
     {
         // The clip() method must create a new clipping region by calculating the intersection
         //of the current clipping region and the area described by the current path, using the
@@ -1056,7 +1038,7 @@ namespace CanvasPlus
         //TODO
     }
 
-    void Context2D::Imp::fill()
+    void GdiContext2D::fill()
     {
         closePath();
         Check();
@@ -1071,7 +1053,7 @@ namespace CanvasPlus
         }
     }
 
-    void Context2D::Imp::stroke()
+    void GdiContext2D::stroke()
     {
         closePath();
         Check();
@@ -1088,7 +1070,7 @@ namespace CanvasPlus
 
     static void GdiTextOut(HDC m_hDC,
                            TextAlign textAlign,
-                           TextBaselineEnum baseLine,
+                           TextBaseline baseLine,
                            const wchar_t* psz,
                            int textlen,
                            int ix,
@@ -1167,7 +1149,7 @@ namespace CanvasPlus
         TextOut(m_hDC, newx, newy, psz, wcslen(psz));
     }
 
-    void Context2D::Imp::fillText(const wchar_t* psz, double x, double y)
+    void GdiContext2D::fillText(const wchar_t* psz, double x, double y)
     {
         Check();
         const int ix = x;//ToPixelX(x);
@@ -1187,424 +1169,249 @@ namespace CanvasPlus
 
     ///
 
-    void Context2D::Imp::set_fillStyle(const CanvasGradient& v)
+    void GdiContext2D::set_fillStyle(const CanvasGradient& v)
     {
         Check();
         fillStyle = v;
     }
 
-    void Context2D::Imp::set_fillStyle(const Color& v)
+    void GdiContext2D::set_fillStyle(const Color& v)
     {
         Check();
         fillStyle = v;
     }
 
-    void Context2D::Imp::set_fillStyle(const char* v)
+    void GdiContext2D::set_fillStyle(const char* v)
     {
         Check();
         fillStyle = v;
     }
 
-    void Context2D::Imp::set_fillStyle(const FillStyle& v)
+    void GdiContext2D::set_fillStyle(const FillStyle& v)
     {
         fillStyle = v;
     }
 
-    const FillStyle& Context2D::Imp::get_fillStyle() const
-    {        
+    const FillStyle& GdiContext2D::get_fillStyle() const
+    {
         return fillStyle;
     }
 
-    void Context2D::Imp::set_strokeStyle(const CanvasGradient& v)
+    void GdiContext2D::set_strokeStyle(const CanvasGradient& v)
     {
         strokeStyle = v;
     }
 
-    void Context2D::Imp::set_strokeStyle(const Color& v)
-    {
-        Check();
-        strokeStyle = v;
-    }
-
-    void Context2D::Imp::set_strokeStyle(const char* v)
+    void GdiContext2D::set_strokeStyle(const Color& v)
     {
         Check();
         strokeStyle = v;
     }
 
-    void Context2D::Imp::set_strokeStyle(const FillStyle& v)
+    void GdiContext2D::set_strokeStyle(const char* v)
     {
         Check();
         strokeStyle = v;
     }
 
-    const FillStyle& Context2D::Imp::get_strokeStyle() const
+    void GdiContext2D::set_strokeStyle(const FillStyle& v)
+    {
+        Check();
+        strokeStyle = v;
+    }
+
+    const FillStyle& GdiContext2D::get_strokeStyle() const
     {
         return strokeStyle;
     }
 
-    void Context2D::Imp::set_textAlign(const char* v)
+    void GdiContext2D::set_textAlign(const char* v)
+    {
+        Check();
+        textAlign = ParseTextAlign(v);
+    }
+
+    void GdiContext2D::set_textAlign(const TextAlign& v)
     {
         Check();
         textAlign = v;
     }
 
-    void Context2D::Imp::set_textAlign(const TextAlign& v)
-    {
-        Check();
-        textAlign = v;
-    }
-
-    const TextAlign& Context2D::Imp::get_textAlign()const
+    const TextAlign& GdiContext2D::get_textAlign()const
     {
         return textAlign;
     }
 
-    void Context2D::Imp::set_textBaseline(const char* v)
+    void GdiContext2D::set_textBaseline(const char* v)
+    {
+        Check();
+        textBaseline = ParseTextBaseline(v);
+    }
+
+    void GdiContext2D::set_textBaseline(const TextBaseline& v)
     {
         Check();
         textBaseline = v;
     }
 
-    void Context2D::Imp::set_textBaseline(const TextBaseline& v)
-    {
-        Check();
-        textBaseline = v;
-    }
-
-    const TextBaseline& Context2D::Imp::get_textBaseline() const
+    const TextBaseline& GdiContext2D::get_textBaseline() const
     {
         return textBaseline;
     }
 
-    void Context2D::Imp::set_font(const char* v)
+    void GdiContext2D::set_font(const char* v)
     {
         Check();
         font = v;
     }
 
-    void Context2D::Imp::set_font(const Font& v)
+    void GdiContext2D::set_font(const Font& v)
     {
         Check();
         font = v;
     }
 
-    const Font& Context2D::Imp::get_font() const
+    const Font& GdiContext2D::get_font() const
     {
         return font;
     }
 
-    void Context2D::Imp::set_lineWidth(double v)
+    void GdiContext2D::set_lineWidth(double v)
     {
         Check();
         lineWidth  = v;
     }
 
-    double Context2D::Imp::get_lineWidth() const
+    double GdiContext2D::get_lineWidth() const
     {
         return lineWidth;
     }
 
-    void Context2D::Imp::set_shadowColor(const Color& v)
+    void GdiContext2D::set_shadowColor(const Color& v)
     {
         Check();
         shadowColor = v;
     }
 
-    const Color&  Context2D::Imp::get_shadowColor()const
+    const Color&  GdiContext2D::get_shadowColor()const
     {
         return shadowColor;
     }
 
-    void Context2D::Imp::set_shadowOffsetX(double v)
+    void GdiContext2D::set_shadowOffsetX(double v)
     {
         Check();
         shadowOffsetX = v;
     }
 
-    double Context2D::Imp::get_shadowOffsetX() const
+    double GdiContext2D::get_shadowOffsetX() const
     {
         return shadowOffsetX;
     }
 
-    void Context2D::Imp::set_shadowOffsetY(double v)
+    void GdiContext2D::set_shadowOffsetY(double v)
     {
         Check();
         shadowOffsetY = v;
     }
 
-    double Context2D::Imp::get_shadowOffsetY() const
+    double GdiContext2D::get_shadowOffsetY() const
     {
         return shadowOffsetY;
     }
 
-    void Context2D::Imp::set_shadowBlur(double v)
+    void GdiContext2D::set_shadowBlur(double v)
     {
         Check();
         shadowBlur = v;
     }
 
-    double Context2D::Imp::get_shadowBlur() const
+    double GdiContext2D::get_shadowBlur() const
     {
         return shadowBlur;
     }
 
-    ////////
-    ////////
-    Context2D::Context2D()
+
+    class GDICanvas : public CanvasImp
     {
-        m_pContext2DImp = nullptr;     
+        CanvasPlus::GdiContext2D* m_pD2DContext2D;
+        int m_width;
+        int m_height;
+
+        ~GDICanvas();
+        Context2D& getContext(const char*);
+        void BeginDraw(void* p, int w, int h);
+        void EndDraw();
+
+        double get_width() const;
+        void set_width(double v);
+
+        double get_height() const;
+
+        void set_height(double v);
+    public:
+        GDICanvas();
+
+    };
+
+    GDICanvas::GDICanvas()
+    {
+        m_pD2DContext2D = nullptr;
     }
 
-    void Context2D::BeginDraw(void* p)
+
+
+    GDICanvas::~GDICanvas()
     {
-        HDC hdc = (HDC)p;
-        if (m_pContext2DImp  == nullptr)
+      delete m_pD2DContext2D;
+    }
+
+    Context2D& GDICanvas::getContext(const char*)
+    {
+        return *m_pD2DContext2D;
+    }
+
+    void GDICanvas::EndDraw()
+    {
+        m_pD2DContext2D->EndDraw();
+    }
+
+    void GDICanvas::BeginDraw(void* p, int w, int h)
+    {
+        if (m_pD2DContext2D == nullptr)
         {
-            m_pContext2DImp = new CanvasPlus::Context2D::Imp(hdc);
+            m_pD2DContext2D = new GdiContext2D((HDC) p);
         }
-        m_pContext2DImp->BeginDraw(hdc);
+
+        RECT rc;
+        GetClientRect((HWND) p, &rc);
+        set_width((rc.right - rc.left));
+        set_height((rc.bottom - rc.top));
+        m_pD2DContext2D->BeginDraw((HDC)p);
     }
 
-    void Context2D::EndDraw()
+    double GDICanvas::get_width() const
     {
-        if (m_pContext2DImp)
-         {
-             m_pContext2DImp->EndDraw();
-        }
+        return m_width;
+    }
+    void GDICanvas::set_width(double v)
+    {
+        m_width = v;
     }
 
-    Context2D::~Context2D()
+    double GDICanvas::get_height() const
     {
-        delete m_pContext2DImp;
+        return m_height;
     }
 
-    // state
-    void Context2D::save()
+    void GDICanvas::set_height(double v)
     {
-        m_pContext2DImp->save();
+        m_height  = v;
     }
 
-    void Context2D::restore()
+    CanvasImp* CreateCanvas(void*)
     {
-        m_pContext2DImp->restore();
-    }
-
-    void Context2D::clearRect(double x, double y, double w, double h)
-    {
-        m_pContext2DImp->clearRect(x, y, w, h);
-    }
-
-    void Context2D::fillRect(double x, double y, double w, double h)
-    {
-        m_pContext2DImp->fillRect(x, y, w, h);
-    }
-
-    void Context2D::strokeRect(double x, double y, double w, double h)
-    {
-        m_pContext2DImp->strokeRect(x, y, w, h);
-    }
-
-    void Context2D::fillText(const wchar_t* psz, double x, double y)
-    {
-        m_pContext2DImp->fillText(psz, x, y);
-    }
-
-    CanvasGradient Context2D::createLinearGradient(double x0, double y0, double x1, double y1)
-    {
-        return m_pContext2DImp->createLinearGradient(x0, y0, x1, y1);
-    }
-
-    TextMetrics Context2D::measureText(const wchar_t* psz)
-    {
-        return m_pContext2DImp->measureText(psz);
-    }
-
-    void Context2D::moveTo(double x, double y)
-    {
-        m_pContext2DImp->moveTo(x, y);
-    }
-
-    void Context2D::lineTo(double x, double y)
-    {
-        m_pContext2DImp->lineTo(x, y);
-    }
-
-    void Context2D::beginPath()
-    {
-        m_pContext2DImp->beginPath();
-    }
-
-    void Context2D::closePath()
-    {
-        m_pContext2DImp->closePath();
-    }
-
-    void Context2D::stroke()
-    {
-        m_pContext2DImp->stroke();
-    }
-
-    void Context2D::fill()
-    {
-        m_pContext2DImp->fill();
-    }
-
-    void Context2D::clip()
-    {
-        m_pContext2DImp->clip();
-    }
-
-    void Context2D::rect(double x, double y, double w, double h)
-    {
-        m_pContext2DImp->rect(x, y, w, h);
-    }
-
-    ///
-
-    void Context2D::set_fillStyle(const CanvasGradient& v)
-    {
-        m_pContext2DImp->set_fillStyle(v);
-    }
-
-    void Context2D::set_fillStyle(const Color& v)
-    {
-        m_pContext2DImp->set_fillStyle(v);
-    }
-
-    void Context2D::set_fillStyle(const char* v)
-    {
-        m_pContext2DImp->set_fillStyle(v);
-    }
-
-    void Context2D::set_fillStyle(const FillStyle& v)
-    {
-        m_pContext2DImp->set_fillStyle(v);
-    }
-
-    const FillStyle& Context2D::get_fillStyle() const
-    {
-        return m_pContext2DImp->get_fillStyle();
-    }
-
-    void Context2D::set_strokeStyle(const CanvasGradient& v)
-    {
-        m_pContext2DImp->set_strokeStyle(v);
-    }
-
-    void Context2D::set_strokeStyle(const Color& v)
-    {
-        m_pContext2DImp->set_strokeStyle(v);
-    }
-
-    void Context2D::set_strokeStyle(const char* v)
-    {
-        m_pContext2DImp->set_strokeStyle(v);
-    }
-
-    void Context2D::set_strokeStyle(const FillStyle& v)
-    {
-        m_pContext2DImp->set_strokeStyle(v);
-    }
-
-    const FillStyle& Context2D::get_strokeStyle() const
-    {
-        return m_pContext2DImp->get_strokeStyle();
-    }
-
-    void Context2D::set_textAlign(const char* v)
-    {
-        m_pContext2DImp->set_textAlign(v);
-    }
-
-    void Context2D::set_textAlign(const TextAlign& v)
-    {
-        m_pContext2DImp->set_textAlign(v);
-    }
-
-    const TextAlign& Context2D::get_textAlign()const
-    {
-        return m_pContext2DImp->get_textAlign();
-    }
-
-    void Context2D::set_textBaseline(const char* v)
-    {
-        m_pContext2DImp->set_textBaseline(v);
-    }
-
-    void Context2D::set_textBaseline(const TextBaseline& v)
-    {
-        m_pContext2DImp->set_textBaseline(v);
-    }
-
-    const TextBaseline& Context2D::get_textBaseline() const
-    {
-        return m_pContext2DImp->get_textBaseline();
-    }
-
-    void Context2D::set_font(const char* v)
-    {
-        m_pContext2DImp->set_font(v);
-    }
-
-    void Context2D::set_font(const Font& v)
-    {
-        m_pContext2DImp->set_font(v);
-    }
-
-    const Font& Context2D::get_font() const
-    {
-        return m_pContext2DImp->get_font();
-    }
-
-    void Context2D::set_lineWidth(double v)
-    {
-        m_pContext2DImp->set_lineWidth(v);
-    }
-
-    double Context2D::get_lineWidth() const
-    {
-        return m_pContext2DImp->get_lineWidth();
-    }
-
-    void Context2D::set_shadowColor(const Color& v)
-    {
-        m_pContext2DImp->set_shadowColor(v);
-    }
-
-    const Color&  Context2D::get_shadowColor()const
-    {
-        return m_pContext2DImp->get_shadowColor();
-    }
-
-    void Context2D::set_shadowOffsetX(double v)
-    {
-        m_pContext2DImp->set_shadowOffsetX(v);
-    }
-
-    double Context2D::get_shadowOffsetX() const
-    {
-        return m_pContext2DImp->get_shadowOffsetX();
-    }
-
-    void Context2D::set_shadowOffsetY(double v)
-    {
-        m_pContext2DImp->set_shadowOffsetY(v);
-    }
-
-    double Context2D::get_shadowOffsetY() const
-    {
-        return m_pContext2DImp->get_shadowOffsetY();
-    }
-
-    void Context2D::set_shadowBlur(double v)
-    {
-        m_pContext2DImp->set_shadowBlur(v);
-    }
-
-    double Context2D::get_shadowBlur() const
-    {
-        return m_pContext2DImp->get_shadowBlur();
+        return new GDICanvas();
     }
 
     ////////

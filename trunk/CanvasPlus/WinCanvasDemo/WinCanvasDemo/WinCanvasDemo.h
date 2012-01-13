@@ -58,7 +58,7 @@ private:
         );
 private:
     HWND m_hwnd;  
-    CanvasPlus::Canvas m_Canvas;    
+    CanvasPlus::CanvasImp* m_pCanvas;
     int m_CurrentSampleIndex;;
 };
 

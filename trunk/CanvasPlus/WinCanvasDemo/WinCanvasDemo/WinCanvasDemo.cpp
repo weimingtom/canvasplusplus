@@ -33,6 +33,7 @@ int WINAPI WinMain(
 DemoApp::DemoApp() :
     m_hwnd(NULL)
 {
+    m_pCanvas = CanvasPlus::CreateCanvas(0);
     m_CurrentSampleIndex = 0;
 }
 
@@ -40,6 +41,7 @@ DemoApp::DemoApp() :
 // Releases the application's resources.
 DemoApp::~DemoApp()
 {
+    delete m_pCanvas;
 }
 
 // Creates the application window and device-independent
@@ -133,87 +135,86 @@ LRESULT CALLBACK DemoApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
         {
             switch (message)
             {
-            case WM_SIZE:
-            {
-                UINT width = LOWORD(lParam);
-                UINT height = HIWORD(lParam);
-                pDemoApp->OnResize(width, height);
-            }
-
-            result = 0;
-            wasHandled = true;
-            break;
-
-            case WM_DISPLAYCHANGE:
-            {
-                InvalidateRect(hwnd, NULL, FALSE);
-            }
-
-            result = 0;
-            wasHandled = true;
-            break;
-
-            case WM_LBUTTONDOWN:
-                if (pDemoApp->m_CurrentSampleIndex < TOTALSAMPLES)
+                case WM_SIZE:
                 {
-                    pDemoApp->m_CurrentSampleIndex++;
-                }
-                else
-                {
-                    pDemoApp->m_CurrentSampleIndex = 0;
+                    UINT width = LOWORD(lParam);
+                    UINT height = HIWORD(lParam);
+                    pDemoApp->OnResize(width, height);
                 }
 
-                InvalidateRect(pDemoApp->m_hwnd, NULL, TRUE);
+                result = 0;
+                wasHandled = true;
                 break;
 
-            case WM_RBUTTONDOWN:
-                if (pDemoApp->m_CurrentSampleIndex > 0)
+                case WM_DISPLAYCHANGE:
                 {
-                    pDemoApp->m_CurrentSampleIndex--;
-                }
-                else
-                {
-                    pDemoApp->m_CurrentSampleIndex = (TOTALSAMPLES - 1);
+                    InvalidateRect(hwnd, NULL, FALSE);
                 }
 
-                InvalidateRect(pDemoApp->m_hwnd, NULL, TRUE);
+                result = 0;
+                wasHandled = true;
                 break;
 
-            case WM_PAINT:
-            {
-                RECT clientRect;
-                GetClientRect(hwnd, &clientRect);
-                PAINTSTRUCT ps;
-                HDC hdc = BeginPaint(pDemoApp->m_hwnd, &ps);
+                case WM_LBUTTONDOWN:
+                    if (pDemoApp->m_CurrentSampleIndex < TOTALSAMPLES)
+                    {
+                        pDemoApp->m_CurrentSampleIndex++;
+                    }
+                    else
+                    {
+                        pDemoApp->m_CurrentSampleIndex = 0;
+                    }
+
+                    InvalidateRect(pDemoApp->m_hwnd, NULL, TRUE);
+                    break;
+
+                case WM_RBUTTONDOWN:
+                    if (pDemoApp->m_CurrentSampleIndex > 0)
+                    {
+                        pDemoApp->m_CurrentSampleIndex--;
+                    }
+                    else
+                    {
+                        pDemoApp->m_CurrentSampleIndex = (TOTALSAMPLES - 1);
+                    }
+
+                    InvalidateRect(pDemoApp->m_hwnd, NULL, TRUE);
+                    break;
+
+                case WM_PAINT:
                 {
-                    //D2D
+                    RECT clientRect;
+                    GetClientRect(hwnd, &clientRect);
+                    PAINTSTRUCT ps;
+                    HDC hdc = BeginPaint(pDemoApp->m_hwnd, &ps);
+                    {
+                        //D2D
 #ifdef USING_WIN_D2D
-                    pDemoApp->m_Canvas.BeginDraw(pDemoApp->m_hwnd, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+                        pDemoApp->m_pCanvas->BeginDraw(pDemoApp->m_hwnd, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 #endif
-
 #ifdef USING_WIN_GDI
-                    //GDI
-                    pDemoApp->m_Canvas.BeginDraw(hdc, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+                        //GDI
+                        pDemoApp->m_pCanvas->BeginDraw(hdc, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 #endif
-                    DrawSample(pDemoApp->m_CurrentSampleIndex, pDemoApp->m_Canvas);
-                    pDemoApp->m_Canvas.EndDraw();
-                } //need to call destructor before end
-                // TODO: Add any drawing code here...
-                EndPaint(pDemoApp->m_hwnd, &ps);
-            }
+                        DrawSample(pDemoApp->m_CurrentSampleIndex, *pDemoApp->m_pCanvas);
+                        pDemoApp->m_pCanvas->EndDraw();
+                    } //need to call destructor before end
+                    // TODO: Add any drawing code here...
+                    EndPaint(pDemoApp->m_hwnd, &ps);
+                }
 
-            result = 0;
-            wasHandled = true;
-            break;
+                result = 0;
+                wasHandled = true;
+                break;
 
-            case WM_DESTROY:
-            {
-                PostQuitMessage(0);
-            }
+                case WM_DESTROY:
+                {
+                    PostQuitMessage(0);
+                }
 
-            result = 1;
-            wasHandled = true;
-            break;
+                result = 1;
+                wasHandled = true;
+                break;
             }
         }
 
