@@ -24,9 +24,9 @@
 #include <vector>
 #define nullptr 0
 
+
 namespace CanvasPlus //Better name?
 {
-    //Local representation of color
     struct Color
     {
         int r;
@@ -42,12 +42,10 @@ namespace CanvasPlus //Better name?
         }
         Color(const char*);
     };
-
-    void ParserColor(const char* psz, Color&);
-
-
+    
+    
     //The possible values are start, end, left, right, and center.
-    enum TextAlignEnum
+    enum TextAlign
     {
         TextAlignStart,
         TextAlignEnd,
@@ -55,34 +53,8 @@ namespace CanvasPlus //Better name?
         TextAlignRight,
         TextAlignCenter,
     };
-
-    TextAlignEnum ParseTextAlign(const char* psz);
-
-
-    struct TextAlign
-    {
-        TextAlignEnum m_Value;
-
-        TextAlign()
-        {
-            //"When the context is created, the textAlign attribute must
-            //initially have the value start."
-            m_Value = CanvasPlus::TextAlignStart;
-        }
-
-        TextAlign& operator = (const char* psz)
-        {
-            m_Value = ParseTextAlign(psz);
-            return *this;
-        }
-
-        operator TextAlignEnum() const
-        {
-            return m_Value;
-        }
-    };
-
-    enum TextBaselineEnum
+    
+    enum TextBaseline
     {
         TextBaselineTop , //The top of the em square
         TextBaselineHanging, //The hanging baseline
@@ -91,175 +63,223 @@ namespace CanvasPlus //Better name?
         TextBaselineIdeographic , //The ideographic baseline
         TextBaselineBottom  //The bottom of the em square
     };
-
-    TextBaselineEnum ParseTextBaseline(const char* psz);
-
-
-    struct TextBaseline
-    {
-        TextBaselineEnum m_Value;
-
-        TextBaseline()
-        {
-            //"the textBaseline attribute must initially have the value alphabetic."
-            m_Value = CanvasPlus::TextBaselineAlphabetic;
-        }
-
-        TextBaseline& operator = (const char* psz)
-        {
-            m_Value = ParseTextBaseline(psz);
-            return *this;
-        }
-
-        operator TextBaselineEnum() const
-        {
-            return m_Value;
-        }
-    };
-
+    
+    
     //TODO
     enum CanvasGradientType
     {
         CanvasGradientTypeLinear,
     };
-
+    
     struct CanvasGradientImp;
     struct CanvasGradient
     {
-        CanvasGradientImp* pCanvasGradientImp;
-
+        CanvasGradientImp* m_pCanvasGradientImp;
+        
         CanvasGradient()
         {
-            pCanvasGradientImp = nullptr; //error
+            m_pCanvasGradientImp = nullptr; //error
         }
-
+        
         CanvasGradient(const CanvasGradient&);
-        CanvasGradient(CanvasGradientImp*);
+        CanvasGradient& operator=(const CanvasGradient&);
+        
+        CanvasGradient(double x0, double y0, double x1, double y1);
         ~CanvasGradient();
-
-        void addColorStop(double offset, const char* color);
+        
+        virtual void addColorStop(double offset, const Color& color);
     };
-
+    
     //TODO
     struct CanvasPattern
     {
         // opaque object
     };
-
+    
     struct Font
     {
-        friend class Context2D;
+        friend struct Context2D;
         void* m_pNativeObject;
-
+        std::string fontdesc;
+        void setFont(const char* psz);
+        
     public:
         Font();
+        Font(const Font&);
         ~Font();
-
+        
+        Font& operator = (const Font&);
         Font& operator = (const char*);
     };
-
-
+    
+    
     struct TextMetrics
     {
         const double width;
         TextMetrics(double w) : width(w)
         {
         }
+        TextMetrics& operator=(const TextMetrics& other); //not imp
     };
-
+    
     enum FillStyleEnum
     {
         FillStyleEnumSolid,
         FillStyleEnumGradient,
     };
-
+    
     class FillStyle
     {
-
+                FillStyleEnum fillStyleEnum;
     public:
-        FillStyleEnum fillStyleEnum;
+
         Color m_Color;
         CanvasGradient canvasGradient;
-
-        FillStyle()
+        
+        bool IsUsingGradient() const 
         {
-            fillStyleEnum =  FillStyleEnumSolid;
+            return canvasGradient.m_pCanvasGradientImp != 0 && 
+                   fillStyleEnum == FillStyleEnumGradient;
         }
-
-        FillStyle& operator = (const char* color)
-        {
-            fillStyleEnum = FillStyleEnumSolid;
-            ParserColor(color, m_Color);
-            return *this;
-        }
-
-        FillStyle& operator = (const CanvasGradient& cg)
-        {
-            fillStyleEnum =     FillStyleEnumGradient;
-            canvasGradient = cg;
-            return *this;
-        }
-
-        FillStyle& operator = (const CanvasPattern&)
-        {
-            //TODO
-            return *this;
-        }
+        bool IsSolid() const { return fillStyleEnum == FillStyleEnumSolid; }
+        FillStyle();
+        FillStyle(const FillStyle&);
+        FillStyle& operator = (const char*);
+        FillStyle& operator = (const Color&);
+        FillStyle& operator = (const FillStyle&);
+        FillStyle& operator = (const CanvasGradient&);
+        FillStyle& operator = (const CanvasPattern&);
     };
-
+    
+    // Store information on the stack
+    class Context2D;
+    struct CanvasStateInfo;
+    
+#define PROPERTY(CLASSTYPE, ATTR_TYPE, ATTR_NAME) \
+struct T##ATTR_NAME \
+{ \
+private:\
+void operator = (const T##ATTR_NAME& ); \
+public:\
+template<class T> void operator=(T v) { \
+reinterpret_cast<CLASSTYPE*>(this - offsetof(CLASSTYPE, ATTR_NAME))->set_##ATTR_NAME(v);\
+}\
+operator ATTR_TYPE () {\
+return reinterpret_cast<CLASSTYPE*>(this - offsetof(CLASSTYPE, ATTR_NAME))->get_##ATTR_NAME();\
+}\
+template<class T>\
+bool operator ==(const T& v) {\
+return reinterpret_cast<CLASSTYPE*>(this - offsetof(CLASSTYPE, ATTR_NAME))->get_##ATTR_NAME() == v;\
+}\
+} ATTR_NAME
+    
+    
+    //
+    //
     //http://dev.w3.org/html5/2dcontext/
-    class Context2D
+    //
+    struct Context2D
     {
-        friend class Canvas;
-        void* m_pNativeHandle;
-        Context2D(void*);
-        Context2D(const Context2D&);//
-
-        int ToPixelX(double);
-        int ToPixelY(double);
-
-    public:
-
-        //fillStyle
-        FillStyle fillStyle;
-        FillStyle strokeStyle;
-
-        TextAlign textAlign;
-        TextBaseline textBaseline;
-        Font font;
-        double lineWidth;
-        //==Shadows==
-        //
-        Color shadowColor;
-        double shadowOffsetX;
-        double shadowOffsetY;
-        double shadowBlur;
-
-        ~Context2D();
-
+        virtual ~Context2D() {}
+        
+        virtual void set_fillStyle(const CanvasGradient&) = 0;
+        virtual void set_fillStyle(const Color&) = 0;
+        virtual void set_fillStyle(const char*) = 0;
+        virtual void set_fillStyle(const FillStyle&) = 0;
+        virtual const FillStyle& get_fillStyle() const = 0;
+        
+        virtual void set_strokeStyle(const CanvasGradient&) = 0;
+        virtual void set_strokeStyle(const Color&) = 0;
+        virtual void set_strokeStyle(const char*) = 0;
+        virtual void set_strokeStyle(const FillStyle&) = 0;
+        virtual const FillStyle& get_strokeStyle() const = 0;
+        
+        virtual void set_textAlign(const char*) = 0;
+        virtual void set_textAlign(const TextAlign&) = 0;
+        virtual const TextAlign& get_textAlign() const = 0;
+        
+        virtual void set_textBaseline(const char*) = 0;
+        virtual void set_textBaseline(const TextBaseline&) = 0;
+        virtual const TextBaseline& get_textBaseline() const = 0;
+        
+        virtual void set_font(const char*) = 0;
+        virtual void set_font(const Font&) = 0;
+        virtual const Font& get_font() const = 0;
+        
+        virtual void set_lineWidth(double) = 0;
+        virtual double get_lineWidth() const = 0;
+        
+        virtual void set_shadowColor(const Color&) = 0;
+        virtual const Color&  get_shadowColor() const = 0;
+        
+        virtual void set_shadowOffsetX(double) = 0;
+        virtual double get_shadowOffsetX() const = 0;
+        
+        virtual void set_shadowOffsetY(double) = 0;
+        virtual double get_shadowOffsetY() const = 0;
+        
+        virtual void set_shadowBlur(double) = 0;
+        virtual double get_shadowBlur() const = 0;
+        
+        PROPERTY(Context2D, FillStyle, fillStyle);        // (default black)
+        PROPERTY(Context2D, FillStyle, strokeStyle);      // (default black)
+        
+        PROPERTY(Context2D, TextAlign, textAlign);        // "start", "end", "left", "right", "center" (default: "start")
+        PROPERTY(Context2D, TextBaseline, textBaseline);  // "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
+        PROPERTY(Context2D, Font, font);                  // (default 10px sans-serif)
+        
+        PROPERTY(Context2D, double, lineWidth);           // (default 1)
+        
+        PROPERTY(Context2D, Color, shadowColor);          // (default transparent black)
+        PROPERTY(Context2D, double, shadowOffsetX);       // (default 0)
+        PROPERTY(Context2D, double, shadowOffsetY);       // (default 0)
+        PROPERTY(Context2D, double,  shadowBlur);          // (default 0)
+        
         // state
-        void save(); // push state on state stack
-        void restore(); // pop state stack and restore state
-
-
-        void fillRect(double x, double y, double w, double h);
-        void strokeRect(double x, double y, double w, double h);
-        void fillText(const wchar_t*, double x, double y);
-        CanvasGradient createLinearGradient(double x0, double y0, double x1, double y1);
-        TextMetrics measureText(const wchar_t*);
-        void moveTo(double x, double y);
-        void lineTo(double x, double y);
-        void beginPath();
-        void closePath();
-        void stroke();
+        virtual void save() = 0; // push state on state stack
+        virtual void restore() = 0; // pop state stack and restore state
+        
+        virtual void clearRect(double x, double y, double w, double h) = 0;
+        virtual void fillRect(double x, double y, double w, double h) = 0;
+        virtual void strokeRect(double x, double y, double w, double h) = 0;
+        virtual void fillText(const wchar_t*, double x, double y) = 0;
+        virtual CanvasGradient createLinearGradient(double x0, double y0, double x1, double y1) = 0;
+        virtual TextMetrics measureText(const wchar_t*) = 0;
+        virtual void moveTo(double x, double y) = 0;
+        virtual void lineTo(double x, double y) = 0;
+        virtual void beginPath() = 0;
+        virtual void closePath() = 0;
+        virtual void stroke() = 0;
+        virtual void fill() = 0;
+        virtual void clip() = 0;
+        virtual void rect(double x, double y, double w, double h) = 0;
     };
-
-    class Canvas
+    
+    struct Canvas
     {
-        Context2D m_CanvasRenderingContext2D;
-    public:
-        Canvas(void*);
-        ~Canvas();
-        Context2D& getContext(const char*);
+        virtual ~Canvas() {}
+        virtual Context2D& getContext(const char*) =0;
+        
+        virtual double get_width() const = 0;
+        virtual void set_width(double) = 0;
+        
+        virtual double get_height() const = 0;
+        virtual void set_height(double) = 0;
+        
+        PROPERTY(Canvas, double, width);
+        PROPERTY(Canvas, double, height);
     };
+    
+    struct CanvasImp : public Canvas
+    {
+        //
+        virtual void BeginDraw(void*, int w, int h)=0;
+        virtual void EndDraw()=0;
+        //
+    };
+    
+    CanvasImp* CreateCanvas(void*);    
+    //
+    TextAlign ParseTextAlign(const char* psz);
+    TextBaseline ParseTextBaseline(const char* psz);
 }

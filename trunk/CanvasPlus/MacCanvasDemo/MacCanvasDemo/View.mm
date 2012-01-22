@@ -11,7 +11,7 @@
 #include "Canvas.h"
 #include "Samples.h"
 
-const int TotalSamples = 11;
+
 int currentaSample = 0;
 
 @implementation View
@@ -39,7 +39,7 @@ int currentaSample = 0;
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-    if (currentaSample < TotalSamples)
+    if (currentaSample < TOTALSAMPLES)
         currentaSample++;
     else
         currentaSample = 0;
@@ -51,7 +51,7 @@ int currentaSample = 0;
    if (currentaSample > 0)
        currentaSample--;
     else
-     currentaSample = TotalSamples-1;
+     currentaSample = TOTALSAMPLES-1;
      [self setNeedsDisplay:YES];
 }
 
@@ -60,23 +60,14 @@ int currentaSample = 0;
 {
     CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
     
-    CanvasPlus::Canvas canvas((void*)context);
-    
-    switch (currentaSample)
-    {
-        case 0:  Sample1(canvas); break;
-        case 1:  Sample2(canvas); break;
-               case 2:  Sample3(canvas); break;
-               case 3:  Sample4(canvas); break;
-               case 4:  Sample5(canvas); break;
-               case 5:  Sample6(canvas); break;
-               case 6:  Sample7(canvas); break;
-               case 7:  Sample8(canvas); break;
-        case 8:  Sample9(canvas); break;
-               case 9:  Sample10(canvas); break;
-               case 10:  Sample11(canvas); break;
 
-    }
+    CanvasPlus::CanvasImp* pCanvas =  CanvasPlus::CreateCanvas(0);
+    pCanvas->BeginDraw((void*)context, 100, 100);
+    
+    DrawSample(currentaSample, *pCanvas);
+ 
+    pCanvas->EndDraw();
+    delete pCanvas;
     // Drawing code here.
 }
 
