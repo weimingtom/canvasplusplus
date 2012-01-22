@@ -253,12 +253,12 @@ function Sample9(ctx)
 
 function Sample10(ctx) 
 {
-
+    ctx.lineWidth = 1;
     for (i = 0; i < 10; i++)
     {
     ctx.beginPath();
     ctx.strokeStyle = "#00F2A0";
-    ctx.lineWidth = i;
+    ctx.lineWidth++;
     ctx.moveTo(i * 10 + 100,i*10+ 100);
     ctx.lineTo(i*10+150, i*10+200);
     ctx.lineTo(i*10+250, i*10+20);

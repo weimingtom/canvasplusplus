@@ -16,8 +16,8 @@ void Sample12(CanvasPlus::Canvas&);
 void Sample13(CanvasPlus::Canvas&);
 void Sample14(CanvasPlus::Canvas&);
 void Sample15(CanvasPlus::Canvas&);
-
-#define TOTALSAMPLES 15
+void Sample16(CanvasPlus::Canvas&);
+#define TOTALSAMPLES 16
 
 inline void DrawSample(int i, CanvasPlus::Canvas& canvas)
 {
@@ -81,6 +81,9 @@ inline void DrawSample(int i, CanvasPlus::Canvas& canvas)
 
         case  15:
             Sample15(canvas);
+            break;
+        case  16:
+            Sample16(canvas);
             break;
     }
 }

@@ -311,3 +311,25 @@ void Sample15(CanvasPlus::Canvas& canvas)
         ctx.stroke();
     }
 }
+void Sample16(CanvasPlus::Canvas& canvas)
+{
+    Context2D& ctx = canvas.getContext("2d");
+    ctx.lineWidth = 1;
+    
+    if (ctx.fillStyle == "#000000"){
+    
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+    ctx.beginPath();
+    ctx.strokeStyle = "#00F2A0";
+    ctx.lineWidth = i;
+    ctx.moveTo(i * 10 + 100,i*10+ 100);
+    ctx.lineTo(i*10+150, i*10+200);
+    ctx.lineTo(i*10+250, i*10+20);
+    ctx.lineTo(i*10+50,i*10+ 20);
+    ctx.closePath();
+    ctx.stroke();
+    }
+}
