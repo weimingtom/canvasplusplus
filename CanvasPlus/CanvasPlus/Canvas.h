@@ -41,6 +41,11 @@ namespace CanvasPlus //Better name?
             a = 0;
         }
         Color(const char*);
+        
+        bool operator == (const Color& other) const
+        {
+            return other.r == r && other.g == g && other.b == b;
+        }
     };
 
 
@@ -142,6 +147,12 @@ namespace CanvasPlus //Better name?
         FillStyle& operator = (const FillStyle&);
         FillStyle& operator = (const CanvasGradient&);
         FillStyle& operator = (const CanvasPattern&);
+        
+        bool operator == (const char* psz) const
+        {
+            Color c(psz);
+            return c == m_Color;
+        }
     };
 
     // Store information on the stack
@@ -167,6 +178,7 @@ namespace CanvasPlus //Better name?
     } ATTR_NAME
 
 
+       
     //
     //
     //http://dev.w3.org/html5/2dcontext/
