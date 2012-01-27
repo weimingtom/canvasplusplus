@@ -1,0 +1,392 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Canvas test</title>
+    <style type="text/css">
+        .auto-style1
+        {
+            width: 100%;
+        }
+    </style>
+</head>
+<script language="JavaScript">
+
+    var currentdraw = 0;
+    var MAXCOUNT = 15;
+
+    function prev() {
+        if (currentdraw > 0)
+            currentdraw--;
+        else
+            currentdraw = MAXCOUNT;
+        drawAll();
+    }
+
+    function next() {
+        if (currentdraw < MAXCOUNT)
+            currentdraw++;
+        else
+            currentdraw = 0;
+        drawAll();
+    }
+
+    function drawAll() {
+
+        var ctx = document.getElementById("canvas1").getContext("2d");
+        ctx.save();
+
+        ctx.clearRect(0,
+                      0,
+                      document.getElementById("canvas1").width,
+                      document.getElementById("canvas1").height);
+
+        switch (currentdraw) {
+            case 0: Sample1(ctx); break;
+            case 1: Sample2(ctx); break;
+            case 2: Sample3(ctx); break;
+            case 3: Sample4(ctx); break;
+            case 4: Sample5(ctx); break;
+            case 5: Sample6(ctx); break;
+            case 6: Sample7(ctx); break;
+            case 7: Sample8(ctx); break;
+            case 8: Sample9(ctx); break;
+            case 9: Sample10(ctx); break;
+            case 10: Sample11(ctx); break;
+            case 11: Sample12(ctx); break;
+            case 12: Sample13(ctx); break;
+            case 13: Sample14(ctx); break;
+            case 14: Sample15(ctx); break;
+        }
+        ctx.restore();
+    }
+
+
+
+    function Sample1(ctx) {
+        var baselines = new Array("top", "hanging", "middle", "alphabetic", "ideographic", "bottom");
+        var align = new Array("start", "end", "left", "right", "center");
+
+        var text = new Array(
+            "top_start", "top_end", "top_left", "top_right", "top_center",
+            "hanging_start", "hanging_end", "hanging_left", "hanging_right", "hanging_center",
+            "middle_start", "middle_end", "middle_left", "middle_right", "middle_center",
+            "alphabetic_start", "alphabetic_end", "alphabetic_left", "alphabetic_right", "alphabetic_center",
+            "ideographic_start", "ideographic_end", "ideographic_left", "ideographic_right", "ideographic_center",
+            "bottom_start", "bottom_end", "bottom_left", "bottom_right", "bottom_center"
+        );
+
+        var j = 0;
+        for (var i = 0; i < 6; i++) {
+            for (var k = 0; k < 5; k++) {
+                var x = 50 + i * 150;
+                var y = 50 + k * 100;
+
+                // Stroked triangle
+                ctx.beginPath();
+                ctx.moveTo(x - 20, y);
+                ctx.lineTo(x + 20, y);
+
+                ctx.moveTo(x, y - 20);
+                ctx.lineTo(x, y + 20);
+                ctx.closePath();
+                ctx.stroke();
+
+                ctx.textBaseline = baselines[i];
+                ctx.textAlign = align[k];
+                ctx.fillText(text[j], x, y);
+                j++;
+            }
+        }
+    }
+
+    function Sample2(ctx) {
+
+        ctx.fillStyle = "rgb(220,220,220)";
+        var w = 200;
+        var h = 200;
+        var t = 100;
+        var l = 100;
+        ctx.fillRect(l, t, w, h);
+        ctx.strokeStyle = "rgb(0,0,0)";
+        ctx.strokeRect(l + 2, t + 2, w - 4, h - 4);
+        ctx.strokeRect(l + 6, t + 6, w - 12, h - 12);
+        var text = "Title";
+        var textw = ctx.measureText(text).width;
+        ctx.fillRect(l + w / 2 - textw / 2,
+                 t + 2,
+                 textw,
+                 t + 10);
+        ctx.fillStyle = "rgb(0,0,0)";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillText(text, l + w / 2, t);
+
+    }
+
+
+    function Sample3(ctx) {
+        var lingrad = ctx.createLinearGradient(0, 10, 0, 10 + 130);
+        lingrad.addColorStop(0, 'rgb(255,0,0)');
+        lingrad.addColorStop(1, 'rgb(255,255,255)');
+
+        ctx.fillStyle = lingrad;
+        ctx.fillRect(10, 10, 130, 130);
+    }
+
+    function Sample4(ctx) {
+        var lingrad = ctx.createLinearGradient(0, 10 + 130, 0, 10);
+        lingrad.addColorStop(0, 'rgb(255,0,0)');
+        lingrad.addColorStop(1, 'rgb(255,255,255)');
+
+        ctx.fillStyle = lingrad;
+        ctx.fillRect(10, 10, 130, 130);
+    }
+
+    function Sample5(ctx) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(100, 100);
+        ctx.lineTo(150, 150);
+        ctx.lineTo(100, 150);
+        ctx.fillStyle = "rgb(0,170,0)";
+        ctx.strokeStyle = "rgb(0,0,0)";
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fill();
+    }
+
+
+    function Sample6(ctx) {
+        ctx.beginPath();
+        ctx.rect(50, 50, 30, 30);
+        ctx.clip();
+        ctx.fillStyle = "rgb(0,0,0)";
+        ctx.fillRect(50, 50, 100, 100);
+        //   ctx.strokeStyle = "rgb(0,0,0)";
+        //  ctx.beginPath();
+        ctx.fillStyle = "rgb(0,170,0)";
+        // ctx.strokeStyle = "rgb(0,0,0)";
+        ctx.fillRect(60, 60, 40, 40);
+        ctx.textBaseline = "top";
+        ctx.fillStyle = "rgb(250,250,250)";
+        ctx.fillText("test clip", 50, 50);
+    }
+
+    function Sample7(ctx) {
+        var ispressed = false;
+        var isfocused = true;
+        var isMouseOver = false;
+        var lingrad = ctx.createLinearGradient(0, 10 + 130, 0, 10);
+
+        if (ispressed) {
+            lingrad.addColorStop(0, "rgb(245,245,245)");
+            lingrad.addColorStop(1, "rgb(220,220,220)");
+        }
+        else {
+            lingrad.addColorStop(1, "rgb(220,220,220)");
+            lingrad.addColorStop(0, "rgb(245,245,245)");
+        }
+
+        ctx.fillStyle = lingrad;
+        ctx.fillRect(10, 10, 130, 130);
+
+        if (isfocused) {
+            ctx.strokeStyle = "rgb(74,144,254)";
+        }
+        else {
+            ctx.strokeStyle = "rgb(198,198,198)";
+        }
+
+        ctx.strokeRect(10, 10, 130, 130);
+        ctx.fillStyle = "rgb(0,0,0)";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Button", (10 + 10 + 130) / 2, (10 + 10 + 130) / 2);
+    }
+
+
+    function Sample8(ctx) {
+        ctx.shadowOffsetX = 5;
+        ctx.shadowOffsetY = 5;
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+        ctx.fillStyle = "rgb(255,0,0)";
+        ctx.fillRect(20, 20, 150, 100);
+    }
+
+    function Sample9(ctx) {
+        ctx.fillStyle = "rgb(220,220,220)";
+        var w = 200;
+        var h = 200;
+        var t = 100;
+        var l = 100;
+        ctx.font = "14px arial";
+        //shadow
+        ctx.shadowOffsetX = 10;
+        ctx.shadowOffsetY = 10;
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+        //main
+        ctx.fillRect(l, t, w, h);
+
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = "#000000";
+
+        ctx.strokeStyle = "rgb(0,0,0)";
+        ctx.strokeRect(l + 2, t + 2, w - 4, h - 4);
+        ctx.strokeRect(l + 4, t + 4, w - 8, h - 8);
+        var text = "Title";
+        var textw = ctx.measureText(text).width;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.fillRect(l + w / 2 - textw / 2,
+                 t + 2,
+                 textw,
+                 14);
+        ctx.fillStyle = "rgb(0,0,0)";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillText(text, l + w / 2, t);
+    }
+
+    function Sample10(ctx) {
+        ctx.lineWidth = 1;
+        for (i = 0; i < 10; i++) {
+            ctx.beginPath();
+            ctx.strokeStyle = "#00F2A0";
+            ctx.lineWidth++;
+            ctx.moveTo(i * 10 + 100, i * 10 + 100);
+            ctx.lineTo(i * 10 + 150, i * 10 + 200);
+            ctx.lineTo(i * 10 + 250, i * 10 + 20);
+            ctx.lineTo(i * 10 + 50, i * 10 + 20);
+            ctx.closePath();
+            ctx.stroke();
+        }
+    }
+    function Sample11(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(100, 100);
+        ctx.lineTo(150, 200);
+        ctx.lineTo(250, 20);
+        ctx.closePath();
+        ctx.stroke();
+    }
+    function Sample12(ctx) {
+        for (i = 0; i < 10; i++) {
+            ctx.beginPath();
+            ctx.strokeStyle = "#00F2A0";
+            ctx.lineWidth = i;
+            ctx.moveTo(i * 10 + 100, i * 10 + 100);
+            ctx.lineTo(i * 10 + 150, i * 10 + 200);
+            ctx.lineTo(i * 10 + 250, i * 10 + 20);
+            ctx.lineTo(i * 10 + 50, i * 10 + 20);
+            ctx.closePath();
+            ctx.stroke();
+        }
+    }
+
+    function Sample13(context) {
+
+        /*
+    |---------------------
+    | Origin: Top Left
+    | End: Bottom Right
+    |---------------------
+    */
+        context.beginPath();
+        context.moveTo(10, 10);
+        context.lineTo(200, 200);
+        context.stroke();
+        /*
+    |---------------------
+    | Origin: Top Middle
+    | End: Bottom Middle
+    |---------------------
+    */
+        context.save();
+        context.beginPath();
+        context.moveTo(100, 0);
+        context.lineTo(100, 200);
+        context.stroke();
+        context.restore();
+        /*
+    |---------------------
+    | Origin: Top Right
+    | End: Bottom Left
+    |---------------------
+    */
+        context.save();
+        context.beginPath();
+        context.moveTo(200, 0);
+        context.lineTo(0, 200);
+        context.stroke();
+        context.restore();
+    }
+    function Sample14(ctx) {
+        //
+        ctx.beginPath();
+        ctx.moveTo(100 - 2, 100);
+        ctx.lineTo(100 + 2, 100);
+        ctx.moveTo(100, 100 - 2);
+        ctx.lineTo(100, 100 + 2);
+        ctx.closePath();
+        ctx.stroke();
+
+        // Filled triangle
+        ctx.beginPath();
+        ctx.moveTo(25, 25);
+        ctx.lineTo(105, 25);
+        ctx.lineTo(25, 105);
+        ctx.fill();
+        // Stroked triangle
+        ctx.beginPath();
+        ctx.moveTo(125, 125);
+        ctx.lineTo(125, 45);
+        ctx.lineTo(45, 125);
+        ctx.closePath();
+        ctx.stroke();
+
+        //
+
+        for (i = 0; i < 10; i++) {
+            ctx.lineWidth = 1 + i;
+            ctx.beginPath();
+            ctx.moveTo(5 + i * 14, 150 + 5);
+            ctx.lineTo(5 + i * 14, 150 + 140);
+            ctx.stroke();
+        }
+    }
+    function Sample15(ctx) {
+
+        for (i = 0; i < 10; i++) {
+            ctx.beginPath();
+            ctx.strokeStyle = "#00F2A0";
+            ctx.lineWidth = i;
+            ctx.moveTo(i * 10 + 100, i * 10 + 100);
+            ctx.lineTo(i * 10 + 150, i * 10 + 200);
+            ctx.lineTo(i * 10 + 250, i * 10 + 20);
+            ctx.lineTo(i * 10 + 50, i * 10 + 20);
+            ctx.closePath();
+            ctx.stroke();
+        }
+    }
+    function Sample16(ctx) {
+    }
+    function Sample17(ctx) {
+    }
+    function Sample18(ctx) {
+    }
+
+
+</script>
+<body onload="drawAll()">
+    <canvas id="canvas1" width="900" height="550" style="border-style: solid"></canvas>
+    <p>
+        <input id="Button1" type="button" value="Prev" onclick="prev()" /><input id="Button2"
+            type="button" value="Next" onclick="next()" /></p>
+</body>
+</html>
