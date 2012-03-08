@@ -28,6 +28,9 @@
     <ClCompile Include="..\..\CanvasPlus\Win\Win_Canvas.cpp">
       <Filter>Source Files\Canvas++\Win</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\CanvasPlus\FontParser.cpp">
+      <Filter>Source Files\Canvas++</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WinCanvasDemo.h">
@@ -37,6 +40,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CanvasPlus\Canvas.h">
+      <Filter>Source Files\Canvas++</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CanvasPlus\FontParser.h">
       <Filter>Source Files\Canvas++</Filter>
     </ClInclude>
   </ItemGroup>

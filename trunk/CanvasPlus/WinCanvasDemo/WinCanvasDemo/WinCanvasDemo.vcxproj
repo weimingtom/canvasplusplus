@@ -75,11 +75,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CanvasPlus\Canvas.h" />
+    <ClInclude Include="..\..\CanvasPlus\FontParser.h" />
     <ClInclude Include="Samples.h" />
     <ClInclude Include="WinCanvasDemo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CanvasPlus\Canvas.cpp" />
+    <ClCompile Include="..\..\CanvasPlus\FontParser.cpp" />
     <ClCompile Include="..\..\CanvasPlus\Win\WinD2D_Canvas.cpp" />
     <ClCompile Include="..\..\CanvasPlus\Win\Win_Canvas.cpp" />
     <ClCompile Include="Samples.cpp" />
