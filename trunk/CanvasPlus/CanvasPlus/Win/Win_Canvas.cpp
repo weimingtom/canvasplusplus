@@ -30,12 +30,22 @@ struct LogfontActions : public Actions
         m_LogFont.lfClipPrecision = 2;
         m_LogFont.lfQuality = 1;
         m_LogFont.lfPitchAndFamily = 49;
+        strcpy(m_LogFont.lfFaceName, "sans-serif");
     }
 
     //Actions
     virtual void SetFontName(const std::string& s)
     {
-        strcpy(m_LogFont.lfFaceName , s.c_str());
+        if (s.size() > 2 && s[0] == '"')
+        {
+            strncpy(m_LogFont.lfFaceName , s.c_str() + 1, s.size() - 2);
+            m_LogFont.lfFaceName[s.size() - 2] = '\0';
+        }
+        else
+        {
+            strncpy(m_LogFont.lfFaceName , s.c_str(), s.size());
+            m_LogFont.lfFaceName[s.size()] = '\0';
+        }
     }
     virtual void SetNormalStyle()
     {
@@ -102,7 +112,7 @@ struct LogfontActions : public Actions
     }
     virtual void SetSizePixels(int px)
     {
-       m_LogFont.lfHeight = -px;        
+        m_LogFont.lfHeight = -px;
     }
     virtual void SetSizeLarger()
     {

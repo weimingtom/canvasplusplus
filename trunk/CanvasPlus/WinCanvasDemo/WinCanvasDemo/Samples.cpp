@@ -344,6 +344,9 @@ void Sample17(CanvasPlus::Canvas& canvas)
     ctx.font = "italic  12px arial";
     ctx.fillText(L"italic  12px arial", 10, 20);
 
-    ctx.font = "normal 14px  ariel";
+    ctx.font = "normal 14px  arial";
     ctx.fillText(L"normal 14px normal arial", 10, 40);
+
+    ctx.font = "normal 14px \"courier new\"";
+    ctx.fillText(L"normal 14px normal courier new", 10, 60);
 }

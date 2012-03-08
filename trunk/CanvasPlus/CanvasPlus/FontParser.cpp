@@ -186,2600 +186,1307 @@ namespace FontShorthand
         TKFontName,
     };
 
-    struct DFA
+struct DFA
+{
+    typedef Tokens TokenType;
+
+    static int GetNext(int state, wchar_t ch)
     {
-        typedef Tokens TokenType;
-
-        static int GetNext(int state, wchar_t ch)
+        switch (state)
         {
-            switch (state)
-            {
             case 0:
-                if (ch == L' ')
-                {
-                    return 1;
-                }
-                else if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch == L'0')
-                {
-                    return 3;
-                }
-                else if (ch == L'1')
-                {
-                    return 4;
-                }
-                else if (ch == L'2')
-                {
-                    return 5;
-                }
-                else if (ch == L'3')
-                {
-                    return 6;
-                }
-                else if (ch == L'4')
-                {
-                    return 7;
-                }
-                else if (ch == L'5')
-                {
-                    return 8;
-                }
-                else if (ch == L'6')
-                {
-                    return 9;
-                }
-                else if (ch == L'7')
-                {
-                    return 10;
-                }
-                else if (ch == L'8')
-                {
-                    return 11;
-                }
-                else if (ch == L'9')
-                {
-                    return 12;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch == L'a')
-                {
-                    return 2;
-                }
-                else if (ch == L'b')
-                {
-                    return 13;
-                }
-                else if (ch >= L'c' && ch <= L'h')
-                {
-                    return 2;
-                }
-                else if (ch == L'i')
-                {
-                    return 14;
-                }
-                else if (ch >= L'j' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 15;
-                }
-                else if (ch == L'm')
-                {
-                    return 16;
-                }
-                else if (ch == L'n')
-                {
-                    return 17;
-                }
-                else if (ch == L'o')
-                {
-                    return 18;
-                }
-                else if (ch >= L'p' && ch <= L'r')
-                {
-                    return 2;
-                }
-                else if (ch == L's')
-                {
-                    return 19;
-                }
-                else if (ch >= L't' && ch <= L'w')
-                {
-                    return 2;
-                }
-                else if (ch == L'x')
-                {
-                    return 20;
-                }
-                else if (ch >= L'y' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                break; //
-
+            if (ch == L' ')
+                return 1;
+            else if (ch == L'"')
+                return 2;
+            else if (ch == L'-')
+                return 3;
+            else if (ch == L'0')
+                return 4;
+            else if (ch == L'1')
+                return 5;
+            else if (ch == L'2')
+                return 6;
+            else if (ch == L'3')
+                return 7;
+            else if (ch == L'4')
+                return 8;
+            else if (ch == L'5')
+                return 9;
+            else if (ch == L'6')
+                return 10;
+            else if (ch == L'7')
+                return 11;
+            else if (ch == L'8')
+                return 12;
+            else if (ch == L'9')
+                return 13;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+            else if (ch == L'a')
+                return 3;
+            else if (ch == L'b')
+                return 14;
+        else if (ch >= L'c' && ch <= L'h')
+          return 3;
+            else if (ch == L'i')
+                return 15;
+        else if (ch >= L'j' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 16;
+            else if (ch == L'm')
+                return 17;
+            else if (ch == L'n')
+                return 18;
+            else if (ch == L'o')
+                return 19;
+        else if (ch >= L'p' && ch <= L'r')
+          return 3;
+            else if (ch == L's')
+                return 20;
+        else if (ch >= L't' && ch <= L'w')
+          return 3;
+            else if (ch == L'x')
+                return 21;
+        else if (ch >= L'y' && ch <= L'z')
+           return 3;
+    break; // 
             case 1:
-                if (ch == L' ')
-                {
-                    return 1;
-                }
-
-                //TKBLANKS
-                break; //
-
+            if (ch == L' ')
+                return 1;
+        //TKBLANKS
+    break; // 
             case 2:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+        if (ch >= L' ' && ch <= L'!')
+          return 2;
+            else if (ch == L'"')
+                return 23;
+        else if (ch >= L'#' && ch <= L'[')
+          return 2;
+            else if (ch == L'\\')
+                return 24;
+        else if (ch >= L']' && ch <= L'~')
+           return 2;
+    break; // 
             case 3:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch >= L'0' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 4:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 24;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+        else if (ch >= L'0' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 5:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 25;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 27;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 6:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 26;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 28;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 7:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 27;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 29;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 8:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 28;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 30;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 9:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 29;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 31;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 10:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 30;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 32;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 11:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 31;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 33;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 12:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 32;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 34;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 13:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'n')
-                {
-                    return 2;
-                }
-                else if (ch == L'o')
-                {
-                    return 33;
-                }
-                else if (ch >= L'p' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 35;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 14:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L's')
-                {
-                    return 2;
-                }
-                else if (ch == L't')
-                {
-                    return 34;
-                }
-                else if (ch >= L'u' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'n')
+          return 3;
+            else if (ch == L'o')
+                return 36;
+        else if (ch >= L'p' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 15:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch == L'a')
-                {
-                    return 35;
-                }
-                else if (ch >= L'b' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L's')
+          return 3;
+            else if (ch == L't')
+                return 37;
+        else if (ch >= L'u' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 16:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'd')
-                {
-                    return 2;
-                }
-                else if (ch == L'e')
-                {
-                    return 36;
-                }
-                else if (ch >= L'f' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+            else if (ch == L'a')
+                return 38;
+        else if (ch >= L'b' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 17:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'n')
-                {
-                    return 2;
-                }
-                else if (ch == L'o')
-                {
-                    return 37;
-                }
-                else if (ch >= L'p' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'd')
+          return 3;
+            else if (ch == L'e')
+                return 39;
+        else if (ch >= L'f' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 18:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch == L'a')
-                {
-                    return 2;
-                }
-                else if (ch == L'b')
-                {
-                    return 38;
-                }
-                else if (ch >= L'c' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'n')
+          return 3;
+            else if (ch == L'o')
+                return 40;
+        else if (ch >= L'p' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 19:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'l')
-                {
-                    return 2;
-                }
-                else if (ch == L'm')
-                {
-                    return 39;
-                }
-                else if (ch >= L'n' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+            else if (ch == L'a')
+                return 3;
+            else if (ch == L'b')
+                return 41;
+        else if (ch >= L'c' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 20:
-                if (ch == L'-')
-                {
-                    return 40;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'w')
-                {
-                    return 2;
-                }
-                else if (ch == L'x')
-                {
-                    return 41;
-                }
-                else if (ch >= L'y' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'l')
+          return 3;
+            else if (ch == L'm')
+                return 42;
+        else if (ch >= L'n' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 21:
-                return -1;
-                break; //
-
+            if (ch == L'-')
+                return 43;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'w')
+          return 3;
+            else if (ch == L'x')
+                return 44;
+        else if (ch >= L'y' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 22:
-                //TKPercent
-                break; //
-
+  return -1;
+    break; // 
             case 23:
-                if (ch == L't')
-                {
-                    return 42;
-                }
-                else if (ch == L'x')
-                {
-                    return 43;
-                }
-
-                break; //
-
+        //TKFontName
+    break; // 
             case 24:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 44;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+  return 2; //any
+    break; // 
             case 25:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 45;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+        //TKPercent
+    break; // 
             case 26:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 46;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L't')
+                return 45;
+        else if (ch == L'x')
+          return 46;
+    break; // 
             case 27:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 47;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 47;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 28:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 48;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 48;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 29:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 49;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 49;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 30:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 50;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 50;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 31:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 51;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 51;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 32:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch == L'0')
-                {
-                    return 52;
-                }
-                else if (ch >= L'1' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 52;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 33:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 53;
-                }
-                else if (ch >= L'm' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 53;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 34:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch == L'a')
-                {
-                    return 54;
-                }
-                else if (ch >= L'b' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 54;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 35:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'q')
-                {
-                    return 2;
-                }
-                else if (ch == L'r')
-                {
-                    return 55;
-                }
-                else if (ch >= L's' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'%')
+                return 25;
+            else if (ch == L'0')
+                return 55;
+        else if (ch >= L'1' && ch <= L'9')
+          return 4;
+        else if (ch == L'p')
+          return 26;
+    break; // 
             case 36:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'c')
-                {
-                    return 2;
-                }
-                else if (ch == L'd')
-                {
-                    return 56;
-                }
-                else if (ch >= L'e' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 56;
+        else if (ch >= L'm' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 37:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'q')
-                {
-                    return 2;
-                }
-                else if (ch == L'r')
-                {
-                    return 57;
-                }
-                else if (ch >= L's' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+            else if (ch == L'a')
+                return 57;
+        else if (ch >= L'b' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 38:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 58;
-                }
-                else if (ch >= L'm' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'q')
+          return 3;
+            else if (ch == L'r')
+                return 58;
+        else if (ch >= L's' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 39:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch == L'a')
-                {
-                    return 59;
-                }
-                else if (ch >= L'b' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'c')
+          return 3;
+            else if (ch == L'd')
+                return 59;
+        else if (ch >= L'e' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 40:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 60;
-                }
-                else if (ch >= L'm' && ch <= L'r')
-                {
-                    return 2;
-                }
-                else if (ch == L's')
-                {
-                    return 61;
-                }
-                else if (ch >= L't' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'q')
+          return 3;
+            else if (ch == L'r')
+                return 60;
+        else if (ch >= L's' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 41:
-                if (ch == L'-')
-                {
-                    return 62;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 61;
+        else if (ch >= L'm' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 42:
-                //TKPoints
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+            else if (ch == L'a')
+                return 62;
+        else if (ch >= L'b' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 43:
-                //TKPixels
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 63;
+        else if (ch >= L'm' && ch <= L'r')
+          return 3;
+            else if (ch == L's')
+                return 64;
+        else if (ch >= L't' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 44:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch >= L'0' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                //TKA100
-                break; //
-
+            if (ch == L'-')
+                return 65;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 45:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch >= L'0' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                //TKA200
-                break; //
-
+        //TKPoints
+    break; // 
             case 46:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch >= L'0' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                //TKA300
-                break; //
-
+        //TKPixels
+    break; // 
             case 47:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch >= L'0' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                //TKA400
-                break; //
-
+            if (ch == L'%')
+                return 25;
+        else if (ch >= L'0' && ch <= L'9')
+          return 4;
+            else if (ch == L'p')
+                return 26;
+        //TKA100
+    break; // 
             case 48:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch >= L'0' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                //TKA500
-                break; //
-
+            if (ch == L'%')
+                return 25;
+        else if (ch >= L'0' && ch <= L'9')
+          return 4;
+            else if (ch == L'p')
+                return 26;
+        //TKA200
+    break; // 
             case 49:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch >= L'0' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                //TKA600
-                break; //
-
+            if (ch == L'%')
+                return 25;
+        else if (ch >= L'0' && ch <= L'9')
+          return 4;
+            else if (ch == L'p')
+                return 26;
+        //TKA300
+    break; // 
             case 50:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch >= L'0' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                //TKA700
-                break; //
-
+            if (ch == L'%')
+                return 25;
+        else if (ch >= L'0' && ch <= L'9')
+          return 4;
+            else if (ch == L'p')
+                return 26;
+        //TKA400
+    break; // 
             case 51:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch >= L'0' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                //TKA800
-                break; //
-
+            if (ch == L'%')
+                return 25;
+        else if (ch >= L'0' && ch <= L'9')
+          return 4;
+            else if (ch == L'p')
+                return 26;
+        //TKA500
+    break; // 
             case 52:
-                if (ch == L'%')
-                {
-                    return 22;
-                }
-                else if (ch >= L'0' && ch <= L'9')
-                {
-                    return 3;
-                }
-                else if (ch == L'p')
-                {
-                    return 23;
-                }
-
-                //TKA900
-                break; //
-
+            if (ch == L'%')
+                return 25;
+        else if (ch >= L'0' && ch <= L'9')
+          return 4;
+            else if (ch == L'p')
+                return 26;
+        //TKA600
+    break; // 
             case 53:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'c')
-                {
-                    return 2;
-                }
-                else if (ch == L'd')
-                {
-                    return 63;
-                }
-                else if (ch >= L'e' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'%')
+                return 25;
+        else if (ch >= L'0' && ch <= L'9')
+          return 4;
+            else if (ch == L'p')
+                return 26;
+        //TKA700
+    break; // 
             case 54:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 64;
-                }
-                else if (ch >= L'm' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'%')
+                return 25;
+        else if (ch >= L'0' && ch <= L'9')
+          return 4;
+            else if (ch == L'p')
+                return 26;
+        //TKA800
+    break; // 
             case 55:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'f')
-                {
-                    return 2;
-                }
-                else if (ch == L'g')
-                {
-                    return 65;
-                }
-                else if (ch >= L'h' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'%')
+                return 25;
+        else if (ch >= L'0' && ch <= L'9')
+          return 4;
+            else if (ch == L'p')
+                return 26;
+        //TKA900
+    break; // 
             case 56:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'h')
-                {
-                    return 2;
-                }
-                else if (ch == L'i')
-                {
-                    return 66;
-                }
-                else if (ch >= L'j' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'c')
+          return 3;
+            else if (ch == L'd')
+                return 66;
+        else if (ch >= L'e' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 57:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'l')
-                {
-                    return 2;
-                }
-                else if (ch == L'm')
-                {
-                    return 67;
-                }
-                else if (ch >= L'n' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 67;
+        else if (ch >= L'm' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 58:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'h')
-                {
-                    return 2;
-                }
-                else if (ch == L'i')
-                {
-                    return 68;
-                }
-                else if (ch >= L'j' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'f')
+          return 3;
+            else if (ch == L'g')
+                return 68;
+        else if (ch >= L'h' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 59:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 69;
-                }
-                else if (ch >= L'm' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'h')
+          return 3;
+            else if (ch == L'i')
+                return 69;
+        else if (ch >= L'j' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 60:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch == L'a')
-                {
-                    return 70;
-                }
-                else if (ch >= L'b' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'l')
+          return 3;
+            else if (ch == L'm')
+                return 70;
+        else if (ch >= L'n' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 61:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'l')
-                {
-                    return 2;
-                }
-                else if (ch == L'm')
-                {
-                    return 71;
-                }
-                else if (ch >= L'n' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'h')
+          return 3;
+            else if (ch == L'i')
+                return 71;
+        else if (ch >= L'j' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 62:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 72;
-                }
-                else if (ch >= L'm' && ch <= L'r')
-                {
-                    return 2;
-                }
-                else if (ch == L's')
-                {
-                    return 73;
-                }
-                else if (ch >= L't' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 72;
+        else if (ch >= L'm' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 63:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKBold
-                //TKBold
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+            else if (ch == L'a')
+                return 73;
+        else if (ch >= L'b' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 64:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'h')
-                {
-                    return 2;
-                }
-                else if (ch == L'i')
-                {
-                    return 74;
-                }
-                else if (ch >= L'j' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'l')
+          return 3;
+            else if (ch == L'm')
+                return 74;
+        else if (ch >= L'n' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 65:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'd')
-                {
-                    return 2;
-                }
-                else if (ch == L'e')
-                {
-                    return 75;
-                }
-                else if (ch >= L'f' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 75;
+        else if (ch >= L'm' && ch <= L'r')
+          return 3;
+            else if (ch == L's')
+                return 76;
+        else if (ch >= L't' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 66:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L't')
-                {
-                    return 2;
-                }
-                else if (ch == L'u')
-                {
-                    return 76;
-                }
-                else if (ch >= L'v' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKBold
+        //TKBold
+    break; // 
             case 67:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch == L'a')
-                {
-                    return 77;
-                }
-                else if (ch >= L'b' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'h')
+          return 3;
+            else if (ch == L'i')
+                return 77;
+        else if (ch >= L'j' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 68:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'p')
-                {
-                    return 2;
-                }
-                else if (ch == L'q')
-                {
-                    return 78;
-                }
-                else if (ch >= L'r' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'd')
+          return 3;
+            else if (ch == L'e')
+                return 78;
+        else if (ch >= L'f' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 69:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 79;
-                }
-                else if (ch >= L'm' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L't')
+          return 3;
+            else if (ch == L'u')
+                return 79;
+        else if (ch >= L'v' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 70:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'q')
-                {
-                    return 2;
-                }
-                else if (ch == L'r')
-                {
-                    return 80;
-                }
-                else if (ch >= L's' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+            else if (ch == L'a')
+                return 80;
+        else if (ch >= L'b' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 71:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch == L'a')
-                {
-                    return 81;
-                }
-                else if (ch >= L'b' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'p')
+          return 3;
+            else if (ch == L'q')
+                return 81;
+        else if (ch >= L'r' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 72:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch == L'a')
-                {
-                    return 82;
-                }
-                else if (ch >= L'b' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 82;
+        else if (ch >= L'm' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 73:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'l')
-                {
-                    return 2;
-                }
-                else if (ch == L'm')
-                {
-                    return 83;
-                }
-                else if (ch >= L'n' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'q')
+          return 3;
+            else if (ch == L'r')
+                return 83;
+        else if (ch >= L's' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 74:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'b')
-                {
-                    return 2;
-                }
-                else if (ch == L'c')
-                {
-                    return 84;
-                }
-                else if (ch >= L'd' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+            else if (ch == L'a')
+                return 84;
+        else if (ch >= L'b' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 75:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'q')
-                {
-                    return 2;
-                }
-                else if (ch == L'r')
-                {
-                    return 85;
-                }
-                else if (ch >= L's' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKlarge
-                //TKlarge
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+            else if (ch == L'a')
+                return 85;
+        else if (ch >= L'b' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 76:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'l')
-                {
-                    return 2;
-                }
-                else if (ch == L'm')
-                {
-                    return 86;
-                }
-                else if (ch >= L'n' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'l')
+          return 3;
+            else if (ch == L'm')
+                return 86;
+        else if (ch >= L'n' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 77:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 87;
-                }
-                else if (ch >= L'm' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'b')
+          return 3;
+            else if (ch == L'c')
+                return 87;
+        else if (ch >= L'd' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 78:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L't')
-                {
-                    return 2;
-                }
-                else if (ch == L'u')
-                {
-                    return 88;
-                }
-                else if (ch >= L'v' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'q')
+          return 3;
+            else if (ch == L'r')
+                return 88;
+        else if (ch >= L's' && ch <= L'z')
+          return 3;
+        //TKlarge
+        //TKlarge
+    break; // 
             case 79:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'd')
-                {
-                    return 2;
-                }
-                else if (ch == L'e')
-                {
-                    return 89;
-                }
-                else if (ch >= L'f' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKsmall
-                //TKsmall
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'l')
+          return 3;
+            else if (ch == L'm')
+                return 89;
+        else if (ch >= L'n' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 80:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'f')
-                {
-                    return 2;
-                }
-                else if (ch == L'g')
-                {
-                    return 90;
-                }
-                else if (ch >= L'h' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 90;
+        else if (ch >= L'm' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 81:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 91;
-                }
-                else if (ch >= L'm' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L't')
+          return 3;
+            else if (ch == L'u')
+                return 91;
+        else if (ch >= L'v' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 82:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'q')
-                {
-                    return 2;
-                }
-                else if (ch == L'r')
-                {
-                    return 92;
-                }
-                else if (ch >= L's' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'd')
+          return 3;
+            else if (ch == L'e')
+                return 92;
+        else if (ch >= L'f' && ch <= L'z')
+          return 3;
+        //TKsmall
+        //TKsmall
+    break; // 
             case 83:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch == L'a')
-                {
-                    return 93;
-                }
-                else if (ch >= L'b' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'f')
+          return 3;
+            else if (ch == L'g')
+                return 93;
+        else if (ch >= L'h' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 84:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKItalic
-                //TKItalic
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 94;
+        else if (ch >= L'm' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 85:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKlarger
-                //TKlarger
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'q')
+          return 3;
+            else if (ch == L'r')
+                return 95;
+        else if (ch >= L's' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 86:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKmedium
-                //TKmedium
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+            else if (ch == L'a')
+                return 96;
+        else if (ch >= L'b' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 87:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKNormal
-                //TKNormal
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKItalic
+        //TKItalic
+    break; // 
             case 88:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'd')
-                {
-                    return 2;
-                }
-                else if (ch == L'e')
-                {
-                    return 94;
-                }
-                else if (ch >= L'f' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKlarger
+        //TKlarger
+    break; // 
             case 89:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'q')
-                {
-                    return 2;
-                }
-                else if (ch == L'r')
-                {
-                    return 95;
-                }
-                else if (ch >= L's' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKmedium
+        //TKmedium
+    break; // 
             case 90:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'd')
-                {
-                    return 2;
-                }
-                else if (ch == L'e')
-                {
-                    return 96;
-                }
-                else if (ch >= L'f' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKNormal
+        //TKNormal
+    break; // 
             case 91:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 97;
-                }
-                else if (ch >= L'm' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'd')
+          return 3;
+            else if (ch == L'e')
+                return 97;
+        else if (ch >= L'f' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 92:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'f')
-                {
-                    return 2;
-                }
-                else if (ch == L'g')
-                {
-                    return 98;
-                }
-                else if (ch >= L'h' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'q')
+          return 3;
+            else if (ch == L'r')
+                return 98;
+        else if (ch >= L's' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 93:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 99;
-                }
-                else if (ch >= L'm' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'd')
+          return 3;
+            else if (ch == L'e')
+                return 99;
+        else if (ch >= L'f' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 94:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKOblique
-                //TKOblique
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 100;
+        else if (ch >= L'm' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 95:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKsmaller
-                //TKsmaller
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'f')
+          return 3;
+            else if (ch == L'g')
+                return 101;
+        else if (ch >= L'h' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 96:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKxlarge
-                //TKxlarge
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 102;
+        else if (ch >= L'm' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
             case 97:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKxsmall
-                //TKxsmall
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKOblique
+        //TKOblique
+    break; // 
             case 98:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'd')
-                {
-                    return 2;
-                }
-                else if (ch == L'e')
-                {
-                    return 100;
-                }
-                else if (ch >= L'f' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKsmaller
+        //TKsmaller
+    break; // 
             case 99:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'k')
-                {
-                    return 2;
-                }
-                else if (ch == L'l')
-                {
-                    return 101;
-                }
-                else if (ch >= L'm' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKFontName
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKxlarge
+        //TKxlarge
+    break; // 
             case 100:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
-
-                //TKxxlarge
-                //TKxxlarge
-                break; //
-
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKxsmall
+        //TKxsmall
+    break; // 
             case 101:
-                if (ch == L'-')
-                {
-                    return 2;
-                }
-                else if (ch >= L'A' && ch <= L'Z')
-                {
-                    return 2;
-                }
-                else if (ch >= L'a' && ch <= L'z')
-                {
-                    return 2;
-                }
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'd')
+          return 3;
+            else if (ch == L'e')
+                return 103;
+        else if (ch >= L'f' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
+            case 102:
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'k')
+          return 3;
+            else if (ch == L'l')
+                return 104;
+        else if (ch >= L'm' && ch <= L'z')
+          return 3;
+        //TKFontName
+    break; // 
+            case 103:
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKxxlarge
+        //TKxxlarge
+    break; // 
+            case 104:
+            if (ch == L'-')
+                return 3;
+        else if (ch >= L'A' && ch <= L'Z')
+          return 3;
+        else if (ch >= L'a' && ch <= L'z')
+          return 3;
+        //TKxxsmall
+        //TKxxsmall
+    break; // 
+        } //switch
+        return -1;
+    }
 
-                //TKxxsmall
-                //TKxxsmall
-                break; //
-            } //switch
+    static bool IsInterleave(Tokens tk)
+    {
+        return tk == TKBLANKS;
+    }
 
-            return -1;
-        }
-
-        static bool IsInterleave(Tokens tk)
+    static bool GetTokenFromState(int state, Tokens& tk)
+    {
+        switch(state)
         {
-            return tk == TKBLANKS;
-        }
-
-        static bool GetTokenFromState(int state, Tokens& tk)
-        {
-            switch (state)
-            {
-            case 1:
-                tk = TKBLANKS;
-                break;
-
-            case 2:
-                tk = TKFontName;
-                break;
-
-            case 13:
-                tk = TKFontName;
-                break;
-
-            case 14:
-                tk = TKFontName;
-                break;
-
-            case 15:
-                tk = TKFontName;
-                break;
-
-            case 16:
-                tk = TKFontName;
-                break;
-
-            case 17:
-                tk = TKFontName;
-                break;
-
-            case 18:
-                tk = TKFontName;
-                break;
-
-            case 19:
-                tk = TKFontName;
-                break;
-
-            case 20:
-                tk = TKFontName;
-                break;
-
-            case 22:
-                tk = TKPercent;
-                break;
-
-            case 33:
-                tk = TKFontName;
-                break;
-
-            case 34:
-                tk = TKFontName;
-                break;
-
-            case 35:
-                tk = TKFontName;
-                break;
-
-            case 36:
-                tk = TKFontName;
-                break;
-
-            case 37:
-                tk = TKFontName;
-                break;
-
-            case 38:
-                tk = TKFontName;
-                break;
-
-            case 39:
-                tk = TKFontName;
-                break;
-
-            case 40:
-                tk = TKFontName;
-                break;
-
-            case 41:
-                tk = TKFontName;
-                break;
-
-            case 42:
-                tk = TKPoints;
-                break;
-
-            case 43:
-                tk = TKPixels;
-                break;
-
-            case 44:
-                tk = TKA100;
-                break;
-
-            case 45:
-                tk = TKA200;
-                break;
-
-            case 46:
-                tk = TKA300;
-                break;
-
-            case 47:
-                tk = TKA400;
-                break;
-
-            case 48:
-                tk = TKA500;
-                break;
-
-            case 49:
-                tk = TKA600;
-                break;
-
-            case 50:
-                tk = TKA700;
-                break;
-
-            case 51:
-                tk = TKA800;
-                break;
-
-            case 52:
-                tk = TKA900;
-                break;
-
-            case 53:
-                tk = TKFontName;
-                break;
-
-            case 54:
-                tk = TKFontName;
-                break;
-
-            case 55:
-                tk = TKFontName;
-                break;
-
-            case 56:
-                tk = TKFontName;
-                break;
-
-            case 57:
-                tk = TKFontName;
-                break;
-
-            case 58:
-                tk = TKFontName;
-                break;
-
-            case 59:
-                tk = TKFontName;
-                break;
-
-            case 60:
-                tk = TKFontName;
-                break;
-
-            case 61:
-                tk = TKFontName;
-                break;
-
-            case 62:
-                tk = TKFontName;
-                break;
-
-            case 63:
-                tk = TKBold;
-                break;
-
-            case 64:
-                tk = TKFontName;
-                break;
-
-            case 65:
-                tk = TKFontName;
-                break;
-
-            case 66:
-                tk = TKFontName;
-                break;
-
-            case 67:
-                tk = TKFontName;
-                break;
-
-            case 68:
-                tk = TKFontName;
-                break;
-
-            case 69:
-                tk = TKFontName;
-                break;
-
-            case 70:
-                tk = TKFontName;
-                break;
-
-            case 71:
-                tk = TKFontName;
-                break;
-
-            case 72:
-                tk = TKFontName;
-                break;
-
-            case 73:
-                tk = TKFontName;
-                break;
-
-            case 74:
-                tk = TKFontName;
-                break;
-
-            case 75:
-                tk = TKlarge;
-                break;
-
-            case 76:
-                tk = TKFontName;
-                break;
-
-            case 77:
-                tk = TKFontName;
-                break;
-
-            case 78:
-                tk = TKFontName;
-                break;
-
-            case 79:
-                tk = TKsmall;
-                break;
-
-            case 80:
-                tk = TKFontName;
-                break;
-
-            case 81:
-                tk = TKFontName;
-                break;
-
-            case 82:
-                tk = TKFontName;
-                break;
-
-            case 83:
-                tk = TKFontName;
-                break;
-
-            case 84:
-                tk = TKItalic;
-                break;
-
-            case 85:
-                tk = TKlarger;
-                break;
-
-            case 86:
-                tk = TKmedium;
-                break;
-
-            case 87:
-                tk = TKNormal;
-                break;
-
-            case 88:
-                tk = TKFontName;
-                break;
-
-            case 89:
-                tk = TKFontName;
-                break;
-
-            case 90:
-                tk = TKFontName;
-                break;
-
-            case 91:
-                tk = TKFontName;
-                break;
-
-            case 92:
-                tk = TKFontName;
-                break;
-
-            case 93:
-                tk = TKFontName;
-                break;
-
-            case 94:
-                tk = TKOblique;
-                break;
-
-            case 95:
-                tk = TKsmaller;
-                break;
-
-            case 96:
-                tk = TKxlarge;
-                break;
-
-            case 97:
-                tk = TKxsmall;
-                break;
-
-            case 98:
-                tk = TKFontName;
-                break;
-
-            case 99:
-                tk = TKFontName;
-                break;
-
-            case 100:
-                tk = TKxxlarge;
-                break;
-
-            case 101:
-                tk = TKxxsmall;
-                break;
-
+            case 1: tk = TKBLANKS; break;
+            case 3: tk = TKFontName; break;
+            case 14: tk = TKFontName; break;
+            case 15: tk = TKFontName; break;
+            case 16: tk = TKFontName; break;
+            case 17: tk = TKFontName; break;
+            case 18: tk = TKFontName; break;
+            case 19: tk = TKFontName; break;
+            case 20: tk = TKFontName; break;
+            case 21: tk = TKFontName; break;
+            case 23: tk = TKFontName; break;
+            case 25: tk = TKPercent; break;
+            case 36: tk = TKFontName; break;
+            case 37: tk = TKFontName; break;
+            case 38: tk = TKFontName; break;
+            case 39: tk = TKFontName; break;
+            case 40: tk = TKFontName; break;
+            case 41: tk = TKFontName; break;
+            case 42: tk = TKFontName; break;
+            case 43: tk = TKFontName; break;
+            case 44: tk = TKFontName; break;
+            case 45: tk = TKPoints; break;
+            case 46: tk = TKPixels; break;
+            case 47: tk = TKA100; break;
+            case 48: tk = TKA200; break;
+            case 49: tk = TKA300; break;
+            case 50: tk = TKA400; break;
+            case 51: tk = TKA500; break;
+            case 52: tk = TKA600; break;
+            case 53: tk = TKA700; break;
+            case 54: tk = TKA800; break;
+            case 55: tk = TKA900; break;
+            case 56: tk = TKFontName; break;
+            case 57: tk = TKFontName; break;
+            case 58: tk = TKFontName; break;
+            case 59: tk = TKFontName; break;
+            case 60: tk = TKFontName; break;
+            case 61: tk = TKFontName; break;
+            case 62: tk = TKFontName; break;
+            case 63: tk = TKFontName; break;
+            case 64: tk = TKFontName; break;
+            case 65: tk = TKFontName; break;
+            case 66: tk = TKBold; break;
+            case 67: tk = TKFontName; break;
+            case 68: tk = TKFontName; break;
+            case 69: tk = TKFontName; break;
+            case 70: tk = TKFontName; break;
+            case 71: tk = TKFontName; break;
+            case 72: tk = TKFontName; break;
+            case 73: tk = TKFontName; break;
+            case 74: tk = TKFontName; break;
+            case 75: tk = TKFontName; break;
+            case 76: tk = TKFontName; break;
+            case 77: tk = TKFontName; break;
+            case 78: tk = TKlarge; break;
+            case 79: tk = TKFontName; break;
+            case 80: tk = TKFontName; break;
+            case 81: tk = TKFontName; break;
+            case 82: tk = TKsmall; break;
+            case 83: tk = TKFontName; break;
+            case 84: tk = TKFontName; break;
+            case 85: tk = TKFontName; break;
+            case 86: tk = TKFontName; break;
+            case 87: tk = TKItalic; break;
+            case 88: tk = TKlarger; break;
+            case 89: tk = TKmedium; break;
+            case 90: tk = TKNormal; break;
+            case 91: tk = TKFontName; break;
+            case 92: tk = TKFontName; break;
+            case 93: tk = TKFontName; break;
+            case 94: tk = TKFontName; break;
+            case 95: tk = TKFontName; break;
+            case 96: tk = TKFontName; break;
+            case 97: tk = TKOblique; break;
+            case 98: tk = TKsmaller; break;
+            case 99: tk = TKxlarge; break;
+            case 100: tk = TKxsmall; break;
+            case 101: tk = TKFontName; break;
+            case 102: tk = TKFontName; break;
+            case 103: tk = TKxxlarge; break;
+            case 104: tk = TKxxsmall; break;
             default:
                 return false;
-            }
-
-            return true;
         }
-    };
+        return true;
+    }
+};
+
 
     class Context
     {
