@@ -13,7 +13,7 @@
 <script language="JavaScript">
 
     var currentdraw = 0;
-    var MAXCOUNT = 15;
+    var MAXCOUNT = 16;
 
     function prev() {
         if (currentdraw > 0)
@@ -56,7 +56,8 @@
             case 11: Sample12(ctx); break;
             case 12: Sample13(ctx); break;
             case 13: Sample14(ctx); break;
-            case 14: Sample15(ctx); break;
+            case 14: Sample15(ctx); break;
+            case 15: Sample16(ctx); break;
         }
         ctx.restore();
     }
@@ -374,8 +375,14 @@
             ctx.stroke();
         }
     }
-    function Sample16(ctx) {
-    }
+    function Sample16(ctx) {
+    ctx.font = "italic  12px arial";
+    ctx.fillText("italic  12px arial", 10, 20);
+
+    ctx.font = "normal 14px  ariel";
+    ctx.fillText("normal 14px normal arial", 10, 40);
+    }
+
     function Sample17(ctx) {
     }
     function Sample18(ctx) {

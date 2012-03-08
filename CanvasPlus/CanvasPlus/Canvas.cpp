@@ -106,12 +106,12 @@ namespace CanvasPlus
 
 
     FillStyle::FillStyle()
-    {        
+    {
         fillStyleEnum =  FillStyleEnumSolid;
     }
 
     FillStyle& FillStyle::operator = (const char* psz)
-    {    
+    {
         fillStyleEnum = FillStyleEnumSolid;
         m_Color = psz;
         return *this;
@@ -148,7 +148,7 @@ namespace CanvasPlus
         return *this;
     }
 
-  
+
 
     //==================BEGIN COLOR ==================
 

@@ -34,6 +34,7 @@ void Sample1(Canvas& canvas)
     };
     int j = 0;
 
+    ctx.font = "bold 12px arial";
     for (int i = 0; i < 6; i++)
     {
         for (int k = 0; k < 5; k++)
@@ -41,6 +42,7 @@ void Sample1(Canvas& canvas)
             double x = 50 + i * 150;
             double y = 50 + k * 100;
             DrawPos(ctx, x, y);
+
             ctx.textBaseline = baselines[i];
             ctx.textAlign = align[k];
             ctx.fillText(text[j], x, y);
@@ -311,6 +313,7 @@ void Sample15(CanvasPlus::Canvas& canvas)
         ctx.stroke();
     }
 }
+
 void Sample16(CanvasPlus::Canvas& canvas)
 {
     Context2D& ctx = canvas.getContext("2d");
@@ -332,4 +335,15 @@ void Sample16(CanvasPlus::Canvas& canvas)
     ctx.closePath();
     ctx.stroke();
     }
+}
+
+
+void Sample17(CanvasPlus::Canvas& canvas)
+{
+    Context2D& ctx = canvas.getContext("2d");
+    ctx.font = "italic  12px arial";
+    ctx.fillText(L"italic  12px arial", 10, 20);
+
+    ctx.font = "normal 14px  ariel";
+    ctx.fillText(L"normal 14px normal arial", 10, 40);
 }

@@ -6,6 +6,136 @@
 #include <Windows.h>
 #include <cassert>
 #include "..\Canvas.h"
+#include "..\FontParser.h"
+
+
+
+struct LogfontActions : public Actions
+{
+    LOGFONTA m_LogFont;
+    LogfontActions()
+    {
+        m_LogFont.lfHeight = -10; //-17;
+        ////////////////////////////////////////////////
+        m_LogFont.lfWidth = 0;
+        m_LogFont.lfEscapement = 0;
+        m_LogFont.lfOrientation = 0;
+        m_LogFont.lfWeight = 400;
+        ////
+        m_LogFont.lfItalic = 0;
+        m_LogFont.lfUnderline = 0;
+        m_LogFont.lfStrikeOut = 0;
+        m_LogFont.lfCharSet = 0;
+        m_LogFont.lfOutPrecision = 3;
+        m_LogFont.lfClipPrecision = 2;
+        m_LogFont.lfQuality = 1;
+        m_LogFont.lfPitchAndFamily = 49;
+    }
+
+    //Actions
+    virtual void SetFontName(const std::string& s)
+    {
+        strcpy(m_LogFont.lfFaceName , s.c_str());
+    }
+    virtual void SetNormalStyle()
+    {
+        //m_LogFont.lfItalic = TRUE;
+    }
+    virtual void SetItalic()
+    {
+        m_LogFont.lfItalic = TRUE;
+    }
+    virtual void SetOblique()
+    {
+    }
+    virtual void SetNormalWeight()
+    {
+        m_LogFont.lfWeight = 400;
+    }
+    virtual void SetWeightBold()
+    {
+        m_LogFont.lfWeight = 700;
+    }
+    virtual void SetWeight100()
+    {
+        m_LogFont.lfWeight = 100;
+    }
+    virtual void SetWeight200()
+    {
+        m_LogFont.lfWeight = 200;
+    }
+
+    virtual void SetWeight300()
+    {
+        m_LogFont.lfWeight = 300;
+    }
+    virtual void SetWeight400()
+    {
+        m_LogFont.lfWeight = 400;
+    }
+    virtual void SetWeight500()
+    {
+        m_LogFont.lfWeight = 500;
+    }
+    virtual void SetWeight600()
+    {
+        m_LogFont.lfWeight = 600;
+    }
+    virtual void SetWeight700()
+    {
+        m_LogFont.lfWeight = 700;
+    }
+    virtual void SetWeight800()
+    {
+        m_LogFont.lfWeight = 800;
+    }
+    virtual void SetWeight900()
+    {
+        m_LogFont.lfWeight = 900;
+    }
+    virtual void SetSizePercent()
+    {
+    }
+    virtual void SetSizePoints(int pt)
+    {
+        m_LogFont.lfHeight = pt; //-17;
+    }
+    virtual void SetSizePixels(int px)
+    {
+       m_LogFont.lfHeight = -px;        
+    }
+    virtual void SetSizeLarger()
+    {
+    }
+    virtual void SetSizeSmaller()
+    {
+    }
+    virtual void SetSizexxsmall()
+    {
+    }
+    virtual void SetSizexsmall()
+    {
+    }
+    virtual void SetSizesmall()
+    {
+    }
+    virtual void SetSizemedium()
+    {
+    }
+    virtual void SetSizelarge()
+    {
+    }
+    virtual void SetSizexlarge()
+    {
+    }
+    virtual void SetSizexxlarge()
+    {
+    }
+};
+
+
+
+
 
 //THIS FILE IS WINDOWS ONLY AND GDI ONLY
 
@@ -63,30 +193,30 @@ public:
         {
             switch (GetClipRgn(hDC, m_hOldRgn))
             {
-                case 1:
-                {
-                    // success, m_hOldRgn contains the current clipping region for the DC
-                    m_hDC = hDC;
-                }
-                break;
+            case 1:
+            {
+                // success, m_hOldRgn contains the current clipping region for the DC
+                m_hDC = hDC;
+            }
+            break;
 
-                case 0:
-                {
-                    // success, but the DC has no clipping region
-                    m_hDC = hDC;
-                    DeleteObject(m_hOldRgn);
-                    m_hOldRgn = NULL;
-                }
-                break;
+            case 0:
+            {
+                // success, but the DC has no clipping region
+                m_hDC = hDC;
+                DeleteObject(m_hOldRgn);
+                m_hOldRgn = NULL;
+            }
+            break;
 
-                default:
-                case -1:
-                {
-                    // erro
-                    DeleteObject(m_hOldRgn);
-                    m_hOldRgn = NULL;
-                }
-                break;
+            default:
+            case -1:
+            {
+                // erro
+                DeleteObject(m_hOldRgn);
+                m_hOldRgn = NULL;
+            }
+            break;
             }
         }
 
@@ -431,12 +561,9 @@ namespace CanvasPlus
         void BeginDraw(HDC hdc)
         {
             this->m_hDC = hdc;
-            
             //defaults==
-
             this->textAlign = TextAlignStart;
             this->textBaseline = TextBaselineAlphabetic;
-
             this->lineWidth = 1.0;
             this->shadowColor = "rgb(0,0,0)";
             this->shadowOffsetX = 0;
@@ -711,66 +838,11 @@ namespace CanvasPlus
             m_pNativeObject = nullptr;
         }
 
-        // TODO THIS IS NOT A PARSER
-        // PROVISORY
-        //See 15.8 Shorthand font property
-        //http://www.w3.org/TR/CSS2/fonts.html#font-shorthand
-        std::string str(psz);
-        //"When the context is created, the font of the
-        //context must be set to 10px sans-serif. "
-        LOGFONT logFont;
-
-        /////////////////////////////////////////////////
-        if (str.find("12pt") != std::string::npos)
-        {
-            logFont.lfHeight = 12;    //-17;
-        }
-        else if (str.find("14px") != std::string::npos)
-        {
-            logFont.lfHeight = -14;    //-17;
-        }
-        else
-        {
-            logFont.lfHeight = -10; //-17;
-        }
-
-        ////////////////////////////////////////////////
-        logFont.lfWidth = 0;
-        logFont.lfEscapement = 0;
-        logFont.lfOrientation = 0;
-
-        ////
-        if (str.find("bold") != std::string::npos)
-        {
-            logFont.lfWeight = 700;
-        }
-        else
-        {
-            logFont.lfWeight = 400;
-        }
-
-        ////
-        logFont.lfItalic = 0;
-        logFont.lfUnderline = 0;
-        logFont.lfStrikeOut = 0;
-        logFont.lfCharSet = 0;
-        logFont.lfOutPrecision = 3;
-        logFont.lfClipPrecision = 2;
-        logFont.lfQuality = 1;
-        logFont.lfPitchAndFamily = 49;
-
-        if (str.find("arial") != std::string::npos)
-        {
-            wcscpy(logFont.lfFaceName , L"arial");
-        }
-        else
-        {
-            wcscpy(logFont.lfFaceName , L"sans-serif");
-        }
-
+        LogfontActions actions;
+        ParseFont(psz, actions);
         assert(m_pNativeObject == nullptr);
         fontdesc = psz;
-        m_pNativeObject = (void*)CreateFontIndirect(&logFont);
+        m_pNativeObject = (void*)CreateFontIndirectA(&actions.m_LogFont);
     }
 
 
@@ -1084,66 +1156,66 @@ namespace CanvasPlus
 
         switch (textAlign)
         {
-            case TextAlignStart:
-                newx = ix;
-                break;
+        case TextAlignStart:
+            newx = ix;
+            break;
 
-            case TextAlignEnd:
-                newx = ix - sz.cx;
-                break;
+        case TextAlignEnd:
+            newx = ix - sz.cx;
+            break;
 
-            case TextAlignLeft:
-                newx = ix;
-                break;
+        case TextAlignLeft:
+            newx = ix;
+            break;
 
-            case TextAlignRight:
-                newx = ix - sz.cx;
-                break;
+        case TextAlignRight:
+            newx = ix - sz.cx;
+            break;
 
-            case TextAlignCenter:
-                newx = ix - sz.cx / 2;
-                break;
+        case TextAlignCenter:
+            newx = ix - sz.cx / 2;
+            break;
 
-            default:
-                assert(false);
+        default:
+            assert(false);
         }
 
         switch (baseLine)
         {
-            case TextBaselineTop :
-                newy = iy;
-                break;//The top of the em square
+        case TextBaselineTop :
+            newy = iy;
+            break;//The top of the em square
 
-            case TextBaselineHanging:
-                newy = iy;
-                break; //The hanging baseline
+        case TextBaselineHanging:
+            newy = iy;
+            break; //The hanging baseline
 
-            case TextBaselineMiddle :
-                newy = iy - sz.cy / 2;
-                break; //The middle of the em square
+        case TextBaselineMiddle :
+            newy = iy - sz.cy / 2;
+            break; //The middle of the em square
 
-            case TextBaselineAlphabetic :
-            {
-                TEXTMETRIC tm;
-                GetTextMetrics(m_hDC, &tm);
-                newy = iy - (tm.tmHeight - tm.tmDescent);
-            }
-            break;//The alphabetic baseline
+        case TextBaselineAlphabetic :
+        {
+            TEXTMETRIC tm;
+            GetTextMetrics(m_hDC, &tm);
+            newy = iy - (tm.tmHeight - tm.tmDescent);
+        }
+        break;//The alphabetic baseline
 
-            case TextBaselineIdeographic :
-            {
-                TEXTMETRIC tm;
-                GetTextMetrics(m_hDC, &tm);
-                newy = iy - (tm.tmHeight);
-            }
-            break; //The ideographic baseline
+        case TextBaselineIdeographic :
+        {
+            TEXTMETRIC tm;
+            GetTextMetrics(m_hDC, &tm);
+            newy = iy - (tm.tmHeight);
+        }
+        break; //The ideographic baseline
 
-            case TextBaselineBottom :
-                newy = iy - sz.cy;
-                break;//The bottom of the em square
+        case TextBaselineBottom :
+            newy = iy - sz.cy;
+            break;//The bottom of the em square
 
-            default:
-                break;
+        default:
+            break;
         }
 
         TextOut(m_hDC, newx, newy, psz, wcslen(psz));
@@ -1363,7 +1435,7 @@ namespace CanvasPlus
 
     GDICanvas::~GDICanvas()
     {
-      delete m_pD2DContext2D;
+        delete m_pD2DContext2D;
     }
 
     Context2D& GDICanvas::getContext(const char*)
