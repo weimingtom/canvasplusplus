@@ -9,6 +9,14 @@
 #include <d2d1helper.h>
 #include <dwrite.h>
 #include <wincodec.h>
+#include <vector>
+
+enum Comands
+{
+    CMD_PATH_BEGIN,
+    CMD_LINE_TO,
+    CMD_RECT ,
+};
 
 #pragma comment( lib, "d2d1.lib" )
 #pragma comment( lib, "WindowsCodecs.lib" )
@@ -40,6 +48,11 @@ namespace CanvasPlus
         IDWriteFactory* m_pDWriteFactory;
         IDWriteTextFormat* m_pTextFormat;
 
+        FLOAT m_strokeWidth;
+        ID2D1StrokeStyle* m_pStrokeStyle;
+
+
+
         //
         FillStyle fillStyle;        // (default black)
         FillStyle strokeStyle;      // (default black)
@@ -54,6 +67,8 @@ namespace CanvasPlus
         double shadowOffsetY;       // (default 0)
         double  shadowBlur;          // (default 0)
 
+        std::vector<FLOAT> m_pathcmds;
+
     public:
         D2DContext2D(HWND hwnd) :
             m_pDirect2dFactory(NULL),
@@ -61,7 +76,10 @@ namespace CanvasPlus
             m_pFillBrush(NULL),
             m_pStrokeBrush(NULL),
             m_pTextFormat(NULL),
-            m_pDWriteFactory(NULL)
+            m_pDWriteFactory(NULL),
+            m_strokeWidth(1.1f),
+            m_pStrokeStyle(NULL)
+
         {
             RECT rc;
             GetClientRect(hwnd, &rc);
@@ -70,10 +88,10 @@ namespace CanvasPlus
             HRESULT hr = CreateDeviceIndependentResources();
             // Because the CreateWindow function takes its size in pixels,
             // obtain the system DPI and use it to scale the window size.
-            FLOAT dpiX, dpiY;
+            //  FLOAT dpiX, dpiY;
             // The factory returns the current system DPI. This is also the value it will use
             // to create its own windows.
-            m_pDirect2dFactory->GetDesktopDpi(&dpiX, &dpiY);
+            //  m_pDirect2dFactory->GetDesktopDpi(&dpiX, &dpiY);
             hr = CreateDeviceResources(hwnd, w, h);
         }
 
@@ -105,16 +123,6 @@ namespace CanvasPlus
                          D2D1::HwndRenderTargetProperties(hwnd, size),
                          &m_pRenderTarget
                      );
-
-                if (SUCCEEDED(hr))
-                {
-                    hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pFillBrush);
-                }
-
-                if (SUCCEEDED(hr))
-                {
-                    hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pStrokeBrush);
-                }
             }
 
             return hr;
@@ -171,6 +179,21 @@ namespace CanvasPlus
             m_pRenderTarget->BeginDraw();
             m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
             m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+            m_strokeWidth = 1.1f;
+            HRESULT hr = S_OK;
+
+            if (SUCCEEDED(hr))
+            {
+                SafeRelease(&m_pFillBrush);
+                hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pFillBrush);
+            }
+
+            if (SUCCEEDED(hr))
+            {
+                SafeRelease(&m_pStrokeBrush);
+                hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black),
+                        &m_pStrokeBrush);
+            }
         }
 
 
@@ -255,9 +278,14 @@ namespace CanvasPlus
         //
     };
 
+    struct CanvasGradientImp
+    {
+      //D2D1_GRADIENT_STOP gradientStops
+    };
 
     void CanvasGradient::addColorStop(double offset, const Color& color)
     {
+      //D2D1_GRADIENT_STOP gradientStops
     }
 
     CanvasGradient::CanvasGradient(CanvasGradientImp* p)
@@ -282,6 +310,18 @@ namespace CanvasPlus
             double x1,
             double y1)
     {
+      /*
+      if (SUCCEEDED(hr))
+{
+    hr = m_pRenderTarget->CreateLinearGradientBrush(
+        D2D1::LinearGradientBrushProperties(
+            D2D1::Point2F(0, 0),
+            D2D1::Point2F(150, 150)),
+        pGradientStops,
+        &m_pLinearGradientBrush
+        );
+}
+      */
         return CanvasGradient();
     }
 
@@ -343,6 +383,8 @@ namespace CanvasPlus
 
     void D2DContext2D::strokeRect(double x, double y, double w, double h)
     {
+        D2D1_RECT_F rc = D2D1::RectF(x, y, x + w, y + h);
+        m_pRenderTarget->DrawRectangle(&rc, m_pStrokeBrush, m_strokeWidth, m_pStrokeStyle);
     }
 
 
@@ -353,22 +395,37 @@ namespace CanvasPlus
 
     void D2DContext2D::moveTo(double x, double y)
     {
+        m_pathcmds.push_back(CMD_PATH_BEGIN);
+        m_pathcmds.push_back(x);
+        m_pathcmds.push_back(y);
     }
 
     void D2DContext2D::lineTo(double x, double y)
     {
-        //
+        m_pathcmds.push_back(CMD_LINE_TO);
+        m_pathcmds.push_back(x);
+        m_pathcmds.push_back(y);
     }
 
     void D2DContext2D::beginPath()
     {
+        m_pathcmds.clear();
     }
+
     void D2DContext2D::closePath()
     {
+        //m_pathcmds.push_back(CMD_PATH_BEGIN);
+        //m_pathcmds.push_back(x);
+        //m_pathcmds.push_back(y);
     }
 
     void D2DContext2D::rect(double x, double y, double w, double h)
     {
+        m_pathcmds.push_back(CMD_RECT);
+        m_pathcmds.push_back(x);
+        m_pathcmds.push_back(y);
+        m_pathcmds.push_back(w);
+        m_pathcmds.push_back(h);
     }
     void D2DContext2D::clip()
     {
@@ -377,10 +434,124 @@ namespace CanvasPlus
 
     void D2DContext2D::fill()
     {
+        if (m_pathcmds.size() < 2)
+        {
+            return;
+        }
+
+        ID2D1GeometrySink* pSink = NULL;
+        std::vector<FLOAT>::iterator it = m_pathcmds.begin();
+        HRESULT hr = E_FAIL;
+        ID2D1PathGeometry* pPathGeometry = NULL;
+
+        for (; it != m_pathcmds.end();)
+        {
+            Comands cmd = (Comands)(int)(*it);
+            ++it;
+
+            if (cmd == CMD_PATH_BEGIN)
+            {
+                if (pSink)
+                {
+                    pSink->EndFigure(D2D1_FIGURE_END_CLOSED);
+                    hr = pSink->Close();
+                    m_pRenderTarget->FillGeometry(pPathGeometry, m_pFillBrush);
+                    SafeRelease(&pSink);
+                    SafeRelease(&pPathGeometry);
+                    hr = m_pDirect2dFactory->CreatePathGeometry(&pPathGeometry);
+                    hr = pPathGeometry->Open(&pSink);
+                }
+                else
+                {
+                    SafeRelease(&pPathGeometry);
+                    hr = m_pDirect2dFactory->CreatePathGeometry(&pPathGeometry);
+                    hr = pPathGeometry->Open(&pSink);
+                }
+
+                pSink->BeginFigure(D2D1::Point2F(*(it + 0), *(it + 1)),
+                                   D2D1_FIGURE_BEGIN_FILLED);
+                it += 2;
+            }
+            else if (cmd == CMD_LINE_TO)
+            {
+                pSink->AddLine(D2D1::Point2F(*(it + 0),  *(it + 1)));
+                it += 2;
+            }
+        }
+
+        pSink->EndFigure(D2D1_FIGURE_END_CLOSED);
+        pSink->Close();
+        m_pRenderTarget->FillGeometry(pPathGeometry, m_pFillBrush, NULL);
+        SafeRelease(&pSink);
+        SafeRelease(&pPathGeometry);
     }
 
     void D2DContext2D::stroke()
     {
+        if (m_pathcmds.size() < 2)
+        {
+            return;
+        }
+
+        ID2D1StrokeStyle* strokeStyle = NULL;
+        HRESULT hr = m_pDirect2dFactory->CreateStrokeStyle(
+                         D2D1::StrokeStyleProperties(
+                             D2D1_CAP_STYLE_FLAT,
+                             D2D1_CAP_STYLE_FLAT,
+                             D2D1_CAP_STYLE_FLAT ,
+                             D2D1_LINE_JOIN_BEVEL,
+                             0,
+                             D2D1_DASH_STYLE_SOLID,
+                             0.0f),
+                         NULL,
+                         0,
+                         &strokeStyle);
+        ID2D1GeometrySink* pSink = NULL;
+        std::vector<FLOAT>::iterator it = m_pathcmds.begin();
+        ID2D1PathGeometry* pPathGeometry = NULL;
+
+        for (; it != m_pathcmds.end();)
+        {
+            Comands cmd = (Comands)(int)(*it);
+            ++it;
+
+            if (cmd == CMD_PATH_BEGIN)
+            {
+                if (pSink)
+                {
+                    pSink->EndFigure(D2D1_FIGURE_END_CLOSED);
+                    hr = pSink->Close();
+                    SafeRelease(&pSink);
+                    m_pRenderTarget->DrawGeometry(pPathGeometry, m_pStrokeBrush, m_strokeWidth, strokeStyle);
+                    SafeRelease(&pPathGeometry);
+                    hr = m_pDirect2dFactory->CreatePathGeometry(&pPathGeometry);
+                    hr = pPathGeometry->Open(&pSink);
+                }
+                else
+                {
+                    SafeRelease(&pPathGeometry);
+                    hr = m_pDirect2dFactory->CreatePathGeometry(&pPathGeometry);
+                    hr = pPathGeometry->Open(&pSink);
+                }
+
+                FLOAT x = *it++;
+                FLOAT y = *it++;
+                pSink->BeginFigure(D2D1::Point2F(x, y),
+                                   D2D1_FIGURE_BEGIN_FILLED);
+            }
+            else if (cmd == CMD_LINE_TO)
+            {
+                FLOAT x = *it++;
+                FLOAT y = *it++;
+                pSink->AddLine(D2D1::Point2F(x, y));
+            }
+        }
+
+        pSink->EndFigure(D2D1_FIGURE_END_CLOSED);
+        pSink->Close();
+        m_pRenderTarget->DrawGeometry(pPathGeometry, m_pStrokeBrush, m_strokeWidth, strokeStyle);
+        SafeRelease(&pSink);
+        SafeRelease(&pPathGeometry);
     }
 
     void D2DContext2D::fillText(const wchar_t* psz, double x, double y)
@@ -403,12 +574,15 @@ namespace CanvasPlus
 
     void D2DContext2D::set_fillStyle(const Color& v)
     {
+        SafeRelease(&m_pStrokeBrush);
+        m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black),
+                                               &m_pStrokeBrush);
     }
 
     void D2DContext2D::set_fillStyle(const char* v)
     {
         Color c(v);
-        D2D1::ColorF d2dcolor(RGB(c.g, c.g, c.r));
+        D2D1::ColorF d2dcolor(RGB(c.b, c.g, c.r));
         SafeRelease(&m_pFillBrush);
         HRESULT hr = m_pRenderTarget->CreateSolidColorBrush(d2dcolor, &m_pFillBrush);
     }
@@ -432,6 +606,10 @@ namespace CanvasPlus
 
     void D2DContext2D::set_strokeStyle(const char* v)
     {
+        Color c(v);
+        D2D1::ColorF d2dcolor(RGB(c.b, c.g, c.r));
+        SafeRelease(&m_pStrokeBrush);
+        HRESULT hr = m_pRenderTarget->CreateSolidColorBrush(d2dcolor, &m_pStrokeBrush);
     }
 
     void D2DContext2D::set_strokeStyle(const FillStyle& v)
@@ -484,11 +662,12 @@ namespace CanvasPlus
 
     void D2DContext2D::set_lineWidth(double v)
     {
+        m_strokeWidth = v;
     }
 
     double D2DContext2D::get_lineWidth()const
     {
-        return 0;
+        return m_strokeWidth;
     }
 
     void D2DContext2D::set_shadowColor(const Color& v)
@@ -559,7 +738,7 @@ namespace CanvasPlus
 
     D2DCanvas::~D2DCanvas()
     {
-      delete m_pD2DContext2D;
+        delete m_pD2DContext2D;
     }
 
     Context2D& D2DCanvas::getContext(const char*)
