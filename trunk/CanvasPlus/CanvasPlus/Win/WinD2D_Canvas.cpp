@@ -11,12 +11,6 @@
 #include <wincodec.h>
 #include <vector>
 
-enum Comands
-{
-    CMD_PATH_BEGIN,
-    CMD_LINE_TO,
-    CMD_RECT ,
-};
 
 #pragma comment( lib, "d2d1.lib" )
 #pragma comment( lib, "WindowsCodecs.lib" )
@@ -67,8 +61,19 @@ namespace CanvasPlus
         double shadowOffsetY;       // (default 0)
         double  shadowBlur;          // (default 0)
 
-        std::vector<FLOAT> m_pathcmds;
 
+        std::vector<ID2D1Geometry*> m_paths;
+        ID2D1GeometrySink* m_pCurrentGeometrySink;
+
+        void CloseCurrentSink()
+        {
+            if (m_pCurrentGeometrySink != NULL)
+            {
+                m_pCurrentGeometrySink->EndFigure(D2D1_FIGURE_END_CLOSED);
+                HRESULT hr = m_pCurrentGeometrySink->Close();
+                SafeRelease(&m_pCurrentGeometrySink);
+            }
+        }
     public:
         D2DContext2D(HWND hwnd) :
             m_pDirect2dFactory(NULL),
@@ -78,7 +83,8 @@ namespace CanvasPlus
             m_pTextFormat(NULL),
             m_pDWriteFactory(NULL),
             m_strokeWidth(1.1f),
-            m_pStrokeStyle(NULL)
+            m_pStrokeStyle(NULL),
+            m_pCurrentGeometrySink(NULL)
 
         {
             RECT rc;
@@ -241,68 +247,141 @@ namespace CanvasPlus
         virtual void set_fillStyle(const Color&);
         virtual void set_fillStyle(const char*);
         virtual void set_fillStyle(const FillStyle&);
-        virtual const FillStyle& get_fillStyle()const ;
+        virtual const FillStyle& get_fillStyle() const;
 
         virtual void set_strokeStyle(const CanvasGradient&);
         virtual void set_strokeStyle(const Color&);
         virtual void set_strokeStyle(const char*);
         virtual void set_strokeStyle(const FillStyle&);
-        virtual const FillStyle& get_strokeStyle()const ;
+        virtual const FillStyle& get_strokeStyle() const;
 
         virtual void set_textAlign(const char*);
         virtual void set_textAlign(const TextAlign&);
-        virtual const TextAlign& get_textAlign()const ;
+        virtual const TextAlign& get_textAlign() const;
 
         virtual void set_textBaseline(const char*);
         virtual void set_textBaseline(const TextBaseline&);
-        virtual const TextBaseline& get_textBaseline()const ;
+        virtual const TextBaseline& get_textBaseline() const;
 
         virtual void set_font(const char*);
         virtual void set_font(const Font&);
-        virtual const Font& get_font()const ;
+        virtual const Font& get_font() const;
 
         virtual void set_lineWidth(double);
-        virtual double get_lineWidth()const ;
+        virtual double get_lineWidth() const;
 
         virtual void set_shadowColor(const Color&);
-        virtual const Color&  get_shadowColor()const ;
+        virtual const Color&  get_shadowColor() const;
 
         virtual void set_shadowOffsetX(double);
-        virtual double get_shadowOffsetX()const ;
+        virtual double get_shadowOffsetX() const;
 
         virtual void set_shadowOffsetY(double);
-        virtual double get_shadowOffsetY()const ;
+        virtual double get_shadowOffsetY() const;
 
         virtual void set_shadowBlur(double);
-        virtual double get_shadowBlur()const ;
+        virtual double get_shadowBlur() const;
         //
     };
 
+
+
+
     struct CanvasGradientImp
     {
-      //D2D1_GRADIENT_STOP gradientStops
-    };
+        std::vector<D2D1_GRADIENT_STOP> m_gradientStops;
+        FLOAT m_x0;
+        FLOAT m_y0;
+        FLOAT m_x1;
+        FLOAT m_y1;
+        unsigned int m_refCount;
 
-    void CanvasGradient::addColorStop(double offset, const Color& color)
-    {
-      //D2D1_GRADIENT_STOP gradientStops
-    }
+        CanvasGradientImp(double x0,
+                          double y0,
+                          double x1,
+                          double y1)
+        {
+            m_x0 = x0;
+            m_y0 = y0;
+            m_x1 = x1;
+            m_y1 = y1;
+            m_refCount = 1;
+        }
+
+        void Release()
+        {
+            m_refCount--;
+
+            if (m_refCount == 0)
+            {
+                delete this;
+            }
+        }
+
+        void AddRef()
+        {
+            m_refCount++;
+        }
+
+        virtual void addColorStop(double offset, const Color& color)
+        {
+            m_gradientStops.push_back(D2D1_GRADIENT_STOP());
+            m_gradientStops.back().color = D2D1::ColorF(color.r, color.g, color.b);
+            m_gradientStops.back().position = offset;
+        }
+
+
+    };
 
     CanvasGradient::CanvasGradient(CanvasGradientImp* p)
     {
+        pCanvasGradientImp = p; //ja vem addref
+        //if (pCanvasGradientImp)
+        //{
+        //pCanvasGradientImp->AddRef();
+        //}
     }
 
     CanvasGradient& CanvasGradient::operator=(const CanvasGradient& other)
     {
+        if (pCanvasGradientImp)
+        {
+            pCanvasGradientImp->Release();
+        }
+
+        pCanvasGradientImp = other.pCanvasGradientImp;
+
+        if (pCanvasGradientImp)
+        {
+            pCanvasGradientImp->AddRef();
+        }
+
         return *this;
     }
 
     CanvasGradient::CanvasGradient(const CanvasGradient& other)
     {
+        pCanvasGradientImp = other.pCanvasGradientImp;
+
+        if (pCanvasGradientImp)
+        {
+            pCanvasGradientImp->AddRef();
+        }
     }
 
+    void CanvasGradient::addColorStop(double offset, const Color& color)
+    {
+        if (pCanvasGradientImp)
+        {
+            pCanvasGradientImp->addColorStop(offset, color);
+        }
+    }
     CanvasGradient::~CanvasGradient()
     {
+        if (pCanvasGradientImp != NULL)
+        {
+            pCanvasGradientImp->Release();
+        }
     }
 
     CanvasGradient D2DContext2D::createLinearGradient(double x0,
@@ -310,19 +389,8 @@ namespace CanvasPlus
             double x1,
             double y1)
     {
-      /*
-      if (SUCCEEDED(hr))
-{
-    hr = m_pRenderTarget->CreateLinearGradientBrush(
-        D2D1::LinearGradientBrushProperties(
-            D2D1::Point2F(0, 0),
-            D2D1::Point2F(150, 150)),
-        pGradientStops,
-        &m_pLinearGradientBrush
-        );
-}
-      */
-        return CanvasGradient();
+        CanvasGradientImp* p = new CanvasPlus::CanvasGradientImp(x0, y0, x1, y1);
+        return CanvasGradient(p);
     }
 
     Font::Font()
@@ -370,6 +438,7 @@ namespace CanvasPlus
     // this method has no effect.
     void D2DContext2D::clearRect(double x, double y, double w, double h)
     {
+        // m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
     }
     ///////////////////////////////////////////////////////////////////////////////
     // The fillRect(x, y, w, h) method must paint the specified rectangular area
@@ -378,7 +447,48 @@ namespace CanvasPlus
     void D2DContext2D::fillRect(double x, double y, double w, double h)
     {
         D2D1_RECT_F rc = D2D1::RectF(x, y, x + w, y + h);
-        m_pRenderTarget->FillRectangle(&rc, m_pFillBrush);
+
+        if (fillStyle.fillStyleEnum == FillStyleEnumSolid)
+        {
+            m_pRenderTarget->FillRectangle(&rc, m_pFillBrush);
+        }
+        else if (fillStyle.fillStyleEnum == FillStyleEnumGradient)
+        {
+            CanvasGradientImp* p = fillStyle.canvasGradient.pCanvasGradientImp;
+
+            if (p == NULL || p->m_gradientStops.empty())
+            {
+                return;
+            }
+
+            ID2D1GradientStopCollection* pGradientStopCollection;
+            // declared array of D2D1_GRADIENT_STOP structs.
+            HRESULT hr = m_pRenderTarget->CreateGradientStopCollection(
+                             &p->m_gradientStops[0],
+                             p->m_gradientStops.size(),
+                             D2D1_GAMMA_2_2,
+                             D2D1_EXTEND_MODE_CLAMP,
+                             &pGradientStopCollection);
+
+            if (SUCCEEDED(hr))
+            {
+                ID2D1LinearGradientBrush* pLinearGradientBrush;
+                hr = m_pRenderTarget->CreateLinearGradientBrush(
+                         D2D1::LinearGradientBrushProperties(
+                             D2D1::Point2F(p->m_x0, p->m_y0),
+                             D2D1::Point2F(p->m_x1, p->m_y1)),
+                         pGradientStopCollection,
+                         &pLinearGradientBrush);
+
+                if (SUCCEEDED(hr))
+                {
+                    m_pRenderTarget->FillRectangle(&rc, pLinearGradientBrush);
+                }
+
+                SafeRelease(&pLinearGradientBrush);
+                SafeRelease(&pGradientStopCollection);
+            }
+        }
     }
 
     void D2DContext2D::strokeRect(double x, double y, double w, double h)
@@ -386,113 +496,80 @@ namespace CanvasPlus
         D2D1_RECT_F rc = D2D1::RectF(x, y, x + w, y + h);
         m_pRenderTarget->DrawRectangle(&rc, m_pStrokeBrush, m_strokeWidth, m_pStrokeStyle);
     }
-
-
     TextMetrics D2DContext2D::measureText(const wchar_t* psz)
     {
         return TextMetrics(1);
     }
-
     void D2DContext2D::moveTo(double x, double y)
     {
-        m_pathcmds.push_back(CMD_PATH_BEGIN);
-        m_pathcmds.push_back(x);
-        m_pathcmds.push_back(y);
-    }
+        CloseCurrentSink();
+        ID2D1PathGeometry* pPathGeometry = NULL;
+        HRESULT hr = m_pDirect2dFactory->CreatePathGeometry(&pPathGeometry);
 
+        if (SUCCEEDED(hr))
+        {
+            m_paths.push_back(pPathGeometry);
+        }
+
+        hr = pPathGeometry->Open(&m_pCurrentGeometrySink);
+
+        if (m_pCurrentGeometrySink)
+        {
+            m_pCurrentGeometrySink->BeginFigure(D2D1::Point2F(x, y), D2D1_FIGURE_BEGIN_FILLED);
+        }
+    }
     void D2DContext2D::lineTo(double x, double y)
     {
-        m_pathcmds.push_back(CMD_LINE_TO);
-        m_pathcmds.push_back(x);
-        m_pathcmds.push_back(y);
+        if (m_pCurrentGeometrySink)
+        {
+            m_pCurrentGeometrySink->AddLine(D2D1::Point2F(x, y));
+        }
     }
+    void ClearPaths(std::vector<ID2D1Geometry*>& v)
+    {
+        for (int i = 0 ; i < v.size(); i++)
+        {
+            v[i]->Release();
+        }
 
+        v.clear();
+    }
     void D2DContext2D::beginPath()
     {
-        m_pathcmds.clear();
+        ClearPaths(m_paths);
     }
-
     void D2DContext2D::closePath()
     {
-        //m_pathcmds.push_back(CMD_PATH_BEGIN);
-        //m_pathcmds.push_back(x);
-        //m_pathcmds.push_back(y);
+        CloseCurrentSink();
     }
-
     void D2DContext2D::rect(double x, double y, double w, double h)
     {
-        m_pathcmds.push_back(CMD_RECT);
-        m_pathcmds.push_back(x);
-        m_pathcmds.push_back(y);
-        m_pathcmds.push_back(w);
-        m_pathcmds.push_back(h);
+        CloseCurrentSink();
+        D2D1_RECT_F layoutRect = D2D1::RectF(x, y, x + w, y + h);
+        ID2D1RectangleGeometry* pRectangleGeometry = NULL;
+        HRESULT hr = m_pDirect2dFactory->CreateRectangleGeometry(layoutRect, &pRectangleGeometry);
+
+        if (SUCCEEDED(hr))
+        {
+            m_paths.push_back(pRectangleGeometry);
+        }
     }
     void D2DContext2D::clip()
     {
         //TODO
     }
-
     void D2DContext2D::fill()
     {
-        if (m_pathcmds.size() < 2)
+        closePath();
+
+        for (int i = 0 ; i < m_paths.size(); i++)
         {
-            return;
+            ID2D1Geometry* pGeometry = m_paths[i];
+            m_pRenderTarget->FillGeometry(pGeometry, m_pFillBrush, NULL);
         }
-
-        ID2D1GeometrySink* pSink = NULL;
-        std::vector<FLOAT>::iterator it = m_pathcmds.begin();
-        HRESULT hr = E_FAIL;
-        ID2D1PathGeometry* pPathGeometry = NULL;
-
-        for (; it != m_pathcmds.end();)
-        {
-            Comands cmd = (Comands)(int)(*it);
-            ++it;
-
-            if (cmd == CMD_PATH_BEGIN)
-            {
-                if (pSink)
-                {
-                    pSink->EndFigure(D2D1_FIGURE_END_CLOSED);
-                    hr = pSink->Close();
-                    m_pRenderTarget->FillGeometry(pPathGeometry, m_pFillBrush);
-                    SafeRelease(&pSink);
-                    SafeRelease(&pPathGeometry);
-                    hr = m_pDirect2dFactory->CreatePathGeometry(&pPathGeometry);
-                    hr = pPathGeometry->Open(&pSink);
-                }
-                else
-                {
-                    SafeRelease(&pPathGeometry);
-                    hr = m_pDirect2dFactory->CreatePathGeometry(&pPathGeometry);
-                    hr = pPathGeometry->Open(&pSink);
-                }
-
-                pSink->BeginFigure(D2D1::Point2F(*(it + 0), *(it + 1)),
-                                   D2D1_FIGURE_BEGIN_FILLED);
-                it += 2;
-            }
-            else if (cmd == CMD_LINE_TO)
-            {
-                pSink->AddLine(D2D1::Point2F(*(it + 0),  *(it + 1)));
-                it += 2;
-            }
-        }
-
-        pSink->EndFigure(D2D1_FIGURE_END_CLOSED);
-        pSink->Close();
-        m_pRenderTarget->FillGeometry(pPathGeometry, m_pFillBrush, NULL);
-        SafeRelease(&pSink);
-        SafeRelease(&pPathGeometry);
     }
-
     void D2DContext2D::stroke()
     {
-        if (m_pathcmds.size() < 2)
-        {
-            return;
-        }
-
         ID2D1StrokeStyle* strokeStyle = NULL;
         HRESULT hr = m_pDirect2dFactory->CreateStrokeStyle(
                          D2D1::StrokeStyleProperties(
@@ -506,54 +583,14 @@ namespace CanvasPlus
                          NULL,
                          0,
                          &strokeStyle);
-        ID2D1GeometrySink* pSink = NULL;
-        std::vector<FLOAT>::iterator it = m_pathcmds.begin();
-        ID2D1PathGeometry* pPathGeometry = NULL;
+        closePath();
 
-        for (; it != m_pathcmds.end();)
+        for (int i = 0 ; i < m_paths.size(); i++)
         {
-            Comands cmd = (Comands)(int)(*it);
-            ++it;
-
-            if (cmd == CMD_PATH_BEGIN)
-            {
-                if (pSink)
-                {
-                    pSink->EndFigure(D2D1_FIGURE_END_CLOSED);
-                    hr = pSink->Close();
-                    SafeRelease(&pSink);
-                    m_pRenderTarget->DrawGeometry(pPathGeometry, m_pStrokeBrush, m_strokeWidth, strokeStyle);
-                    SafeRelease(&pPathGeometry);
-                    hr = m_pDirect2dFactory->CreatePathGeometry(&pPathGeometry);
-                    hr = pPathGeometry->Open(&pSink);
-                }
-                else
-                {
-                    SafeRelease(&pPathGeometry);
-                    hr = m_pDirect2dFactory->CreatePathGeometry(&pPathGeometry);
-                    hr = pPathGeometry->Open(&pSink);
-                }
-
-                FLOAT x = *it++;
-                FLOAT y = *it++;
-                pSink->BeginFigure(D2D1::Point2F(x, y),
-                                   D2D1_FIGURE_BEGIN_FILLED);
-            }
-            else if (cmd == CMD_LINE_TO)
-            {
-                FLOAT x = *it++;
-                FLOAT y = *it++;
-                pSink->AddLine(D2D1::Point2F(x, y));
-            }
+            ID2D1Geometry* pGeometry = m_paths[i];
+            m_pRenderTarget->DrawGeometry(pGeometry, m_pStrokeBrush, m_strokeWidth, strokeStyle);
         }
-
-        pSink->EndFigure(D2D1_FIGURE_END_CLOSED);
-        pSink->Close();
-        m_pRenderTarget->DrawGeometry(pPathGeometry, m_pStrokeBrush, m_strokeWidth, strokeStyle);
-        SafeRelease(&pSink);
-        SafeRelease(&pPathGeometry);
     }
-
     void D2DContext2D::fillText(const wchar_t* psz, double x, double y)
     {
         // Create a D2D rect that is the same size as the window.
@@ -567,146 +604,125 @@ namespace CanvasPlus
             m_pFillBrush// The brush used to draw the text.
         );
     }
-
     void D2DContext2D::set_fillStyle(const CanvasGradient& v)
     {
+        fillStyle = v;
     }
-
     void D2DContext2D::set_fillStyle(const Color& v)
     {
+        fillStyle = v;
         SafeRelease(&m_pStrokeBrush);
         m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black),
                                                &m_pStrokeBrush);
     }
-
     void D2DContext2D::set_fillStyle(const char* v)
     {
         Color c(v);
+        fillStyle = c;
         D2D1::ColorF d2dcolor(RGB(c.b, c.g, c.r));
         SafeRelease(&m_pFillBrush);
         HRESULT hr = m_pRenderTarget->CreateSolidColorBrush(d2dcolor, &m_pFillBrush);
     }
-
     void D2DContext2D::set_fillStyle(const FillStyle& v)
     {
+        fillStyle = v;
     }
-
-    const FillStyle& D2DContext2D::get_fillStyle()const
+    const FillStyle& D2DContext2D::get_fillStyle() const
     {
-        return FillStyle();
+        return fillStyle;
     }
-
     void D2DContext2D::set_strokeStyle(const CanvasGradient& v)
     {
+      strokeStyle = v;
     }
-
     void D2DContext2D::set_strokeStyle(const Color& v)
     {
+      strokeStyle = v;
     }
-
     void D2DContext2D::set_strokeStyle(const char* v)
     {
         Color c(v);
+        strokeStyle = c;
         D2D1::ColorF d2dcolor(RGB(c.b, c.g, c.r));
         SafeRelease(&m_pStrokeBrush);
         HRESULT hr = m_pRenderTarget->CreateSolidColorBrush(d2dcolor, &m_pStrokeBrush);
     }
-
     void D2DContext2D::set_strokeStyle(const FillStyle& v)
     {
+      strokeStyle = v;
     }
-
-    const FillStyle& D2DContext2D::get_strokeStyle()const
+    const FillStyle& D2DContext2D::get_strokeStyle() const
     {
-        return FillStyle();
+        return strokeStyle;
     }
-
     void D2DContext2D::set_textAlign(const char* v)
     {
     }
-
     void D2DContext2D::set_textAlign(const TextAlign& v)
     {
     }
-
-    const TextAlign& D2DContext2D::get_textAlign()const
+    const TextAlign& D2DContext2D::get_textAlign() const
     {
         return TextAlign();
     }
-
     void D2DContext2D::set_textBaseline(const char* v)
     {
     }
-
     void D2DContext2D::set_textBaseline(const TextBaseline& v)
     {
     }
-
-    const TextBaseline& D2DContext2D::get_textBaseline()const
+    const TextBaseline& D2DContext2D::get_textBaseline() const
     {
         return TextBaseline();
     }
-
     void D2DContext2D::set_font(const char* v)
     {
+      font = v;
     }
-
     void D2DContext2D::set_font(const Font& v)
     {
+      font = v;
     }
-
-    const Font& D2DContext2D::get_font()const
+    const Font& D2DContext2D::get_font() const
     {
-        return Font();
+        return font;
     }
-
     void D2DContext2D::set_lineWidth(double v)
     {
         m_strokeWidth = v;
     }
-
-    double D2DContext2D::get_lineWidth()const
+    double D2DContext2D::get_lineWidth() const
     {
         return m_strokeWidth;
     }
-
     void D2DContext2D::set_shadowColor(const Color& v)
     {
     }
-
-    const Color&  D2DContext2D::get_shadowColor()const
+    const Color&  D2DContext2D::get_shadowColor() const
     {
         return Color();
     }
-
     void D2DContext2D::set_shadowOffsetX(double v)
     {
     }
-
-    double D2DContext2D::get_shadowOffsetX()const
+    double D2DContext2D::get_shadowOffsetX() const
     {
         return 0;
     }
-
     void D2DContext2D::set_shadowOffsetY(double v)
     {
     }
-
-    double D2DContext2D::get_shadowOffsetY()const
+    double D2DContext2D::get_shadowOffsetY() const
     {
         return 0;
     }
-
     void D2DContext2D::set_shadowBlur(double v)
     {
     }
-
-    double D2DContext2D::get_shadowBlur()const
+    double D2DContext2D::get_shadowBlur() const
     {
         return 0;
     }
-
-
     class D2DCanvas : public CanvasImp
     {
         CanvasPlus::D2DContext2D* m_pD2DContext2D;
@@ -728,29 +744,22 @@ namespace CanvasPlus
         D2DCanvas();
 
     };
-
     D2DCanvas::D2DCanvas()
     {
         m_pD2DContext2D = nullptr;
     }
-
-
-
     D2DCanvas::~D2DCanvas()
     {
         delete m_pD2DContext2D;
     }
-
     Context2D& D2DCanvas::getContext(const char*)
     {
         return *m_pD2DContext2D;
     }
-
     void D2DCanvas::EndDraw()
     {
         m_pD2DContext2D->EndDraw();
     }
-
     void D2DCanvas::BeginDraw(void* p, int w, int h)
     {
         if (m_pD2DContext2D == nullptr)
@@ -764,7 +773,6 @@ namespace CanvasPlus
         set_height((rc.bottom - rc.top));
         m_pD2DContext2D->BeginDraw(width, height);
     }
-
     double D2DCanvas::get_width() const
     {
         return m_width;
@@ -773,22 +781,18 @@ namespace CanvasPlus
     {
         m_width = v;
     }
-
     double D2DCanvas::get_height() const
     {
         return m_height;
     }
-
     void D2DCanvas::set_height(double v)
     {
         m_height  = v;
     }
-
     CanvasImp* CreateCanvas(void*)
     {
         return new D2DCanvas();
     }
-
     ////////
 } //namespace CanvasPlus
 
