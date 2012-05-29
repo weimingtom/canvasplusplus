@@ -137,7 +137,7 @@ void Sample7(CanvasPlus::Canvas& canvas)
 {
     Context2D& ctx = canvas.getContext("2d");
     auto lingrad = ctx.createLinearGradient(10, 0, 130, 0);
-    lingrad.addColorStop(0, "#FF01F2");
+    lingrad.addColorStop(0, "rgb(0,0,255)");// "#FF01F2");
     lingrad.addColorStop(1, "rgb(255,255,255)");
     ctx.fillStyle = lingrad;
     ctx.fillRect(10, 10, 130, 130);
@@ -176,7 +176,7 @@ void Sample11(CanvasPlus::Canvas& canvas)
     Context2D& ctx = canvas.getContext("2d");
     bool ispressed =  false;
     bool isfocused = true;
-    auto lingrad = ctx.createLinearGradient(0, 10 + 130, 0, 10);
+    auto lingrad = ctx.createLinearGradient(10, 10 ,10+ 130,10+ 130);
 
     if (ispressed)
     {
@@ -185,8 +185,9 @@ void Sample11(CanvasPlus::Canvas& canvas)
     }
     else
     {
+         lingrad.addColorStop(0, "rgb(245,245,245)");
         lingrad.addColorStop(1, "rgb(220,220,220)");
-        lingrad.addColorStop(0, "rgb(245,245,245)");
+     
     }
 
     ctx.fillStyle = lingrad;
