@@ -38,9 +38,11 @@ namespace CanvasPlus
         ID2D1SolidColorBrush* m_pFillBrush;
         ID2D1SolidColorBrush* m_pStrokeBrush;
 
+        int m_LayerCount;
+
         // DirectWrite
         IDWriteFactory* m_pDWriteFactory;
-        IDWriteTextFormat* m_pTextFormat;
+        //IDWriteTextFormat* m_pTextFormat;
 
         FLOAT m_strokeWidth;
         ID2D1StrokeStyle* m_pStrokeStyle;
@@ -80,11 +82,12 @@ namespace CanvasPlus
             m_pRenderTarget(NULL),
             m_pFillBrush(NULL),
             m_pStrokeBrush(NULL),
-            m_pTextFormat(NULL),
+            //m_pTextFormat(NULL),
             m_pDWriteFactory(NULL),
             m_strokeWidth(1.1f),
             m_pStrokeStyle(NULL),
-            m_pCurrentGeometrySink(NULL)
+            m_pCurrentGeometrySink(NULL),
+            m_LayerCount(0)
 
         {
             RECT rc;
@@ -150,32 +153,6 @@ namespace CanvasPlus
 
             // Create a text format using Gabriola with a font size of 72.
             // This sets the default font, weight, stretch, style, and locale.
-
-            if (SUCCEEDED(hr))
-            {
-                hr = m_pDWriteFactory->CreateTextFormat(
-                         L"Arial",                // Font family name.
-                         NULL,                       // Font collection (NULL sets it to use the system font collection).
-                         DWRITE_FONT_WEIGHT_REGULAR,
-                         DWRITE_FONT_STYLE_NORMAL,
-                         DWRITE_FONT_STRETCH_NORMAL,
-                         14.0f,
-                         L"en-us",
-                         &m_pTextFormat
-                     );
-            }
-
-            // Center align (horizontally) the text.
-            if (SUCCEEDED(hr))
-            {
-                hr = m_pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-            }
-
-            if (SUCCEEDED(hr))
-            {
-                hr = m_pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-            }
-
             return hr;
         }
 
@@ -186,6 +163,13 @@ namespace CanvasPlus
             m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
             m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
             m_strokeWidth = 1.1f;
+
+            if (m_LayerCount > 0)
+            {
+                m_pRenderTarget->PopLayer();
+                m_LayerCount--;
+            }
+
             HRESULT hr = S_OK;
 
             if (SUCCEEDED(hr))
@@ -205,6 +189,12 @@ namespace CanvasPlus
 
         void EndDraw()
         {
+            if (m_LayerCount > 0)
+            {
+                m_pRenderTarget->PopLayer();
+                m_LayerCount--;
+            }
+
             if (m_pRenderTarget)
             {
                 m_pRenderTarget->EndDraw();
@@ -556,6 +546,23 @@ namespace CanvasPlus
     }
     void D2DContext2D::clip()
     {
+        CloseCurrentSink();
+        // Create a layer.
+        ID2D1Layer* pLayer = NULL;
+        HRESULT hr = m_pRenderTarget->CreateLayer(NULL, &pLayer);
+
+        if (SUCCEEDED(hr))
+        {
+            ID2D1Geometry* pGeometry = m_paths.back();
+            m_pRenderTarget->PushLayer(
+                D2D1::LayerParameters(D2D1::InfiniteRect(), pGeometry),
+                pLayer
+            );
+            m_LayerCount++;
+            //m_pRenderTarget->PopLayer();
+        }
+
+        SafeRelease(&pLayer);
         //TODO
     }
     void D2DContext2D::fill()
@@ -591,19 +598,131 @@ namespace CanvasPlus
             m_pRenderTarget->DrawGeometry(pGeometry, m_pStrokeBrush, m_strokeWidth, strokeStyle);
         }
     }
+
     void D2DContext2D::fillText(const wchar_t* psz, double x, double y)
     {
+      //// (default 10px sans-serif)
+        //font.setFont();
+        IDWriteTextFormat* pTextFormat;
+        HRESULT hr = m_pDWriteFactory->CreateTextFormat(
+                         L"Microsoft Sans Serif",                // Font family name.
+                         NULL,                       // Font collection (NULL sets it to use the system font collection).
+                         DWRITE_FONT_WEIGHT_REGULAR,
+                         DWRITE_FONT_STYLE_NORMAL,
+                         DWRITE_FONT_STRETCH_NORMAL,
+                         10.0f,
+                         L"en-us",
+                         &pTextFormat
+                     );
+        //font metrics
+        IDWriteFontCollection* collection;
+        TCHAR name[64];
+        UINT32 findex;
+        BOOL exists;
+        pTextFormat->GetFontFamilyName(name, 64);
+        pTextFormat->GetFontCollection(&collection);
+        collection->FindFamilyName(name, &findex, &exists);
+        IDWriteFontFamily* ffamily;
+        collection->GetFontFamily(findex, &ffamily);
+        IDWriteFont* font;
+        ffamily->GetFirstMatchingFont(pTextFormat->GetFontWeight(), pTextFormat->GetFontStretch(), pTextFormat->GetFontStyle(), &font);
+        DWRITE_FONT_METRICS metrics;
+        font->GetMetrics(&metrics);
+        float ratio = pTextFormat->GetFontSize() / (float)metrics.designUnitsPerEm;
+        float size = (metrics.ascent + metrics.descent + metrics.lineGap) * ratio;
+        //  float height = GetHeight();
+        //int retval = static_cast<int>(height/size);
+        SafeRelease(&ffamily);
+        SafeRelease(&collection);
+        SafeRelease(&font);
+        //
+        double x0 = 0;
+        double y0 = 0;
+        double x1 = 0;
+        double y1 = 0;
+
+        if (textAlign == TextAlignCenter)
+        {
+            x0 = x - 10;
+            x1 = x + 10;
+            //centro
+            pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+        }
+        else if (textAlign == TextAlignStart || textAlign == TextAlignLeft)
+        {
+            x0 = x;
+            x1 = x + 10;
+            //esquerda
+            pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+        }
+        else if (textAlign == TextAlignRight ||
+                 textAlign == TextAlignEnd)
+        {
+            x0 = x - 10;
+            x1 = x ;
+            //direita
+            pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
+        }
+        else
+        {
+            x0 = x - 10;
+            x1 = x + 10;
+        }
+
+        if (textBaseline == TextBaselineBottom || textBaseline == TextBaselineIdeographic)
+        {
+            y0 = y - 10;
+            y1 = y;
+            //BASE
+            pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+        }
+        else if (textBaseline == TextBaselineTop ||
+                 textBaseline == TextBaselineHanging)
+        {
+            y0 = y;
+            y1 = y + 10;
+            //TOP
+            pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+        }
+        else  if (textBaseline == TextBaselineMiddle)
+        {
+            y0 = y - 10;
+            y1 = y + 10;
+            //CENTRO
+            pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+        }
+        else  if (textBaseline == TextBaselineAlphabetic)
+        {
+            float size2 = (metrics.ascent) * ratio;
+            y0 = y - size2;
+            y1 = y + 10;
+            //TOP
+            pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+        }
+        else
+        {
+            y0 = y - 10;
+            y1 = y + 10;
+        }
+
+        D2D1_RECT_F layoutRect = D2D1::RectF(x0, y0, x1, y1);
+        pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
         // Create a D2D rect that is the same size as the window.
-        D2D1_RECT_F layoutRect = D2D1::RectF(x, y, x + 10000, y + 10000);
+        //        D2D1_RECT_F layoutRect = D2D1::RectF(x-1, y, x + 10000, y + 10000);
         // Use the DrawText method of the D2D render target interface to draw.
         m_pRenderTarget->DrawText(
             psz,        // The string to render.
             wcslen(psz),    // The string's length.
-            m_pTextFormat,    // The text format.
+            pTextFormat,    // The text format.
             layoutRect,       // The region of the window where the text will be rendered.
             m_pFillBrush// The brush used to draw the text.
         );
+        SafeRelease(&pTextFormat);
+        //set_strokeStyle("rgb(255,0,0)");
+        //strokeRect(layoutRect.left, layoutRect.top, layoutRect.right - layoutRect.left, layoutRect.bottom - layoutRect.top);
+        //set_strokeStyle("rgb(0,0,0)");
     }
+
     void D2DContext2D::set_fillStyle(const CanvasGradient& v)
     {
         fillStyle = v;
@@ -633,11 +752,11 @@ namespace CanvasPlus
     }
     void D2DContext2D::set_strokeStyle(const CanvasGradient& v)
     {
-      strokeStyle = v;
+        strokeStyle = v;
     }
     void D2DContext2D::set_strokeStyle(const Color& v)
     {
-      strokeStyle = v;
+        strokeStyle = v;
     }
     void D2DContext2D::set_strokeStyle(const char* v)
     {
@@ -649,7 +768,7 @@ namespace CanvasPlus
     }
     void D2DContext2D::set_strokeStyle(const FillStyle& v)
     {
-      strokeStyle = v;
+        strokeStyle = v;
     }
     const FillStyle& D2DContext2D::get_strokeStyle() const
     {
@@ -657,31 +776,35 @@ namespace CanvasPlus
     }
     void D2DContext2D::set_textAlign(const char* v)
     {
+        textAlign = ParseTextAlign(v);
     }
     void D2DContext2D::set_textAlign(const TextAlign& v)
     {
+        textAlign = v;
     }
     const TextAlign& D2DContext2D::get_textAlign() const
     {
-        return TextAlign();
+        return textAlign;
     }
     void D2DContext2D::set_textBaseline(const char* v)
     {
+        textBaseline = ParseTextBaseline(v);
     }
     void D2DContext2D::set_textBaseline(const TextBaseline& v)
     {
+        textBaseline = v;
     }
     const TextBaseline& D2DContext2D::get_textBaseline() const
     {
-        return TextBaseline();
+        return textBaseline;
     }
     void D2DContext2D::set_font(const char* v)
     {
-      font = v;
+        font = v;
     }
     void D2DContext2D::set_font(const Font& v)
     {
-      font = v;
+        font = v;
     }
     const Font& D2DContext2D::get_font() const
     {

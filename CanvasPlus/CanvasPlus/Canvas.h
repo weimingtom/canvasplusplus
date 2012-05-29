@@ -247,7 +247,7 @@ namespace CanvasPlus //Better name?
         virtual void clearRect(double x, double y, double w, double h) = 0;
         virtual void fillRect(double x, double y, double w, double h) = 0;
         virtual void strokeRect(double x, double y, double w, double h) = 0;
-        virtual void fillText(const wchar_t*, double x, double y) = 0;
+        virtual void fillText(const wchar_t*, double x, double y) = 0;        
         virtual CanvasGradient createLinearGradient(double x0, double y0, double x1, double y1) = 0;
         virtual TextMetrics measureText(const wchar_t*) = 0;
         virtual void moveTo(double x, double y) = 0;
