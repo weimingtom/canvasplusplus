@@ -33,8 +33,10 @@ void Sample1(Canvas& canvas)
         L"bottom_start" , L"bottom_end" , L"bottom_left" , L"bottom_right", L"bottom_center"
     };
     int j = 0;
-
     ctx.font = "bold 12px arial";
+
+   
+  
     for (int i = 0; i < 6; i++)
     {
         for (int k = 0; k < 5; k++)
@@ -42,7 +44,6 @@ void Sample1(Canvas& canvas)
             double x = 50 + i * 150;
             double y = 50 + k * 100;
             DrawPos(ctx, x, y);
-
             ctx.textBaseline = baselines[i];
             ctx.textAlign = align[k];
             ctx.fillText(text[j], x, y);
@@ -176,7 +177,7 @@ void Sample11(CanvasPlus::Canvas& canvas)
     Context2D& ctx = canvas.getContext("2d");
     bool ispressed =  false;
     bool isfocused = true;
-    auto lingrad = ctx.createLinearGradient(10, 10 ,10+ 130,10+ 130);
+    auto lingrad = ctx.createLinearGradient(10, 10 , 10 + 130, 10 + 130);
 
     if (ispressed)
     {
@@ -185,9 +186,8 @@ void Sample11(CanvasPlus::Canvas& canvas)
     }
     else
     {
-         lingrad.addColorStop(0, "rgb(245,245,245)");
+        lingrad.addColorStop(0, "rgb(245,245,245)");
         lingrad.addColorStop(1, "rgb(220,220,220)");
-     
     }
 
     ctx.fillStyle = lingrad;
@@ -288,7 +288,6 @@ void Sample15(CanvasPlus::Canvas& canvas)
     ctx.lineTo(100, 100 + 2);
     ctx.closePath();
     ctx.stroke();
-
     // Filled triangle
     ctx.beginPath();
     ctx.moveTo(25, 25);
@@ -319,22 +318,22 @@ void Sample16(CanvasPlus::Canvas& canvas)
 {
     Context2D& ctx = canvas.getContext("2d");
     ctx.lineWidth = 1;
-    
-    if (ctx.fillStyle == "#000000"){
-    
+
+    if (ctx.fillStyle == "#000000")
+    {
     }
 
     for (int i = 0; i < 10; i++)
     {
-    ctx.beginPath();
-    ctx.strokeStyle = "#00F2A0";
-    ctx.lineWidth = i;
-    ctx.moveTo(i * 10 + 100,i*10+ 100);
-    ctx.lineTo(i*10+150, i*10+200);
-    ctx.lineTo(i*10+250, i*10+20);
-    ctx.lineTo(i*10+50,i*10+ 20);
-    ctx.closePath();
-    ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = "#00F2A0";
+        ctx.lineWidth = i;
+        ctx.moveTo(i * 10 + 100, i * 10 + 100);
+        ctx.lineTo(i * 10 + 150, i * 10 + 200);
+        ctx.lineTo(i * 10 + 250, i * 10 + 20);
+        ctx.lineTo(i * 10 + 50, i * 10 + 20);
+        ctx.closePath();
+        ctx.stroke();
     }
 }
 
@@ -344,10 +343,8 @@ void Sample17(CanvasPlus::Canvas& canvas)
     Context2D& ctx = canvas.getContext("2d");
     ctx.font = "italic  12px arial";
     ctx.fillText(L"italic  12px arial", 10, 20);
-
     ctx.font = "normal 14px  arial";
     ctx.fillText(L"normal 14px normal arial", 10, 40);
-
     ctx.font = "normal 14px \"courier new\"";
     ctx.fillText(L"normal 14px normal courier new", 10, 60);
 }
