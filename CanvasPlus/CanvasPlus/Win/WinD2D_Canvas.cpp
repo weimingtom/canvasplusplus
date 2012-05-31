@@ -486,10 +486,44 @@ namespace CanvasPlus
         D2D1_RECT_F rc = D2D1::RectF(x, y, x + w, y + h);
         m_pRenderTarget->DrawRectangle(&rc, m_pStrokeBrush, m_strokeWidth, m_pStrokeStyle);
     }
+    //
     TextMetrics D2DContext2D::measureText(const wchar_t* psz)
     {
-        return TextMetrics(1);
+        IDWriteTextFormat* pTextFormat;
+        HRESULT hr = m_pDWriteFactory->CreateTextFormat(
+                         L"Microsoft Sans Serif",                // Font family name.
+                         NULL,                       // Font collection (NULL sets it to use the system font collection).
+                         DWRITE_FONT_WEIGHT_REGULAR,
+                         DWRITE_FONT_STYLE_NORMAL,
+                         DWRITE_FONT_STRETCH_NORMAL,
+                         10.0f,
+                         L"en-us",
+                         &pTextFormat
+                     );
+        //
+        IDWriteTextLayout* pTextLayout;
+        hr = m_pDWriteFactory->CreateTextLayout(
+                 psz,      // The string to be laid out and formatted.
+                 wcslen(psz),  // The length of the string.
+                 pTextFormat,  // The text format to apply to the string (contains font information, etc).
+                 100000,         // The width of the layout box.
+                 100000,        // The height of the layout box.
+                 &pTextLayout  // The IDWriteTextLayout interface pointer.
+             );
+        FLOAT width = 0;
+
+        if (SUCCEEDED(hr))
+        {
+            DWRITE_TEXT_METRICS textMetrics;
+            pTextLayout->GetMetrics(&textMetrics);
+            width = textMetrics.width;
+        }
+
+        SafeRelease(&pTextFormat);
+        SafeRelease(&pTextLayout);
+        return TextMetrics(width);
     }
+    //
     void D2DContext2D::moveTo(double x, double y)
     {
         CloseCurrentSink();
@@ -601,7 +635,7 @@ namespace CanvasPlus
 
     void D2DContext2D::fillText(const wchar_t* psz, double x, double y)
     {
-      //// (default 10px sans-serif)
+        //// (default 10px sans-serif)
         //font.setFont();
         IDWriteTextFormat* pTextFormat;
         HRESULT hr = m_pDWriteFactory->CreateTextFormat(
@@ -614,6 +648,8 @@ namespace CanvasPlus
                          L"en-us",
                          &pTextFormat
                      );
+        //
+        //
         //font metrics
         IDWriteFontCollection* collection;
         TCHAR name[64];
@@ -635,6 +671,8 @@ namespace CanvasPlus
         SafeRelease(&ffamily);
         SafeRelease(&collection);
         SafeRelease(&font);
+        //
+        //
         //
         double x0 = 0;
         double y0 = 0;
