@@ -34,7 +34,7 @@ DemoApp::DemoApp() :
     m_hwnd(NULL)
 {
     m_pCanvas = CanvasPlus::CreateCanvas(0);
-    m_CurrentSampleIndex = 0;
+    m_CurrentSampleIndex = 1;
 }
 
 // DemoApp destructor
@@ -154,6 +154,11 @@ LRESULT CALLBACK DemoApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 result = 0;
                 wasHandled = true;
                 break;
+                
+                case WM_ERASEBKGND:
+                 result = 0;
+                 wasHandled = true;
+                 break;
 
                 case WM_LBUTTONDOWN:
                     if (pDemoApp->m_CurrentSampleIndex < TOTALSAMPLES)
@@ -162,20 +167,20 @@ LRESULT CALLBACK DemoApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     }
                     else
                     {
-                        pDemoApp->m_CurrentSampleIndex = 0;
+                        pDemoApp->m_CurrentSampleIndex = 1;
                     }
 
                     InvalidateRect(pDemoApp->m_hwnd, NULL, TRUE);
                     break;
 
                 case WM_RBUTTONDOWN:
-                    if (pDemoApp->m_CurrentSampleIndex > 0)
+                    if (pDemoApp->m_CurrentSampleIndex > 1)
                     {
                         pDemoApp->m_CurrentSampleIndex--;
                     }
                     else
                     {
-                        pDemoApp->m_CurrentSampleIndex = (TOTALSAMPLES - 1);
+                        pDemoApp->m_CurrentSampleIndex = TOTALSAMPLES;
                     }
 
                     InvalidateRect(pDemoApp->m_hwnd, NULL, TRUE);

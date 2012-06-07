@@ -35,8 +35,6 @@ void Sample1(Canvas& canvas)
     int j = 0;
     ctx.font = "bold 12px arial";
 
-   
-  
     for (int i = 0; i < 6; i++)
     {
         for (int k = 0; k < 5; k++)
@@ -347,4 +345,32 @@ void Sample17(CanvasPlus::Canvas& canvas)
     ctx.fillText(L"normal 14px normal arial", 10, 40);
     ctx.font = "normal 14px \"courier new\"";
     ctx.fillText(L"normal 14px normal courier new", 10, 60);
+}
+
+
+void Sample18(CanvasPlus::Canvas& canvas)
+{
+    Context2D& ctx = canvas.getContext("2d");
+    ctx.beginPath();
+    double cx = 10;
+    double cy = 150;
+    double ax = 1;
+    double ay = -10;
+    double x = 0;
+    double y = 0;
+    ctx.moveTo(cx + ax * x, cy + ay * y);
+
+    for (;;)
+    {
+        y = sin(x) * 10;
+        x = x  + 0.1;
+        ctx.lineTo(cx + ax * x, cy + ay * y);
+
+        if (x > 800)
+        {
+            break;
+        }
+    }
+
+    ctx.stroke();
 }
