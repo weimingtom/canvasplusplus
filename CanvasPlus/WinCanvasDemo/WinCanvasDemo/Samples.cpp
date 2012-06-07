@@ -354,7 +354,7 @@ void Sample18(CanvasPlus::Canvas& canvas)
     ctx.beginPath();
     double cx = 10;
     double cy = 150;
-    double ax = 1;
+    double ax = 0.5;
     double ay = -10;
     double x = 0;
     double y = 0;
@@ -366,7 +366,7 @@ void Sample18(CanvasPlus::Canvas& canvas)
         x = x  + 0.1;
         ctx.lineTo(cx + ax * x, cy + ay * y);
 
-        if (x > 800)
+        if ((cx + ax * x) > 1000)
         {
             break;
         }
